@@ -28,6 +28,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add public/earn_nt_net_dashboard.json
+          git add docs/earn_nt_net_dashboard.json
           git commit -m "Aggiorna JSON Eurostat" || exit 0
           git push
