@@ -1,4 +1,4 @@
-name: aggiorna-pil-dashboard
+name: aggiorna-pil-json
 
 on:
   schedule:
@@ -19,17 +19,17 @@ jobs:
           python-version: "3.11"
 
       - name: install
-        run: pip install pandas numpy plotly eurostat requests
+        run: pip install pandas numpy eurostat
 
-      - name: build html
-        run: python build_pil_dashboard.py
+      - name: build json
+        run: python build_pil_json.py
 
       - name: commit
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add docs/pil_dashboard.html
-          git commit -m "Aggiorna PIL dashboard" || exit 0
+          git add docs/pil_dashboard.json
+          git commit -m "Aggiorna PIL JSON" || exit 0
           git fetch origin main
           git rebase origin/main
           git push
