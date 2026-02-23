@@ -21,8 +21,17 @@ jobs:
       - name: install
         run: pip install pandas numpy requests
 
+      - name: check merge markers (tracked files)
+        run: bash scripts/check_merge_markers.sh
+
+      - name: lint script syntax
+        run: python -m compileall -q build_occupazione_json.py
+
       - name: build json
         run: python build_occupazione_json.py
+
+      - name: re-check merge markers before commit
+        run: bash scripts/check_merge_markers.sh
 
       - name: commit
         run: |
