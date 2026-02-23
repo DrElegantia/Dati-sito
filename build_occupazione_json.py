@@ -161,6 +161,39 @@ def _col(df: pd.DataFrame, *candidates: str) -> str | None:
     return None
 
 
+def _dedup_total(df: pd.DataFrame, period_col: str = "TIME_PERIOD") -> pd.DataFrame:
+    """Keep one row per period.  When duplicates exist (e.g. unfiltered DURATA
+    dimension), keep the row with the *largest* OBS_VALUE — the aggregate
+    'total' is always >= any component."""
+    return (
+        df.sort_values([period_col, "OBS_VALUE"], ascending=[True, False])
+        .drop_duplicates(period_col)
+    )
+
+
+def _find_extra_dim(df: pd.DataFrame, known_cols: set[str]) -> str | None:
+    """Find a dimension column that still varies after all known filters.
+
+    This detects hidden dimensions like DURATA / CARATTERE_OCC that cause
+    duplicate rows per TIME_PERIOD.
+    """
+    skip = known_cols | {
+        "DATAFLOW", "FREQ", "TIME_PERIOD", "OBS_VALUE",
+        "OBS_STATUS", "OBS_FLAG", "UNIT_MEASURE", "UNIT_MULT",
+        "CONF_STATUS", "ACTION",
+    }
+    for col in df.columns:
+        if col in skip:
+            continue
+        unique = set(df[col].dropna().astype(str).unique())
+        if len(unique) > 1:
+            return col
+    return None
+
+
+_TOTAL_TOKENS = {"TOTAL", "_T", "9", "T", "TOT"}
+
+
 def _diag(df: pd.DataFrame, label: str):
     """Print unique values for key dimensions — useful for first‑run debugging."""
     print(f"  [{label}] shape={df.shape}  columns={list(df.columns)}")
@@ -204,19 +237,48 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
     tot_mask = (df_it["SESSO"] == sex_total) & (df_it["CLASSE_ETA"] == age_total)
     if pos_total and pos_col:
         tot_mask = tot_mask & (df_it[pos_col] == pos_total)
-    tot = df_it[tot_mask][["TIME_PERIOD", "OBS_VALUE"]].rename(
+    tot = _dedup_total(df_it[tot_mask])[["TIME_PERIOD", "OBS_VALUE"]].rename(
         columns={"TIME_PERIOD": "periodo", "OBS_VALUE": "occupati"}
-    ).sort_values("periodo").drop_duplicates("periodo")
+    ).sort_values("periodo")
+
+    # ── Detect the hidden duration dimension (DURATA/CARATTERE_OCC) ─
+    # Employees often carry an extra dimension (TOTAL/TEMP/PERM) that
+    # must be filtered to avoid picking random sub-categories.
+    dur_col = _col(df_it, "DURATA", "CARATTERE_OCC", "CARATTERE_OCCUPAZIONE", "TIPO_CONTRATTO")
+    if not dur_col and pos_col and pos_empl:
+        # Auto-detect: find the column that varies within EMPL rows
+        _probe = df_it[
+            (df_it["SESSO"] == sex_total)
+            & (df_it["CLASSE_ETA"] == age_total)
+            & (df_it[pos_col] == pos_empl)
+        ]
+        dur_col = _find_extra_dim(
+            _probe,
+            {"ITTER107", "SESSO", "CLASSE_ETA", pos_col},
+        )
+        if dur_col:
+            print(f"  Auto-detected duration column: {dur_col}  "
+                  f"values: {sorted(_probe[dur_col].dropna().unique().tolist())}")
+
+    dur_total = None
+    if dur_col and dur_col in df_it.columns:
+        dur_vals = set(df_it[dur_col].astype(str).unique())
+        dur_total = next((t for t in _TOTAL_TOKENS if t in dur_vals), None)
+        print(f"  dur_col={dur_col}  dur_total={dur_total}  dur_vals={sorted(dur_vals)}")
 
     # ── 1b. Per posizione professionale (base 100 gen 2023) ─────────
     pos_list = []
     if pos_col and pos_empl and pos_self:
         for code, label in [(pos_empl, "Dipendenti"), (pos_self, "Indipendenti")]:
-            s = df_it[
+            mask = (
                 (df_it["SESSO"] == sex_total)
                 & (df_it["CLASSE_ETA"] == age_total)
                 & (df_it[pos_col] == code)
-            ].sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD").copy()
+            )
+            # For employees, filter for aggregate duration
+            if code == pos_empl and dur_col and dur_total:
+                mask = mask & (df_it[dur_col].astype(str) == dur_total)
+            s = _dedup_total(df_it[mask]).copy()
             s["idx"] = _base100(s["OBS_VALUE"], s["TIME_PERIOD"], BASE_PERIOD)
             for _, r in s.iterrows():
                 pos_list.append({
@@ -230,23 +292,29 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
     # ── 1c. Composizione percentuale occupati ───────────────────────
     comp_list = []
     if pos_col and pos_total and pos_empl and pos_self:
-        comp_src = df_it[
+        comp_mask = (
             (df_it["SESSO"] == sex_total)
             & (df_it["CLASSE_ETA"] == age_total)
             & (df_it[pos_col].isin([pos_empl, pos_self, pos_total]))
-        ].copy()
+        )
+        # Filter for aggregate duration to avoid sub-categories
+        if dur_col and dur_total:
+            comp_mask = comp_mask & (df_it[dur_col].astype(str) == dur_total)
+        comp_src = df_it[comp_mask].copy()
         for per, g in comp_src.groupby("TIME_PERIOD"):
             total_val = g.loc[g[pos_col] == pos_total, "OBS_VALUE"]
-            if total_val.empty or total_val.iloc[0] == 0:
+            if total_val.empty:
                 continue
-            tv = total_val.iloc[0]
+            tv = total_val.max()  # pick aggregate if duplicates remain
+            if tv == 0:
+                continue
             for code, label in [(pos_empl, "Dipendenti"), (pos_self, "Indipendenti")]:
                 v = g.loc[g[pos_col] == code, "OBS_VALUE"]
                 if not v.empty:
                     comp_list.append({
                         "periodo": per,
                         "posizione": label,
-                        "quota_pct": round(float(v.iloc[0] / tv * 100), 2),
+                        "quota_pct": round(float(v.max() / tv * 100), 2),
                     })
     comp_df = pd.DataFrame(comp_list).sort_values(["periodo", "posizione"]) if comp_list else pd.DataFrame()
 
@@ -260,7 +328,7 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
         mask = (df_it["SESSO"] == sex_total) & (df_it["CLASSE_ETA"] == code)
         if pos_total and pos_col:
             mask = mask & (df_it[pos_col] == pos_total)
-        s = df_it[mask].sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD").copy()
+        s = _dedup_total(df_it[mask]).copy()
         s["idx"] = _base100(s["OBS_VALUE"], s["TIME_PERIOD"], BASE_PERIOD)
         for _, r in s.iterrows():
             age_list.append({
@@ -277,7 +345,7 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
         mask = (df_it["SESSO"] == sex) & (df_it["CLASSE_ETA"] == age_total)
         if pos_total and pos_col:
             mask = mask & (df_it[pos_col] == pos_total)
-        s = df_it[mask].sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD").copy()
+        s = _dedup_total(df_it[mask]).copy()
         for _, r in s.iterrows():
             gen_list.append({
                 "periodo": r["TIME_PERIOD"],
@@ -287,15 +355,16 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
     gen_df = pd.DataFrame(gen_list).sort_values(["periodo", "genere"]) if gen_list else pd.DataFrame()
 
     # ── 1f. Quota dipendenti a termine ──────────────────────────────
-    # Try multiple possible column names for contract type
-    dur_col = _col(df_it, "DURATA", "CARATTERE_OCC", "CARATTERE_OCCUPAZIONE", "TIPO_CONTRATTO")
+    # dur_col was already detected above (either by name or auto-detected)
     term_list = []
     if not dur_col:
         print("  ⚠ No DURATA/CARATTERE_OCC column — quota_termine will be empty")
     if dur_col and pos_empl and pos_col:
         dur_vals = set(df_it[dur_col].astype(str).unique())
-        temp_code = "TEMP" if "TEMP" in dur_vals else ("TD" if "TD" in dur_vals else None)
-        total_code = "TOTAL" if "TOTAL" in dur_vals else ("9" if "9" in dur_vals else None)
+        temp_code = next(
+            (t for t in ["TEMP", "TD", "2", "FT"] if t in dur_vals), None
+        )
+        total_code = dur_total  # already computed above
         if temp_code and total_code:
             term_src = df_it[
                 (df_it["SESSO"] == sex_total)
@@ -402,27 +471,45 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
     _diag(df, "TASSO_OCCUPAZIONE")
 
     macro = {"ITF+ITG": "Mezzogiorno", "ITC+ITH": "Nord", "ITI": "Centro"}
-    all_parts = ["ITF", "ITG", "ITC", "ITH", "ITI"]
+    nuts1_prefixes = ["ITF", "ITG", "ITC", "ITH", "ITI"]
     all_itter = sorted(df["ITTER107"].unique().tolist())
     print(f"  Available ITTER107: {all_itter[:30]}")
-    df_macro = df[df["ITTER107"].isin(all_parts)].copy()
+
+    # Try exact NUTS1 match first; fall back to NUTS2 prefix matching
+    df_macro = df[df["ITTER107"].isin(nuts1_prefixes)].copy()
     if df_macro.empty:
-        print("  ⚠ No macro-region data (ITF/ITG/ITC/ITH/ITI) — macro breakdowns will be empty")
+        # NUTS2 codes: ITC1, ITC2, ITF1 … — match by prefix
+        prefix_mask = df["ITTER107"].apply(
+            lambda x: any(str(x).startswith(p) for p in nuts1_prefixes)
+            and str(x) != "IT"
+        )
+        df_macro = df[prefix_mask].copy()
+        if not df_macro.empty:
+            df_macro["_NUTS1"] = df_macro["ITTER107"].str[:3]
+            print(f"  Using NUTS2→NUTS1 prefix matching ({len(df_macro)} rows)")
+        else:
+            print("  ⚠ No macro-region data — macro breakdowns will be empty")
+    else:
+        df_macro["_NUTS1"] = df_macro["ITTER107"]
 
     # Check available age codes for youth
     eta_vals = set(df_macro["CLASSE_ETA"].unique()) if not df_macro.empty else set()
     youth_age = "Y15-29" if "Y15-29" in eta_vals else ("Y15-24" if "Y15-24" in eta_vals else None)
 
+    def _macro_aggregate(g: pd.DataFrame, prefixes: list[str]) -> pd.Series:
+        """Select rows matching NUTS1 prefixes and return their values."""
+        return g.loc[g["_NUTS1"].isin(prefixes), "OBS_VALUE"]
+
     # ── 4a. Occupazione giovanile per macroregione ──────────────────
     youth_list = []
-    if youth_age:
+    if youth_age and not df_macro.empty:
         youth = df_macro[
             (df_macro["SESSO"] == "9") & (df_macro["CLASSE_ETA"] == youth_age)
         ].copy()
         for per, g in youth.groupby("TIME_PERIOD"):
             for codes, label in macro.items():
                 parts = codes.split("+")
-                vals = g.loc[g["ITTER107"].isin(parts), "OBS_VALUE"]
+                vals = _macro_aggregate(g, parts)
                 if not vals.empty:
                     youth_list.append({
                         "periodo": per,
@@ -433,19 +520,20 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
 
     # ── 4b. Occupazione femminile per macroregione ──────────────────
     fem_list = []
-    fem = df_macro[
-        (df_macro["SESSO"] == "2") & (df_macro["CLASSE_ETA"] == "Y15-64")
-    ].copy()
-    for per, g in fem.groupby("TIME_PERIOD"):
-        for codes, label in macro.items():
-            parts = codes.split("+")
-            vals = g.loc[g["ITTER107"].isin(parts), "OBS_VALUE"]
-            if not vals.empty:
-                fem_list.append({
-                    "periodo": per,
-                    "macroregione": label,
-                    "tasso_occupazione": _safe(vals.mean()),
-                })
+    if not df_macro.empty:
+        fem = df_macro[
+            (df_macro["SESSO"] == "2") & (df_macro["CLASSE_ETA"] == "Y15-64")
+        ].copy()
+        for per, g in fem.groupby("TIME_PERIOD"):
+            for codes, label in macro.items():
+                parts = codes.split("+")
+                vals = _macro_aggregate(g, parts)
+                if not vals.empty:
+                    fem_list.append({
+                        "periodo": per,
+                        "macroregione": label,
+                        "tasso_occupazione": _safe(vals.mean()),
+                    })
     fem_df = pd.DataFrame(fem_list).sort_values(["periodo", "macroregione"]) if fem_list else pd.DataFrame()
 
     return {
@@ -468,34 +556,82 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
     else:
         df_it = df.copy()
 
-    # Filter for household sector (S14)
+    # Filter for household sector (S14) — prefer exact S14, avoid S14_S15
     sector_col = _col(df_it, "SETTORE_ISTIT", "SECTOR", "SETTORE", "SETTORE_ISTITUZIONALE")
     if sector_col:
-        households = df_it[df_it[sector_col].astype(str).str.contains("S14", case=False, na=False)].copy()
+        # Try exact S14 first
+        exact = df_it[df_it[sector_col].astype(str).str.strip() == "S14"]
+        if not exact.empty:
+            households = exact.copy()
+        else:
+            households = df_it[
+                df_it[sector_col].astype(str).str.contains("S14", case=False, na=False)
+            ].copy()
         if households.empty:
             print("  ⚠ No S14 (household) sector found — using all data")
             households = df_it.copy()
+        else:
+            print(f"  Sector filter: {sector_col}={sorted(households[sector_col].unique().tolist())}")
     else:
         households = df_it.copy()
 
-    # Find disposable income indicator
-    tipo_col = _col(households, "TIPO_DATO", "TIPO_DATO_CNT", "AGGREGATO", "TIPO_CONTO")
+    # Find disposable income indicator (B6G = gross disposable income in ESA 2010)
+    tipo_col = _col(households, "TIPO_DATO_CNT", "TIPO_DATO", "AGGREGATO", "TIPO_CONTO")
     if tipo_col:
-        reddito = households[
-            households[tipo_col].astype(str).str.contains("B6G|REDD_DISP|RDL", case=False, na=False)
-        ].copy()
+        tipo_vals = sorted(households[tipo_col].unique().tolist())
+        print(f"  {tipo_col} values: {tipo_vals[:30]}")
+        # Prefer exact B6G match
+        reddito = households[households[tipo_col].astype(str).str.strip() == "B6G"].copy()
         if reddito.empty:
-            print(f"  ⚠ No B6G/REDD_DISP indicator found in {tipo_col} — using all rows")
+            # Fallback to partial match
+            reddito = households[
+                households[tipo_col].astype(str).str.contains(
+                    "B6G|REDD_DISP|RDL", case=False, na=False
+                )
+            ].copy()
+        if reddito.empty:
+            print(f"  ⚠ No B6G/REDD_DISP indicator in {tipo_col} — using all rows")
             reddito = households.copy()
+        else:
+            print(f"  B6G filter → {len(reddito)} rows")
     else:
         reddito = households.copy()
 
-    reddito = reddito.sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD")
+    # Filter remaining dimensions to avoid mixing levels, changes, and prices
+    # Look for a "measure type" / "correction" / "prices" dimension and keep
+    # only level data at current prices.
+    _known = {"ITTER107", "SESSO", "CLASSE_ETA", "TIME_PERIOD", "OBS_VALUE",
+              "FREQ", "DATAFLOW", "OBS_STATUS", "OBS_FLAG", "UNIT_MEASURE",
+              "UNIT_MULT", "CONF_STATUS", "ACTION"}
+    if sector_col:
+        _known.add(sector_col)
+    if tipo_col:
+        _known.add(tipo_col)
+
+    for col in list(reddito.columns):
+        if col in _known:
+            continue
+        unique = sorted(reddito[col].dropna().astype(str).unique().tolist())
+        if len(unique) > 1:
+            print(f"  Extra dim {col}: {unique}")
+            # Try to keep "level / current prices" variant
+            # Common ISTAT codes: V = level, PC = current prices, N = no correction
+            preferred = None
+            for candidate in ["V", "PC", "N", "VALASS", "CP_MEUR", "CP_EUR",
+                              "L", "TOTAL", "_T", "9"]:
+                if candidate in unique:
+                    preferred = candidate
+                    break
+            if preferred:
+                reddito = reddito[reddito[col].astype(str) == preferred].copy()
+                print(f"    → filtered {col}={preferred}")
+
+    reddito = _dedup_total(reddito)
 
     # Base‑100 index (first 2023 period available)
     periods = reddito["TIME_PERIOD"].astype(str)
     base_mask = periods.str.startswith("2023")
-    base_per = periods[base_mask].sort_values().iloc[0] if base_mask.any() else BASE_PERIOD
+    base_per = periods[base_mask].sort_values().iloc[0] if base_mask.any() else periods.iloc[-1]
 
     reddito = reddito.copy()
     reddito["idx"] = _base100(reddito["OBS_VALUE"], reddito["TIME_PERIOD"], base_per)
