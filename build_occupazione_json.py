@@ -515,6 +515,8 @@ def main():
     }
 
     # ── Fetch datasets (respecting 5 req/min rate limit) ────────────
+    # Each entry: (label, [candidate IDs to try], startPeriod)
+    # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
         (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
         (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
