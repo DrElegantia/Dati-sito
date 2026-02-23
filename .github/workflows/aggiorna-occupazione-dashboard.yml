@@ -21,6 +21,16 @@ jobs:
       - name: install
         run: pip install pandas numpy requests
 
+      - name: check merge markers
+        run: |
+          if rg -n "^(<<<<<<<|=======|>>>>>>>)" build_occupazione_json.py; then
+            echo "Merge conflict markers found in build_occupazione_json.py"
+            exit 1
+          fi
+
+      - name: lint script syntax
+        run: python -m compileall -q build_occupazione_json.py
+
       - name: build json
         run: python build_occupazione_json.py
 
