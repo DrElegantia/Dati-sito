@@ -2,12 +2,15 @@
 Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
-Datasets used (semantic names, more stable than numeric IDs):
-  - DCCV_OCCUPATIMENS1   Occupati – dati mensili
-  - DCCV_INATTIVMENS1    Inattivi – dati mensili
-  - DCCV_TAXINATTMENS1   Tasso di inattività – dati mensili
-  - DCCV_TAXOCCUMENS1    Tasso di occupazione – dati mensili
-  - DCCN_SEQCONTIRFT     Reddito disponibile delle famiglie
+Datasets used:
+  - 150_875 / DCCV_OCCUPATI1     Occupati
+  - 150_877 / DCCV_INATTIVI1     Inattivi
+  - 150_882 / DCCV_TAXINATT1     Tasso di inattività
+  - 150_878 / DCCV_TAXOCCU1      Tasso di occupazione
+  - DCCN_SEQCONTIRFT             Reddito disponibile delle famiglie
+
+Note: ISTAT often exposes labour-force dataflows as broader datasets;
+monthly series are filtered locally using FREQ == "M" when available.
 """
 
 from __future__ import annotations
@@ -33,30 +36,37 @@ BASE_PERIOD = "2023-01"  # January 2023 = 100
 
 
 # ── helpers ─────────────────────────────────────────────────────────
-def _fetch_csv(dataflow: str, start: str = START_PERIOD) -> pd.DataFrame:
-    """Download a full dataflow in SDMX‑CSV, return a DataFrame.
-
-    Uses semantic dataflow names (e.g. ``IT1,DCCV_OCCUPATIMENS1,1.0``).
-    Falls back to shorter forms if the full triplet fails.
-    """
-    # Try full triplet first, then just the name
-    candidates = [
-        f"IT1,{dataflow},1.0",
-        dataflow,
-    ]
-    for ref in candidates:
-        url = f"{BASE}/{ref}/all?startPeriod={start}"
-        print(f"  GET {url}")
-        try:
-            r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
-            r.raise_for_status()
-            df = pd.read_csv(io.StringIO(r.text))
-            print(f"    → {len(df)} rows, columns: {list(df.columns)}")
-            return df
-        except requests.HTTPError as exc:
-            print(f"    ✗ HTTP {exc.response.status_code} — trying next form")
-            continue
-    raise RuntimeError(f"All URL forms failed for dataflow {dataflow}")
+def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD) -> pd.DataFrame:
+    """Download a dataflow in SDMX‑CSV, trying multiple flow references."""
+    errors: list[str] = []
+    for dataflow in dataflow_refs:
+        refs = [f"IT1,{dataflow},1.0", dataflow]
+        for ref in refs:
+            url = f"{BASE}/{ref}/all?startPeriod={start}"
+            print(f"  GET {url}")
+            try:
+                r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
+                r.raise_for_status()
+                df = pd.read_csv(io.StringIO(r.text))
+                print(f"    → {len(df)} rows, columns: {list(df.columns)}")
+                return df
+            except requests.HTTPError as exc:
+                status = exc.response.status_code if exc.response is not None else "?"
+                msg = f"HTTP {status} {url}"
+                print(f"    ✗ {msg} — trying next form")
+                errors.append(msg)
+                continue
+            except requests.RequestException as exc:
+                msg = f"REQ_ERR {url} {exc}"
+                print(f"    ✗ {msg} — trying next form")
+                errors.append(msg)
+                continue
+    raise RuntimeError(
+        "All URL forms failed for dataflows "
+        + ", ".join(dataflow_refs)
+        + "\n  "
+        + "\n  ".join(errors[-8:])
+    )
 
 
 def _safe(x):
@@ -96,6 +106,10 @@ def _norm(df: pd.DataFrame) -> pd.DataFrame:
     df.columns = [c.upper() for c in df.columns]
     df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
     df = df.dropna(subset=["OBS_VALUE"])
+    if "FREQ" in df.columns:
+        month_mask = df["FREQ"].astype(str).str.strip().eq("M")
+        if month_mask.any():
+            df = df[month_mask].copy()
     # SESSO may arrive as int or str — normalise to str
     if "SESSO" in df.columns:
         df["SESSO"] = df["SESSO"].astype(str).str.strip()
@@ -459,10 +473,10 @@ def main():
             "source": "ISTAT – Rilevazione sulle forze di lavoro",
             "base_index": BASE_PERIOD,
             "datasets": [
-                "DCCV_OCCUPATIMENS1",
-                "DCCV_INATTIVMENS1",
-                "DCCV_TAXINATTMENS1",
-                "DCCV_TAXOCCUMENS1",
+                "150_875|DCCV_OCCUPATI1",
+                "150_877|DCCV_INATTIVI1",
+                "150_882|DCCV_TAXINATT1",
+                "150_878|DCCV_TAXOCCU1",
                 "DCCN_SEQCONTIRFT",
             ],
         }
@@ -470,16 +484,16 @@ def main():
 
     # ── Fetch datasets (respecting 5 req/min rate limit) ────────────
     dataflows = [
-        ("DCCV_OCCUPATIMENS1", START_PERIOD),
-        ("DCCV_INATTIVMENS1", START_PERIOD),
-        ("DCCV_TAXINATTMENS1", START_PERIOD),
-        ("DCCV_TAXOCCUMENS1", START_PERIOD),
-        ("DCCN_SEQCONTIRFT", "2015-01"),
+        (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
+        (["150_877", "DCCV_INATTIVI1", "DCCV_INATTIVMENS1"], START_PERIOD),
+        (["150_882", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
+        (["150_878", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
+        (["DCCN_SEQCONTIRFT"], "2015-01"),
     ]
     frames = []
-    for i, (name, start) in enumerate(dataflows, 1):
-        print(f"{i}/{len(dataflows)}  Fetching {name} …")
-        frames.append(_fetch_csv(name, start))
+    for i, (refs, start) in enumerate(dataflows, 1):
+        print(f"{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
+        frames.append(_fetch_csv(refs, start))
         if i < len(dataflows):
             print(f"  (pausing {PAUSE}s for rate limit)")
             time.sleep(PAUSE)
