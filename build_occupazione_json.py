@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import io
 import json
+import re
 import time
 from pathlib import Path
 
@@ -76,6 +77,13 @@ def _empty_frame() -> pd.DataFrame:
         "SETTORE_ISTIT", "SECTOR", "TIPO_DATO", "TIPO_DATO_CNT", "AGGREGATO",
     ]
     return pd.DataFrame(columns=cols)
+
+
+def _assert_no_merge_markers() -> None:
+    """Fail fast if this file contains unresolved git merge markers."""
+    src = Path(__file__).read_text(encoding="utf-8")
+    if re.search(r"^(<<<<<<<|=======|>>>>>>>)", src, flags=re.MULTILINE):
+        raise RuntimeError("Merge conflict markers detected in build_occupazione_json.py")
 
 
 def _safe(x):
@@ -488,6 +496,7 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
 
 # ── MAIN ────────────────────────────────────────────────────────────
 def main():
+    _assert_no_merge_markers()
     out_path = Path("docs/occupazione_dashboard.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
