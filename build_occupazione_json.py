@@ -2,19 +2,21 @@
 Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
-Datasets used (semantic names, more stable than numeric IDs):
-  - DCCV_OCCUPATIMENS1   Occupati – dati mensili
-  - DCCV_INATTIVMENS1    Inattivi – dati mensili
-  - DCCV_TAXINATTMENS1   Tasso di inattività – dati mensili
-  - DCCV_TAXOCCUMENS1    Tasso di occupazione – dati mensili
-  - DCCN_SEQCONTIRFT     Reddito disponibile delle famiglie
+Datasets used (numeric dataflow IDs for esploradati.istat.it):
+  - 150_875  (DSD: DCCV_OCCUPATIMENS1)   Occupati – dati mensili
+  - 152_879  (DSD: DCCV_INATTIVMENS1)    Inattivi – dati mensili
+  - 152_878  (DSD: DCCV_TAXINATTMENS1)   Tasso di inattività – dati mensili
+  - 150_872  (DSD: DCCV_TAXOCCUMENS1)    Tasso di occupazione – dati mensili
+  - 396_61   (DSD: DCCN_SEQCONTIRFT)     Reddito disponibile delle famiglie
+
+NOTE: The API uses numeric dataflow IDs (e.g. 150_875), NOT the DSD
+names (e.g. DCCV_OCCUPATIMENS1).  DSD names return HTTP 404.
 """
 
 from __future__ import annotations
 
 import io
 import json
-import sys
 import time
 from pathlib import Path
 
@@ -33,18 +35,19 @@ BASE_PERIOD = "2023-01"  # January 2023 = 100
 
 
 # ── helpers ─────────────────────────────────────────────────────────
-def _fetch_csv(dataflow: str, start: str = START_PERIOD) -> pd.DataFrame:
-    """Download a full dataflow in SDMX‑CSV, return a DataFrame.
+def _fetch_csv(
+    dataflow_ids: list[str],
+    start: str = START_PERIOD,
+    label: str = "",
+) -> pd.DataFrame:
+    """Download a dataflow in SDMX‑CSV, return a DataFrame.
 
-    Uses semantic dataflow names (e.g. ``IT1,DCCV_OCCUPATIMENS1,1.0``).
-    Falls back to shorter forms if the full triplet fails.
+    *dataflow_ids* is a list of candidate IDs to try in order
+    (numeric IDs like ``150_875``, or full triplets like
+    ``IT1,150_875,1.0``).  The first that returns HTTP 200 wins.
     """
-    # Try full triplet first, then just the name
-    candidates = [
-        f"IT1,{dataflow},1.0",
-        dataflow,
-    ]
-    for ref in candidates:
+    last_exc: Exception | None = None
+    for ref in dataflow_ids:
         url = f"{BASE}/{ref}/all?startPeriod={start}"
         print(f"  GET {url}")
         try:
@@ -55,8 +58,15 @@ def _fetch_csv(dataflow: str, start: str = START_PERIOD) -> pd.DataFrame:
             return df
         except requests.HTTPError as exc:
             print(f"    ✗ HTTP {exc.response.status_code} — trying next form")
+            last_exc = exc
             continue
-    raise RuntimeError(f"All URL forms failed for dataflow {dataflow}")
+        except requests.RequestException as exc:
+            print(f"    ✗ {exc} — trying next form")
+            last_exc = exc
+            continue
+    raise RuntimeError(
+        f"All URL forms failed for {label or dataflow_ids}: {last_exc}"
+    )
 
 
 def _safe(x):
@@ -469,17 +479,19 @@ def main():
     }
 
     # ── Fetch datasets (respecting 5 req/min rate limit) ────────────
+    # Each entry: (label, [candidate IDs to try], startPeriod)
+    # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
-        ("DCCV_OCCUPATIMENS1", START_PERIOD),
-        ("DCCV_INATTIVMENS1", START_PERIOD),
-        ("DCCV_TAXINATTMENS1", START_PERIOD),
-        ("DCCV_TAXOCCUMENS1", START_PERIOD),
-        ("DCCN_SEQCONTIRFT", "2015-01"),
+        ("DCCV_OCCUPATIMENS1",  ["150_875", "IT1,150_875,1.0", "150_938"], START_PERIOD),
+        ("DCCV_INATTIVMENS1",   ["152_879", "IT1,152_879,1.0", "152_928"], START_PERIOD),
+        ("DCCV_TAXINATTMENS1",  ["152_878", "IT1,152_878,1.0", "152_913"], START_PERIOD),
+        ("DCCV_TAXOCCUMENS1",   ["150_872", "IT1,150_872,1.0", "150_916"], START_PERIOD),
+        ("DCCN_SEQCONTIRFT",    ["396_61",  "IT1,396_61,1.0",  "39_1005"], "2015-01"),
     ]
     frames = []
-    for i, (name, start) in enumerate(dataflows, 1):
-        print(f"{i}/{len(dataflows)}  Fetching {name} …")
-        frames.append(_fetch_csv(name, start))
+    for i, (label, ids, start) in enumerate(dataflows, 1):
+        print(f"{i}/{len(dataflows)}  Fetching {label} …")
+        frames.append(_fetch_csv(ids, start, label=label))
         if i < len(dataflows):
             print(f"  (pausing {PAUSE}s for rate limit)")
             time.sleep(PAUSE)
