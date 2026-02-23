@@ -361,10 +361,16 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
         print("  ⚠ No DURATA/CARATTERE_OCC column — quota_termine will be empty")
     if dur_col and pos_empl and pos_col:
         dur_vals = set(df_it[dur_col].astype(str).unique())
+        # "2" excluded — ambiguous (could be PERM in some ISTAT schemes)
         temp_code = next(
-            (t for t in ["TEMP", "TD", "2", "FT"] if t in dur_vals), None
+            (t for t in ["TEMP", "TD", "FT"] if t in dur_vals), None
+        )
+        perm_code = next(
+            (t for t in ["PERM", "TI", "PI"] if t in dur_vals), None
         )
         total_code = dur_total  # already computed above
+        print(f"  quota_termine: temp_code={temp_code}  perm_code={perm_code}  "
+              f"total_code={total_code}  dur_vals={sorted(dur_vals)}")
         if temp_code and total_code:
             term_src = df_it[
                 (df_it["SESSO"] == sex_total)
@@ -372,13 +378,34 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
                 & (df_it[pos_col] == pos_empl)
                 & (df_it[dur_col].isin([temp_code, total_code]))
             ].copy()
+            # Reduce any remaining extra dimensions to their aggregate
+            _term_known = {"ITTER107", "SESSO", "CLASSE_ETA", pos_col,
+                           dur_col, "TIME_PERIOD", "OBS_VALUE", "FREQ",
+                           "DATAFLOW", "OBS_STATUS", "OBS_FLAG",
+                           "UNIT_MEASURE", "UNIT_MULT", "CONF_STATUS", "ACTION"}
+            for _ecol in list(term_src.columns):
+                if _ecol in _term_known:
+                    continue
+                _evals = sorted(term_src[_ecol].dropna().astype(str).unique().tolist())
+                if len(_evals) > 1:
+                    _etotal = next((t for t in _TOTAL_TOKENS if t in _evals), None)
+                    if _etotal:
+                        term_src = term_src[term_src[_ecol].astype(str) == _etotal].copy()
+                        print(f"    quota_termine extra dim {_ecol}: filtered to {_etotal}")
             for per, g in term_src.groupby("TIME_PERIOD"):
                 tot_v = g.loc[g[dur_col] == total_code, "OBS_VALUE"]
                 tmp_v = g.loc[g[dur_col] == temp_code, "OBS_VALUE"]
                 if not tot_v.empty and not tmp_v.empty and tot_v.iloc[0] > 0:
+                    pct = round(float(tmp_v.iloc[0] / tot_v.iloc[0] * 100), 2)
+                    # Sanity: temporary share in Italy is typically 10-20%
+                    # If > 50%, codes are likely swapped — compute complement
+                    if pct > 50:
+                        print(f"  ⚠ quota_termine {per}: {pct}% > 50 — likely inverted, "
+                              f"using complement")
+                        pct = round(100.0 - pct, 2)
                     term_list.append({
                         "periodo": per,
-                        "quota_termine_pct": round(float(tmp_v.iloc[0] / tot_v.iloc[0] * 100), 2),
+                        "quota_termine_pct": pct,
                     })
     term_df = pd.DataFrame(term_list).sort_values("periodo") if term_list else pd.DataFrame()
 
