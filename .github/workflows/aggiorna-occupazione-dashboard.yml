@@ -21,10 +21,10 @@ jobs:
       - name: install
         run: pip install pandas numpy requests
 
-      - name: check merge markers (repo-wide)
+      - name: check merge markers (tracked files)
         run: |
-          if rg -n "^(<<<<<<<|=======|>>>>>>>)" .; then
-            echo "Merge conflict markers found in repository"
+          if git grep -nE '^(<<<<<<<|=======|>>>>>>>)' -- .; then
+            echo "Merge conflict markers found in tracked files"
             exit 1
           fi
 
@@ -33,6 +33,13 @@ jobs:
 
       - name: build json
         run: python build_occupazione_json.py
+
+      - name: re-check merge markers before commit
+        run: |
+          if git grep -nE '^(<<<<<<<|=======|>>>>>>>)' -- .; then
+            echo "Merge conflict markers found after build step"
+            exit 1
+          fi
 
       - name: commit
         run: |
