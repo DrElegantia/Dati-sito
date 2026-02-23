@@ -538,7 +538,7 @@ def main():
         (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
-        (["175_634", "737_1093", "DCCN_SEQCONTIRFT"], "2015-01"),
+        (["175_634", "93_1095", "737_1093"], "2015-01"),
     ]
     frames = []
     failed_dataflows = []
