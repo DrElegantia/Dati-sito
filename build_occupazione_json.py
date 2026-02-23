@@ -2,21 +2,22 @@
 Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
-Datasets used (numeric dataflow IDs for esploradati.istat.it):
-  - 150_875  (DSD: DCCV_OCCUPATIMENS1)   Occupati – dati mensili
-  - 152_879  (DSD: DCCV_INATTIVMENS1)    Inattivi – dati mensili
-  - 152_878  (DSD: DCCV_TAXINATTMENS1)   Tasso di inattività – dati mensili
-  - 150_872  (DSD: DCCV_TAXOCCUMENS1)    Tasso di occupazione – dati mensili
-  - 396_61   (DSD: DCCN_SEQCONTIRFT)     Reddito disponibile delle famiglie
+Datasets used (with fallback references):
+  - Occupati:              150_875, DCCV_OCCUPATI1, DCCV_OCCUPATIMENS1
+  - Inattivi:              150_879, 150_880, DCCV_INATTIVI1, DCCV_INATTIV1
+  - Tasso inattività:      150_882, 150_883, DCCV_TAXINATT1, DCCV_TASSOINATT1
+  - Tasso occupazione:     150_878, 150_881, DCCV_TAXOCCU1, DCCV_TASSOOCCU1
+  - Reddito famiglie:      DCCN_SEQCONTIRFT
 
-NOTE: The API uses numeric dataflow IDs (e.g. 150_875), NOT the DSD
-names (e.g. DCCV_OCCUPATIMENS1).  DSD names return HTTP 404.
+Note: ISTAT often exposes labour-force dataflows as broader datasets;
+monthly series are filtered locally using FREQ == "M" when available.
 """
 
 from __future__ import annotations
 
 import io
 import json
+import re
 import time
 from pathlib import Path
 
@@ -35,38 +36,54 @@ BASE_PERIOD = "2023-01"  # January 2023 = 100
 
 
 # ── helpers ─────────────────────────────────────────────────────────
-def _fetch_csv(
-    dataflow_ids: list[str],
-    start: str = START_PERIOD,
-    label: str = "",
-) -> pd.DataFrame:
-    """Download a dataflow in SDMX‑CSV, return a DataFrame.
-
-    *dataflow_ids* is a list of candidate IDs to try in order
-    (numeric IDs like ``150_875``, or full triplets like
-    ``IT1,150_875,1.0``).  The first that returns HTTP 200 wins.
-    """
-    last_exc: Exception | None = None
-    for ref in dataflow_ids:
-        url = f"{BASE}/{ref}/all?startPeriod={start}"
-        print(f"  GET {url}")
-        try:
-            r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
-            r.raise_for_status()
-            df = pd.read_csv(io.StringIO(r.text))
-            print(f"    → {len(df)} rows, columns: {list(df.columns)}")
-            return df
-        except requests.HTTPError as exc:
-            print(f"    ✗ HTTP {exc.response.status_code} — trying next form")
-            last_exc = exc
-            continue
-        except requests.RequestException as exc:
-            print(f"    ✗ {exc} — trying next form")
-            last_exc = exc
-            continue
+def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD) -> pd.DataFrame:
+    """Download a dataflow in SDMX‑CSV, trying multiple flow references."""
+    errors: list[str] = []
+    for dataflow in dataflow_refs:
+        refs = [f"IT1,{dataflow},1.0", dataflow]
+        for ref in refs:
+            url = f"{BASE}/{ref}/all?startPeriod={start}"
+            print(f"  GET {url}")
+            try:
+                r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
+                r.raise_for_status()
+                df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
+                print(f"    → {len(df)} rows, columns: {list(df.columns)}")
+                return df
+            except requests.HTTPError as exc:
+                status = exc.response.status_code if exc.response is not None else "?"
+                msg = f"HTTP {status} {url}"
+                print(f"    ✗ {msg} — trying next form")
+                errors.append(msg)
+                continue
+            except requests.RequestException as exc:
+                msg = f"REQ_ERR {url} {exc}"
+                print(f"    ✗ {msg} — trying next form")
+                errors.append(msg)
+                continue
     raise RuntimeError(
-        f"All URL forms failed for {label or dataflow_ids}: {last_exc}"
+        "All URL forms failed for dataflows "
+        + ", ".join(dataflow_refs)
+        + "\n  "
+        + "\n  ".join(errors[-8:])
     )
+
+def _empty_frame() -> pd.DataFrame:
+    """Return an empty frame with canonical columns expected by builders."""
+    cols = [
+        "FREQ", "TIME_PERIOD", "OBS_VALUE",
+        "ITTER107", "SESSO", "CLASSE_ETA", "POSIZIONE_PROF",
+        "DURATA", "CARATTERE_OCC",
+        "SETTORE_ISTIT", "SECTOR", "TIPO_DATO", "TIPO_DATO_CNT", "AGGREGATO",
+    ]
+    return pd.DataFrame(columns=cols)
+
+
+def _assert_no_merge_markers() -> None:
+    """Fail fast if this file contains unresolved git merge markers."""
+    src = Path(__file__).read_text(encoding="utf-8")
+    if re.search(r"^(<<<<<<<|=======|>>>>>>>)", src, flags=re.MULTILINE):
+        raise RuntimeError("Merge conflict markers detected in build_occupazione_json.py")
 
 
 def _safe(x):
@@ -104,8 +121,26 @@ def _norm(df: pd.DataFrame) -> pd.DataFrame:
     """Uppercase columns, coerce OBS_VALUE, stringify dimension cols."""
     df = df.copy()
     df.columns = [c.upper() for c in df.columns]
+
+    # Harmonise ISTAT old/new dimension names to canonical ones used below
+    rename_map = {
+        "REF_AREA": "ITTER107",
+        "SEX": "SESSO",
+        "AGE": "CLASSE_ETA",
+        "POSIZ_PROF": "POSIZIONE_PROF",
+        "PERM_TEMP_EMPLOYEES": "DURATA",
+        "DATA_TYPE": "TIPO_DATO",
+    }
+    existing = {k: v for k, v in rename_map.items() if k in df.columns and v not in df.columns}
+    if existing:
+        df = df.rename(columns=existing)
+
     df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
     df = df.dropna(subset=["OBS_VALUE"])
+    if "FREQ" in df.columns:
+        month_mask = df["FREQ"].astype(str).str.strip().eq("M")
+        if month_mask.any():
+            df = df[month_mask].copy()
     # SESSO may arrive as int or str — normalise to str
     if "SESSO" in df.columns:
         df["SESSO"] = df["SESSO"].astype(str).str.strip()
@@ -461,6 +496,7 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
 
 # ── MAIN ────────────────────────────────────────────────────────────
 def main():
+    _assert_no_merge_markers()
     out_path = Path("docs/occupazione_dashboard.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -469,10 +505,10 @@ def main():
             "source": "ISTAT – Rilevazione sulle forze di lavoro",
             "base_index": BASE_PERIOD,
             "datasets": [
-                "DCCV_OCCUPATIMENS1",
-                "DCCV_INATTIVMENS1",
-                "DCCV_TAXINATTMENS1",
-                "DCCV_TAXOCCUMENS1",
+                "150_875|DCCV_OCCUPATI1",
+                "150_879|150_880|DCCV_INATTIVI1",
+                "150_882|150_883|DCCV_TAXINATT1",
+                "150_878|150_881|DCCV_TAXOCCU1",
                 "DCCN_SEQCONTIRFT",
             ],
         }
@@ -482,19 +518,28 @@ def main():
     # Each entry: (label, [candidate IDs to try], startPeriod)
     # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
-        ("DCCV_OCCUPATIMENS1",  ["150_875", "IT1,150_875,1.0", "150_938"], START_PERIOD),
-        ("DCCV_INATTIVMENS1",   ["152_879", "IT1,152_879,1.0", "152_928"], START_PERIOD),
-        ("DCCV_TAXINATTMENS1",  ["152_878", "IT1,152_878,1.0", "152_913"], START_PERIOD),
-        ("DCCV_TAXOCCUMENS1",   ["150_872", "IT1,150_872,1.0", "150_916"], START_PERIOD),
-        ("DCCN_SEQCONTIRFT",    ["396_61",  "IT1,396_61,1.0",  "39_1005"], "2015-01"),
+        (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
+        (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
+        (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
+        (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
+        (["DCCN_SEQCONTIRFT"], "2015-01"),
     ]
     frames = []
-    for i, (label, ids, start) in enumerate(dataflows, 1):
-        print(f"{i}/{len(dataflows)}  Fetching {label} …")
-        frames.append(_fetch_csv(ids, start, label=label))
+    failed_dataflows = []
+    for i, (refs, start) in enumerate(dataflows, 1):
+        print(f"{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
+        try:
+            frames.append(_fetch_csv(refs, start))
+        except RuntimeError as exc:
+            print(f"  ⚠ fetch failed; continuing with empty dataset: {exc}")
+            failed_dataflows.append({"requested": refs, "error": str(exc)})
+            frames.append(_empty_frame())
         if i < len(dataflows):
             print(f"  (pausing {PAUSE}s for rate limit)")
             time.sleep(PAUSE)
+
+    if failed_dataflows:
+        payload["meta"]["fetch_warnings"] = failed_dataflows
 
     df_occ, df_ina, df_tin, df_toc, df_red = frames
 
