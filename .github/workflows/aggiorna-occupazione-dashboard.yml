@@ -21,10 +21,10 @@ jobs:
       - name: install
         run: pip install pandas numpy requests
 
-      - name: check merge markers
+      - name: check merge markers (repo-wide)
         run: |
-          if rg -n "^(<<<<<<<|=======|>>>>>>>)" build_occupazione_json.py; then
-            echo "Merge conflict markers found in build_occupazione_json.py"
+          if rg -n "^(<<<<<<<|=======|>>>>>>>)" .; then
+            echo "Merge conflict markers found in repository"
             exit 1
           fi
 
