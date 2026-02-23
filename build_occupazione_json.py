@@ -7,7 +7,7 @@ Datasets used (with fallback references):
   - Inattivi:              150_879, 150_880, DCCV_INATTIVI1, DCCV_INATTIV1
   - Tasso inattività:      150_882, 150_883, DCCV_TAXINATT1, DCCV_TASSOINATT1
   - Tasso occupazione:     150_878, 150_881, DCCV_TAXOCCU1, DCCV_TASSOOCCU1
-  - Reddito famiglie:      DCCN_SEQCONTIRFT
+  - Reddito famiglie:      175_634 (DSD: DCCN_ISTITUZ_TNA)
 
 Note: ISTAT often exposes labour-force dataflows as broader datasets;
 monthly series are filtered locally using FREQ == "M" when available.
@@ -163,14 +163,15 @@ def _col(df: pd.DataFrame, *candidates: str) -> str | None:
 
 def _diag(df: pd.DataFrame, label: str):
     """Print unique values for key dimensions — useful for first‑run debugging."""
-    print(f"  [{label}] shape={df.shape}")
+    print(f"  [{label}] shape={df.shape}  columns={list(df.columns)}")
     for c in ["SESSO", "CLASSE_ETA", "POSIZIONE_PROF", "ITTER107",
-              "TIPO_DATO", "DURATA", "CARATTERE_OCC",
-              "SETTORE_ISTIT", "SECTOR", "TIPO_DATO_CNT", "AGGREGATO"]:
+              "TIPO_DATO", "DURATA", "CARATTERE_OCC", "TIPO_CONTRATTO",
+              "SETTORE_ISTIT", "SECTOR", "TIPO_DATO_CNT", "AGGREGATO",
+              "SETTORE", "SETTORE_ISTITUZIONALE", "TIPO_CONTO", "FREQ"]:
         if c in df.columns:
             vals = sorted(df[c].dropna().unique().tolist())
-            short = vals[:15]
-            suffix = f" … (+{len(vals)-15})" if len(vals) > 15 else ""
+            short = vals[:20]
+            suffix = f" … (+{len(vals)-20})" if len(vals) > 20 else ""
             print(f"    {c}: {short}{suffix}")
 
 
@@ -289,6 +290,8 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
     # Try multiple possible column names for contract type
     dur_col = _col(df_it, "DURATA", "CARATTERE_OCC", "CARATTERE_OCCUPAZIONE", "TIPO_CONTRATTO")
     term_list = []
+    if not dur_col:
+        print("  ⚠ No DURATA/CARATTERE_OCC column — quota_termine will be empty")
     if dur_col and pos_empl and pos_col:
         dur_vals = set(df_it[dur_col].astype(str).unique())
         temp_code = "TEMP" if "TEMP" in dur_vals else ("TD" if "TD" in dur_vals else None)
@@ -400,10 +403,14 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
 
     macro = {"ITF+ITG": "Mezzogiorno", "ITC+ITH": "Nord", "ITI": "Centro"}
     all_parts = ["ITF", "ITG", "ITC", "ITH", "ITI"]
+    all_itter = sorted(df["ITTER107"].unique().tolist())
+    print(f"  Available ITTER107: {all_itter[:30]}")
     df_macro = df[df["ITTER107"].isin(all_parts)].copy()
+    if df_macro.empty:
+        print("  ⚠ No macro-region data (ITF/ITG/ITC/ITH/ITI) — macro breakdowns will be empty")
 
     # Check available age codes for youth
-    eta_vals = set(df_macro["CLASSE_ETA"].unique())
+    eta_vals = set(df_macro["CLASSE_ETA"].unique()) if not df_macro.empty else set()
     youth_age = "Y15-29" if "Y15-29" in eta_vals else ("Y15-24" if "Y15-24" in eta_vals else None)
 
     # ── 4a. Occupazione giovanile per macroregione ──────────────────
@@ -452,15 +459,24 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
     df = _norm(df_raw)
     _diag(df, "REDDITO")
 
+    # Filter for territory = Italy if available
+    if "ITTER107" in df.columns:
+        df_it = df[df["ITTER107"] == "IT"].copy()
+        if df_it.empty:
+            print("  ⚠ No ITTER107=IT — using all data")
+            df_it = df.copy()
+    else:
+        df_it = df.copy()
+
     # Filter for household sector (S14)
-    sector_col = _col(df, "SETTORE_ISTIT", "SECTOR", "SETTORE", "SETTORE_ISTITUZIONALE")
+    sector_col = _col(df_it, "SETTORE_ISTIT", "SECTOR", "SETTORE", "SETTORE_ISTITUZIONALE")
     if sector_col:
-        households = df[df[sector_col].astype(str).str.contains("S14", case=False, na=False)].copy()
+        households = df_it[df_it[sector_col].astype(str).str.contains("S14", case=False, na=False)].copy()
         if households.empty:
             print("  ⚠ No S14 (household) sector found — using all data")
-            households = df.copy()
+            households = df_it.copy()
     else:
-        households = df.copy()
+        households = df_it.copy()
 
     # Find disposable income indicator
     tipo_col = _col(households, "TIPO_DATO", "TIPO_DATO_CNT", "AGGREGATO", "TIPO_CONTO")
@@ -509,7 +525,7 @@ def main():
                 "150_879|150_880|DCCV_INATTIVI1",
                 "150_882|150_883|DCCV_TAXINATT1",
                 "150_878|150_881|DCCV_TAXOCCU1",
-                "DCCN_SEQCONTIRFT",
+                "175_634|DCCN_ISTITUZ_TNA",
             ],
         }
     }
@@ -522,7 +538,7 @@ def main():
         (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
-        (["DCCN_SEQCONTIRFT"], "2015-01"),
+        (["175_634", "93_1095", "737_1093"], "2015-01"),
     ]
     frames = []
     failed_dataflows = []
