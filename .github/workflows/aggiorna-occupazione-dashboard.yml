@@ -22,11 +22,7 @@ jobs:
         run: pip install pandas numpy requests
 
       - name: check merge markers (tracked files)
-        run: |
-          if git grep -nE '^(<<<<<<<|=======|>>>>>>>)' -- .; then
-            echo "Merge conflict markers found in tracked files"
-            exit 1
-          fi
+        run: bash scripts/check_merge_markers.sh
 
       - name: lint script syntax
         run: python -m compileall -q build_occupazione_json.py
@@ -35,11 +31,7 @@ jobs:
         run: python build_occupazione_json.py
 
       - name: re-check merge markers before commit
-        run: |
-          if git grep -nE '^(<<<<<<<|=======|>>>>>>>)' -- .; then
-            echo "Merge conflict markers found after build step"
-            exit 1
-          fi
+        run: bash scripts/check_merge_markers.sh
 
       - name: commit
         run: |
