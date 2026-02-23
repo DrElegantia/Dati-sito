@@ -2,12 +2,12 @@
 Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
-Datasets used:
-  - 150_875 / DCCV_OCCUPATI1     Occupati
-  - 150_877 / DCCV_INATTIVI1     Inattivi
-  - 150_882 / DCCV_TAXINATT1     Tasso di inattività
-  - 150_878 / DCCV_TAXOCCU1      Tasso di occupazione
-  - DCCN_SEQCONTIRFT             Reddito disponibile delle famiglie
+Datasets used (with fallback references):
+  - Occupati:              150_875, DCCV_OCCUPATI1, DCCV_OCCUPATIMENS1
+  - Inattivi:              150_879, 150_880, DCCV_INATTIVI1, DCCV_INATTIV1
+  - Tasso inattività:      150_882, 150_883, DCCV_TAXINATT1, DCCV_TASSOINATT1
+  - Tasso occupazione:     150_878, 150_881, DCCV_TAXOCCU1, DCCV_TASSOOCCU1
+  - Reddito famiglie:      DCCN_SEQCONTIRFT
 
 Note: ISTAT often exposes labour-force dataflows as broader datasets;
 monthly series are filtered locally using FREQ == "M" when available.
@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import io
 import json
-import sys
+import re
 import time
 from pathlib import Path
 
@@ -47,7 +47,7 @@ def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD) -> pd.DataFr
             try:
                 r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
                 r.raise_for_status()
-                df = pd.read_csv(io.StringIO(r.text))
+                df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
                 print(f"    → {len(df)} rows, columns: {list(df.columns)}")
                 return df
             except requests.HTTPError as exc:
@@ -67,6 +67,23 @@ def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD) -> pd.DataFr
         + "\n  "
         + "\n  ".join(errors[-8:])
     )
+
+def _empty_frame() -> pd.DataFrame:
+    """Return an empty frame with canonical columns expected by builders."""
+    cols = [
+        "FREQ", "TIME_PERIOD", "OBS_VALUE",
+        "ITTER107", "SESSO", "CLASSE_ETA", "POSIZIONE_PROF",
+        "DURATA", "CARATTERE_OCC",
+        "SETTORE_ISTIT", "SECTOR", "TIPO_DATO", "TIPO_DATO_CNT", "AGGREGATO",
+    ]
+    return pd.DataFrame(columns=cols)
+
+
+def _assert_no_merge_markers() -> None:
+    """Fail fast if this file contains unresolved git merge markers."""
+    src = Path(__file__).read_text(encoding="utf-8")
+    if re.search(r"^(<<<<<<<|=======|>>>>>>>)", src, flags=re.MULTILINE):
+        raise RuntimeError("Merge conflict markers detected in build_occupazione_json.py")
 
 
 def _safe(x):
@@ -104,6 +121,20 @@ def _norm(df: pd.DataFrame) -> pd.DataFrame:
     """Uppercase columns, coerce OBS_VALUE, stringify dimension cols."""
     df = df.copy()
     df.columns = [c.upper() for c in df.columns]
+
+    # Harmonise ISTAT old/new dimension names to canonical ones used below
+    rename_map = {
+        "REF_AREA": "ITTER107",
+        "SEX": "SESSO",
+        "AGE": "CLASSE_ETA",
+        "POSIZ_PROF": "POSIZIONE_PROF",
+        "PERM_TEMP_EMPLOYEES": "DURATA",
+        "DATA_TYPE": "TIPO_DATO",
+    }
+    existing = {k: v for k, v in rename_map.items() if k in df.columns and v not in df.columns}
+    if existing:
+        df = df.rename(columns=existing)
+
     df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
     df = df.dropna(subset=["OBS_VALUE"])
     if "FREQ" in df.columns:
@@ -465,6 +496,7 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
 
 # ── MAIN ────────────────────────────────────────────────────────────
 def main():
+    _assert_no_merge_markers()
     out_path = Path("docs/occupazione_dashboard.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -474,9 +506,9 @@ def main():
             "base_index": BASE_PERIOD,
             "datasets": [
                 "150_875|DCCV_OCCUPATI1",
-                "150_877|DCCV_INATTIVI1",
-                "150_882|DCCV_TAXINATT1",
-                "150_878|DCCV_TAXOCCU1",
+                "150_879|150_880|DCCV_INATTIVI1",
+                "150_882|150_883|DCCV_TAXINATT1",
+                "150_878|150_881|DCCV_TAXOCCU1",
                 "DCCN_SEQCONTIRFT",
             ],
         }
@@ -485,18 +517,27 @@ def main():
     # ── Fetch datasets (respecting 5 req/min rate limit) ────────────
     dataflows = [
         (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
-        (["150_877", "DCCV_INATTIVI1", "DCCV_INATTIVMENS1"], START_PERIOD),
-        (["150_882", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
-        (["150_878", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
+        (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
+        (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
+        (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
         (["DCCN_SEQCONTIRFT"], "2015-01"),
     ]
     frames = []
+    failed_dataflows = []
     for i, (refs, start) in enumerate(dataflows, 1):
         print(f"{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
-        frames.append(_fetch_csv(refs, start))
+        try:
+            frames.append(_fetch_csv(refs, start))
+        except RuntimeError as exc:
+            print(f"  ⚠ fetch failed; continuing with empty dataset: {exc}")
+            failed_dataflows.append({"requested": refs, "error": str(exc)})
+            frames.append(_empty_frame())
         if i < len(dataflows):
             print(f"  (pausing {PAUSE}s for rate limit)")
             time.sleep(PAUSE)
+
+    if failed_dataflows:
+        payload["meta"]["fetch_warnings"] = failed_dataflows
 
     df_occ, df_ina, df_tin, df_toc, df_red = frames
 
