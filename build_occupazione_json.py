@@ -3,11 +3,11 @@ Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
 Datasets used (with fallback references):
-  - Occupati:              150_875, DCCV_OCCUPATI1, DCCV_OCCUPATIMENS1
+  - Occupati:              150_875, 150_938, DCCV_OCCUPATIMENS1, DCCV_OCCUPATIT1
   - Inattivi:              152_928, 152_879, DCCV_INATTIV1, DCCV_INATTIVMENS1
   - Tasso inattività:      152_913, 152_878, DCCV_TAXINATT1, DCCV_TAXINATTMENS1
   - Tasso occupazione:     150_915, 150_872, DCCV_TAXOCCU1, DCCV_TAXOCCUMENS1
-  - Reddito famiglie:      175_634 (DSD: DCCN_ISTITUZ_TNA)
+  - Reddito famiglie:      162_1064, 94_1063, 396_61, DCCN_ISTITUZ_QNA1, DCCN_SEQCONTIRFT
 
 Note: ISTAT often exposes labour-force dataflows as broader datasets;
 monthly series are filtered locally using FREQ == "M" when available.
@@ -70,7 +70,7 @@ def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD,
                 _rate_limit_wait()
                 t0 = time.monotonic()
                 try:
-                    r = requests.get(url, headers=CSV_ACCEPT, timeout=120)
+                    r = requests.get(url, headers=CSV_ACCEPT, timeout=300)
                     r.raise_for_status()
                     df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
                     dt = time.monotonic() - t0
@@ -248,6 +248,10 @@ def _diag(df: pd.DataFrame, label: str):
 # ── 1. OCCUPATI ─────────────────────────────────────────────────────
 def build_occupati(df_raw: pd.DataFrame) -> dict:
     df = _norm(df_raw)
+    # Fallback: if monthly filter returned no rows, try quarterly
+    if df.empty and not df_raw.empty:
+        print("  ⚠ No monthly data — retrying with quarterly frequency")
+        df = _norm(df_raw, freq="Q")
     _diag(df, "OCCUPATI")
 
     # Territory = Italy
@@ -803,7 +807,7 @@ def main():
             "source": "ISTAT – Rilevazione sulle forze di lavoro",
             "base_index": BASE_PERIOD,
             "datasets": [
-                "150_875|DCCV_OCCUPATI1",
+                "150_875|150_938|DCCV_OCCUPATIMENS1",
                 "152_928|152_879|DCCV_INATTIV1",
                 "152_913|152_878|DCCV_TAXINATT1",
                 "150_915|150_872|DCCV_TAXOCCU1",
@@ -816,7 +820,7 @@ def main():
     # Each entry: (label, [candidate IDs to try], startPeriod)
     # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
-        (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
+        (["150_875", "150_938", "DCCV_OCCUPATIMENS1", "DCCV_OCCUPATIT1"], START_PERIOD),
         (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
