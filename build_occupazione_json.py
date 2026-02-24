@@ -3,7 +3,7 @@ Fetches Italian labor market data from ISTAT SDMX REST API
 and produces docs/occupazione_dashboard.json.
 
 Datasets used (with fallback references):
-  - Occupati:              150_875, 150_938, DCCV_OCCUPATIMENS1, DCCV_OCCUPATIT1
+  - Occupati:              150_875, 150_938, 150_882, DCCV_OCCUPATIMENS1, DCCV_OCCUPATIT1
   - Inattivi:              152_928, 152_879, DCCV_INATTIV1, DCCV_INATTIVMENS1
   - Tasso inattività:      152_913, 152_878, DCCV_TAXINATT1, DCCV_TAXINATTMENS1
   - Tasso occupazione:     150_915, 150_872, DCCV_TAXOCCU1, DCCV_TAXOCCUMENS1
@@ -248,10 +248,13 @@ def _diag(df: pd.DataFrame, label: str):
 # ── 1. OCCUPATI ─────────────────────────────────────────────────────
 def build_occupati(df_raw: pd.DataFrame) -> dict:
     df = _norm(df_raw)
-    # Fallback: if monthly filter returned no rows, try quarterly
+    # Fallback: if monthly filter returned no rows, try quarterly then annual
     if df.empty and not df_raw.empty:
         print("  ⚠ No monthly data — retrying with quarterly frequency")
         df = _norm(df_raw, freq="Q")
+    if df.empty and not df_raw.empty:
+        print("  ⚠ No quarterly data either — retrying with annual frequency")
+        df = _norm(df_raw, freq="A")
     _diag(df, "OCCUPATI")
 
     # Territory = Italy
@@ -817,10 +820,12 @@ def main():
     }
 
     # ── Fetch datasets (respecting 5 req/min rate limit) ────────────
-    # Each entry: (label, [candidate IDs to try], startPeriod)
+    # Each entry: ([candidate IDs], startPeriod, key_filter)
+    # key_filter is optional (defaults to "all"). Using a filter on the
+    # occupati dataset avoids downloading all regions (only IT is needed).
     # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
-        (["150_875", "150_938", "DCCV_OCCUPATIMENS1", "DCCV_OCCUPATIT1"], START_PERIOD),
+        (["150_875", "150_938", "150_882", "DCCV_OCCUPATIMENS1", "DCCV_OCCUPATIT1"], START_PERIOD),
         (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
@@ -829,7 +834,8 @@ def main():
     frames = []
     failed_dataflows = []
     t_start = time.monotonic()
-    for i, (refs, start) in enumerate(dataflows, 1):
+    for i, entry in enumerate(dataflows, 1):
+        refs, start = entry[0], entry[1]
         print(f"\n{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
         try:
             frames.append(_fetch_csv(refs, start))
