@@ -4,9 +4,9 @@ and produces docs/occupazione_dashboard.json.
 
 Datasets used (with fallback references):
   - Occupati:              150_875, DCCV_OCCUPATI1, DCCV_OCCUPATIMENS1
-  - Inattivi:              150_879, 150_880, DCCV_INATTIVI1, DCCV_INATTIV1
-  - Tasso inattività:      150_882, 150_883, DCCV_TAXINATT1, DCCV_TASSOINATT1
-  - Tasso occupazione:     150_878, 150_881, DCCV_TAXOCCU1, DCCV_TASSOOCCU1
+  - Inattivi:              152_928, 152_879, DCCV_INATTIV1, DCCV_INATTIVMENS1
+  - Tasso inattività:      152_913, 152_878, DCCV_TAXINATT1, DCCV_TAXINATTMENS1
+  - Tasso occupazione:     150_915, 150_872, DCCV_TAXOCCU1, DCCV_TAXOCCUMENS1
   - Reddito famiglie:      175_634 (DSD: DCCN_ISTITUZ_TNA)
 
 Note: ISTAT often exposes labour-force dataflows as broader datasets;
@@ -715,9 +715,9 @@ def main():
             "base_index": BASE_PERIOD,
             "datasets": [
                 "150_875|DCCV_OCCUPATI1",
-                "150_879|150_880|DCCV_INATTIVI1",
-                "150_882|150_883|DCCV_TAXINATT1",
-                "150_878|150_881|DCCV_TAXOCCU1",
+                "152_928|152_879|DCCV_INATTIV1",
+                "152_913|152_878|DCCV_TAXINATT1",
+                "150_915|150_872|DCCV_TAXOCCU1",
                 "175_634|DCCN_ISTITUZ_TNA",
             ],
         }
@@ -728,9 +728,9 @@ def main():
     # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
         (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
-        (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
-        (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
-        (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
+        (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
+        (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
+        (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
         (["175_634", "93_1095", "737_1093"], "2015-01"),
     ]
     frames = []
