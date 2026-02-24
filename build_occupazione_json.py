@@ -30,37 +30,63 @@ BASE = "https://esploradati.istat.it/SDMXWS/rest/data"
 CSV_ACCEPT = {"Accept": "application/vnd.sdmx.data+csv;version=1.0.0"}
 START_PERIOD = "2018-01"
 PAUSE = 13  # seconds between API calls (ISTAT limit: 5 req/min)
+_last_request_ts: float = 0  # monotonic timestamp of last API call
 
 # ── base‑index reference ────────────────────────────────────────────
 BASE_PERIOD = "2023-01"  # January 2023 = 100
 
 
 # ── helpers ─────────────────────────────────────────────────────────
-def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD) -> pd.DataFrame:
-    """Download a dataflow in SDMX‑CSV, trying multiple flow references."""
+def _rate_limit_wait() -> None:
+    """Wait only as long as needed to respect ISTAT's 5-req/min limit."""
+    global _last_request_ts
+    if _last_request_ts > 0:
+        elapsed = time.monotonic() - _last_request_ts
+        if elapsed < PAUSE:
+            wait = PAUSE - elapsed
+            print(f"  (rate-limit wait {wait:.0f}s)")
+            time.sleep(wait)
+    _last_request_ts = time.monotonic()
+
+
+def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD,
+               key_filter: str = "all") -> pd.DataFrame:
+    """Download a dataflow in SDMX‑CSV, trying multiple flow references.
+
+    key_filter: SDMX dimension key (e.g. "Q.IT..." to filter server-side).
+                Defaults to "all" (no filter). If server rejects the filter,
+                falls back to "all" automatically.
+    """
     errors: list[str] = []
     for dataflow in dataflow_refs:
-        refs = [f"IT1,{dataflow},1.0", dataflow]
+        # Try bare ID first (faster), then qualified form as fallback
+        refs = [dataflow, f"IT1,{dataflow},1.0"]
         for ref in refs:
-            url = f"{BASE}/{ref}/all?startPeriod={start}"
-            print(f"  GET {url}")
-            try:
-                r = requests.get(url, headers=CSV_ACCEPT, timeout=180)
-                r.raise_for_status()
-                df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
-                print(f"    → {len(df)} rows, columns: {list(df.columns)}")
-                return df
-            except requests.HTTPError as exc:
-                status = exc.response.status_code if exc.response is not None else "?"
-                msg = f"HTTP {status} {url}"
-                print(f"    ✗ {msg} — trying next form")
-                errors.append(msg)
-                continue
-            except requests.RequestException as exc:
-                msg = f"REQ_ERR {url} {exc}"
-                print(f"    ✗ {msg} — trying next form")
-                errors.append(msg)
-                continue
+            # Try with filter first, fallback to "all" if it fails
+            keys_to_try = [key_filter] if key_filter == "all" else [key_filter, "all"]
+            for key in keys_to_try:
+                url = f"{BASE}/{ref}/{key}?startPeriod={start}"
+                print(f"  GET {url}")
+                _rate_limit_wait()
+                t0 = time.monotonic()
+                try:
+                    r = requests.get(url, headers=CSV_ACCEPT, timeout=90)
+                    r.raise_for_status()
+                    df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
+                    dt = time.monotonic() - t0
+                    print(f"    → {len(df)} rows in {dt:.1f}s")
+                    return df
+                except requests.HTTPError as exc:
+                    status = exc.response.status_code if exc.response is not None else "?"
+                    msg = f"HTTP {status} {url}"
+                    print(f"    ✗ {msg} — trying next")
+                    errors.append(msg)
+                    continue
+                except requests.RequestException as exc:
+                    msg = f"REQ_ERR {url} {exc}"
+                    print(f"    ✗ {msg} — trying next")
+                    errors.append(msg)
+                    continue
     raise RuntimeError(
         "All URL forms failed for dataflows "
         + ", ".join(dataflow_refs)
@@ -124,8 +150,12 @@ def _base100(series: pd.Series, periods: pd.Series, base: str) -> pd.Series:
     return series / base_val * 100.0
 
 
-def _norm(df: pd.DataFrame) -> pd.DataFrame:
-    """Uppercase columns, coerce OBS_VALUE, stringify dimension cols."""
+def _norm(df: pd.DataFrame, freq: str | None = "M") -> pd.DataFrame:
+    """Uppercase columns, coerce OBS_VALUE, stringify dimension cols.
+
+    freq: preferred frequency code to filter ("M"=monthly, "Q"=quarterly).
+          None to skip FREQ filtering entirely.
+    """
     df = df.copy()
     df.columns = [c.upper() for c in df.columns]
 
@@ -144,10 +174,10 @@ def _norm(df: pd.DataFrame) -> pd.DataFrame:
 
     df["OBS_VALUE"] = pd.to_numeric(df["OBS_VALUE"], errors="coerce")
     df = df.dropna(subset=["OBS_VALUE"])
-    if "FREQ" in df.columns:
-        month_mask = df["FREQ"].astype(str).str.strip().eq("M")
-        if month_mask.any():
-            df = df[month_mask].copy()
+    if freq and "FREQ" in df.columns:
+        freq_mask = df["FREQ"].astype(str).str.strip().eq(freq)
+        if freq_mask.any():
+            df = df[freq_mask].copy()
     # SESSO may arrive as int or str — normalise to str
     if "SESSO" in df.columns:
         df["SESSO"] = df["SESSO"].astype(str).str.strip()
@@ -367,12 +397,12 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
         print("  ⚠ No DURATA/CARATTERE_OCC column — quota_termine will be empty")
     if dur_col and pos_empl and pos_col:
         dur_vals = set(df_it[dur_col].astype(str).unique())
-        # "2" excluded — ambiguous (could be PERM in some ISTAT schemes)
+        # PERM_TEMP_EMPLOYEES: "1"=temporary, "2"=permanent, "9"=total
         temp_code = next(
-            (t for t in ["TEMP", "TD", "FT"] if t in dur_vals), None
+            (t for t in ["TEMP", "TD", "FT", "1"] if t in dur_vals), None
         )
         perm_code = next(
-            (t for t in ["PERM", "TI", "PI"] if t in dur_vals), None
+            (t for t in ["PERM", "TI", "PI", "2"] if t in dur_vals), None
         )
         total_code = dur_total  # already computed above
         print(f"  quota_termine: temp_code={temp_code}  perm_code={perm_code}  "
@@ -430,6 +460,20 @@ def build_inattivi(df_raw: pd.DataFrame) -> dict:
     df = _norm(df_raw)
     _diag(df, "INATTIVI")
     df_it = df[df["ITTER107"] == "IT"].copy()
+
+    # Reduce extra dimensions to their aggregate value
+    _ina_known = {"ITTER107", "SESSO", "CLASSE_ETA", "TIME_PERIOD",
+                  "OBS_VALUE", "FREQ", "DATAFLOW", "OBS_STATUS", "OBS_FLAG",
+                  "UNIT_MEASURE", "UNIT_MULT", "CONF_STATUS", "ACTION"}
+    for _ecol in list(df_it.columns):
+        if _ecol in _ina_known:
+            continue
+        _evals = sorted(df_it[_ecol].dropna().astype(str).unique().tolist())
+        if len(_evals) > 1:
+            _etotal = next((t for t in _TOTAL_TOKENS if t in _evals), None)
+            if _etotal:
+                df_it = df_it[df_it[_ecol].astype(str) == _etotal].copy()
+                print(f"  inattivi extra dim {_ecol}: filtered to {_etotal}")
 
     age_15_64 = "Y15-64"
 
@@ -527,35 +571,68 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
     df = _norm(df_raw)
     _diag(df, "TASSO_OCCUPAZIONE")
 
-    macro = {"ITF+ITG": "Mezzogiorno", "ITC+ITH": "Nord", "ITI": "Centro"}
+    # Reduce extra dimensions to their aggregate value
+    _toc_known = {"ITTER107", "SESSO", "CLASSE_ETA", "TIME_PERIOD",
+                  "OBS_VALUE", "FREQ", "DATAFLOW", "OBS_STATUS", "OBS_FLAG",
+                  "UNIT_MEASURE", "UNIT_MULT", "CONF_STATUS", "ACTION"}
+    for _ecol in list(df.columns):
+        if _ecol in _toc_known:
+            continue
+        _evals = sorted(df[_ecol].dropna().astype(str).unique().tolist())
+        if len(_evals) > 1:
+            _etotal = next((t for t in _TOTAL_TOKENS if t in _evals), None)
+            if _etotal:
+                df = df[df[_ecol].astype(str) == _etotal].copy()
+                print(f"  tasso_occ extra dim {_ecol}: filtered to {_etotal}")
+
+    # ISTAT composite macro-region codes (pre-aggregated)
+    composite_macro = {"ITCD": "Nord", "ITE": "Centro", "ITFG": "Mezzogiorno"}
+    # NUTS1-based macro codes (older datasets)
+    nuts1_macro = {"ITC+ITH": "Nord", "ITI": "Centro", "ITF+ITG": "Mezzogiorno"}
     nuts1_prefixes = ["ITF", "ITG", "ITC", "ITH", "ITI"]
+
     all_itter = sorted(df["ITTER107"].unique().tolist())
     print(f"  Available ITTER107: {all_itter[:30]}")
 
-    # Try exact NUTS1 match first; fall back to NUTS2 prefix matching
-    df_macro = df[df["ITTER107"].isin(nuts1_prefixes)].copy()
-    if df_macro.empty:
-        # NUTS2 codes: ITC1, ITC2, ITF1 … — match by prefix
-        prefix_mask = df["ITTER107"].apply(
-            lambda x: any(str(x).startswith(p) for p in nuts1_prefixes)
-            and str(x) != "IT"
-        )
-        df_macro = df[prefix_mask].copy()
-        if not df_macro.empty:
-            df_macro["_NUTS1"] = df_macro["ITTER107"].str[:3]
-            print(f"  Using NUTS2→NUTS1 prefix matching ({len(df_macro)} rows)")
-        else:
-            print("  ⚠ No macro-region data — macro breakdowns will be empty")
+    # Try ISTAT composite codes first (ITCD, ITE, ITFG)
+    composite_present = set(composite_macro.keys()) & set(all_itter)
+    if composite_present:
+        df_macro = df[df["ITTER107"].isin(composite_macro.keys())].copy()
+        df_macro["_MACRO"] = df_macro["ITTER107"].map(composite_macro)
+        macro = composite_macro
+        use_composite = True
+        print(f"  Using ISTAT composite macro codes: {sorted(composite_present)}")
     else:
-        df_macro["_NUTS1"] = df_macro["ITTER107"]
+        use_composite = False
+        macro = nuts1_macro
+        # Try exact NUTS1 match first; fall back to NUTS2 prefix matching
+        df_macro = df[df["ITTER107"].isin(nuts1_prefixes)].copy()
+        if df_macro.empty:
+            prefix_mask = df["ITTER107"].apply(
+                lambda x: any(str(x).startswith(p) for p in nuts1_prefixes)
+                and str(x) != "IT"
+            )
+            df_macro = df[prefix_mask].copy()
+            if not df_macro.empty:
+                df_macro["_NUTS1"] = df_macro["ITTER107"].str[:3]
+                print(f"  Using NUTS2→NUTS1 prefix matching ({len(df_macro)} rows)")
+            else:
+                print("  ⚠ No macro-region data — macro breakdowns will be empty")
+        else:
+            df_macro["_NUTS1"] = df_macro["ITTER107"]
 
     # Check available age codes for youth
     eta_vals = set(df_macro["CLASSE_ETA"].unique()) if not df_macro.empty else set()
     youth_age = "Y15-29" if "Y15-29" in eta_vals else ("Y15-24" if "Y15-24" in eta_vals else None)
 
-    def _macro_aggregate(g: pd.DataFrame, prefixes: list[str]) -> pd.Series:
-        """Select rows matching NUTS1 prefixes and return their values."""
-        return g.loc[g["_NUTS1"].isin(prefixes), "OBS_VALUE"]
+    def _get_macro_val(g: pd.DataFrame, code_or_codes: str, label: str):
+        """Get macro region value — handles both composite and NUTS1 modes."""
+        if use_composite:
+            rows = g.loc[g["_MACRO"] == label, "OBS_VALUE"]
+        else:
+            parts = code_or_codes.split("+")
+            rows = g.loc[g["_NUTS1"].isin(parts), "OBS_VALUE"]
+        return rows
 
     # ── 4a. Occupazione giovanile per macroregione ──────────────────
     youth_list = []
@@ -565,8 +642,7 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
         ].copy()
         for per, g in youth.groupby("TIME_PERIOD"):
             for codes, label in macro.items():
-                parts = codes.split("+")
-                vals = _macro_aggregate(g, parts)
+                vals = _get_macro_val(g, codes, label)
                 if not vals.empty:
                     youth_list.append({
                         "periodo": per,
@@ -583,8 +659,7 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
         ].copy()
         for per, g in fem.groupby("TIME_PERIOD"):
             for codes, label in macro.items():
-                parts = codes.split("+")
-                vals = _macro_aggregate(g, parts)
+                vals = _get_macro_val(g, codes, label)
                 if not vals.empty:
                     fem_list.append({
                         "periodo": per,
@@ -601,7 +676,10 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
 
 # ── 5. REDDITO DISPONIBILE FAMIGLIE ────────────────────────────────
 def build_reddito(df_raw: pd.DataFrame) -> dict:
-    df = _norm(df_raw)
+    # National accounts are quarterly — try Q first, fall back to no filter
+    df = _norm(df_raw, freq="Q")
+    if df.empty:
+        df = _norm(df_raw, freq=None)
     _diag(df, "REDDITO")
 
     # Filter for territory = Italy if available
@@ -735,17 +813,17 @@ def main():
     ]
     frames = []
     failed_dataflows = []
+    t_start = time.monotonic()
     for i, (refs, start) in enumerate(dataflows, 1):
-        print(f"{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
+        print(f"\n{i}/{len(dataflows)}  Fetching {refs[0]} (fallbacks: {refs[1:]}) …")
         try:
             frames.append(_fetch_csv(refs, start))
         except RuntimeError as exc:
             print(f"  ⚠ fetch failed; continuing with empty dataset: {exc}")
             failed_dataflows.append({"requested": refs, "error": str(exc)})
             frames.append(_empty_frame())
-        if i < len(dataflows):
-            print(f"  (pausing {PAUSE}s for rate limit)")
-            time.sleep(PAUSE)
+    t_fetch = time.monotonic() - t_start
+    print(f"\nAll datasets fetched in {t_fetch:.0f}s")
 
     if failed_dataflows:
         payload["meta"]["fetch_warnings"] = failed_dataflows
