@@ -4,9 +4,9 @@ and produces docs/occupazione_dashboard.json.
 
 Datasets used (with fallback references):
   - Occupati:              150_875, DCCV_OCCUPATI1, DCCV_OCCUPATIMENS1
-  - Inattivi:              150_879, 150_880, DCCV_INATTIVI1, DCCV_INATTIV1
-  - Tasso inattività:      150_882, 150_883, DCCV_TAXINATT1, DCCV_TASSOINATT1
-  - Tasso occupazione:     150_878, 150_881, DCCV_TAXOCCU1, DCCV_TASSOOCCU1
+  - Inattivi:              152_928, 152_879, DCCV_INATTIV1, DCCV_INATTIVMENS1
+  - Tasso inattività:      152_913, 152_878, DCCV_TAXINATT1, DCCV_TAXINATTMENS1
+  - Tasso occupazione:     150_915, 150_872, DCCV_TAXOCCU1, DCCV_TAXOCCUMENS1
   - Reddito famiglie:      175_634 (DSD: DCCN_ISTITUZ_TNA)
 
 Note: ISTAT often exposes labour-force dataflows as broader datasets;
@@ -108,7 +108,14 @@ def _records(df: pd.DataFrame) -> list[dict]:
 
 def _base100(series: pd.Series, periods: pd.Series, base: str) -> pd.Series:
     """Index a numeric series to 100 at the row whose period == base."""
-    mask = periods.astype(str) == base
+    str_periods = periods.astype(str)
+    mask = str_periods == base
+    # Fallback: monthly base "2023-01" → quarterly "2023-Q1"
+    if not mask.any() and re.match(r"^\d{4}-(\d{2})$", base):
+        month = int(base.split("-")[1])
+        q = (month - 1) // 3 + 1
+        q_base = f"{base.split('-')[0]}-Q{q}"
+        mask = str_periods == q_base
     if not mask.any():
         return series
     base_val = series.loc[mask].iloc[0]
@@ -308,14 +315,13 @@ def build_occupati(df_raw: pd.DataFrame) -> dict:
             tv = total_val.max()  # pick aggregate if duplicates remain
             if tv == 0:
                 continue
-            for code, label in [(pos_empl, "Dipendenti"), (pos_self, "Indipendenti")]:
-                v = g.loc[g[pos_col] == code, "OBS_VALUE"]
-                if not v.empty:
-                    comp_list.append({
-                        "periodo": per,
-                        "posizione": label,
-                        "quota_pct": round(float(v.max() / tv * 100), 2),
-                    })
+            v_dip = g.loc[g[pos_col] == pos_empl, "OBS_VALUE"]
+            v_ind = g.loc[g[pos_col] == pos_self, "OBS_VALUE"]
+            if not v_dip.empty and not v_ind.empty:
+                pct_dip = round(float(v_dip.max() / tv * 100), 2)
+                pct_ind = round(100.0 - pct_dip, 2)
+                comp_list.append({"periodo": per, "posizione": "Dipendenti", "quota_pct": pct_dip})
+                comp_list.append({"periodo": per, "posizione": "Indipendenti", "quota_pct": pct_ind})
     comp_df = pd.DataFrame(comp_list).sort_values(["periodo", "posizione"]) if comp_list else pd.DataFrame()
 
     # ── 1d. Per fascia d'età (base 100 gen 2023) ────────────────────
@@ -485,7 +491,31 @@ def build_tasso_inattivita(df_raw: pd.DataFrame) -> dict:
 
     rates = df_it[
         (df_it["SESSO"] == "9") & (df_it["CLASSE_ETA"] == "Y15-64")
-    ].sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD").copy()
+    ].copy()
+
+    # Reduce extra dimensions to their aggregate value
+    _rate_known = {"ITTER107", "SESSO", "CLASSE_ETA", "TIME_PERIOD",
+                   "OBS_VALUE", "FREQ", "DATAFLOW", "OBS_STATUS", "OBS_FLAG",
+                   "UNIT_MEASURE", "UNIT_MULT", "CONF_STATUS", "ACTION"}
+    for _ecol in list(rates.columns):
+        if _ecol in _rate_known:
+            continue
+        _evals = sorted(rates[_ecol].dropna().astype(str).unique().tolist())
+        if len(_evals) > 1:
+            _etotal = next((t for t in _TOTAL_TOKENS if t in _evals), None)
+            if _etotal:
+                rates = rates[rates[_ecol].astype(str) == _etotal].copy()
+                print(f"  tassi_inattivita extra dim {_ecol}: filtered to {_etotal}")
+
+    rates = rates.sort_values("TIME_PERIOD").drop_duplicates("TIME_PERIOD").copy()
+
+    # Sanity: inactivity rates should be 0-100; values > 100 are likely
+    # absolute counts (thousands) instead of percentages
+    median_val = rates["OBS_VALUE"].median()
+    if median_val > 100:
+        print(f"  ⚠ tassi_inattivita median={median_val:.1f} > 100 — "
+              f"looks like absolute counts, not rates")
+
     out = rates[["TIME_PERIOD", "OBS_VALUE"]].rename(
         columns={"TIME_PERIOD": "periodo", "OBS_VALUE": "tasso_inattivita"}
     )
@@ -685,9 +715,9 @@ def main():
             "base_index": BASE_PERIOD,
             "datasets": [
                 "150_875|DCCV_OCCUPATI1",
-                "150_879|150_880|DCCV_INATTIVI1",
-                "150_882|150_883|DCCV_TAXINATT1",
-                "150_878|150_881|DCCV_TAXOCCU1",
+                "152_928|152_879|DCCV_INATTIV1",
+                "152_913|152_878|DCCV_TAXINATT1",
+                "150_915|150_872|DCCV_TAXOCCU1",
                 "175_634|DCCN_ISTITUZ_TNA",
             ],
         }
@@ -698,9 +728,9 @@ def main():
     # Numeric IDs are for esploradati.istat.it; DSD names are fallbacks.
     dataflows = [
         (["150_875", "DCCV_OCCUPATI1", "DCCV_OCCUPATIMENS1"], START_PERIOD),
-        (["150_879", "150_880", "DCCV_INATTIVI1", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
-        (["150_882", "150_883", "DCCV_TAXINATT1", "DCCV_TASSOINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
-        (["150_878", "150_881", "DCCV_TAXOCCU1", "DCCV_TASSOOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
+        (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
+        (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
+        (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
         (["175_634", "93_1095", "737_1093"], "2015-01"),
     ]
     frames = []
