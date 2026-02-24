@@ -807,7 +807,7 @@ def main():
                 "152_928|152_879|DCCV_INATTIV1",
                 "152_913|152_878|DCCV_TAXINATT1",
                 "150_915|150_872|DCCV_TAXOCCU1",
-                "162_1064|94_1063|DCCN_ISTITUZ_QNA1",
+                "162_1064|94_1063|396_61|DCCN_ISTITUZ_QNA1",
             ],
         }
     }
@@ -820,7 +820,7 @@ def main():
         (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
-        (["162_1064", "94_1063", "DCCN_ISTITUZ_QNA1", "DCCN_ISTITUZ_TNA"], "2015"),
+        (["162_1064", "94_1063", "396_61", "DCCN_ISTITUZ_QNA1", "DCCN_SEQCONTIRFT"], "2015"),
     ]
     frames = []
     failed_dataflows = []
