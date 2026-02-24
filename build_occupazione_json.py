@@ -70,7 +70,7 @@ def _fetch_csv(dataflow_refs: list[str], start: str = START_PERIOD,
                 _rate_limit_wait()
                 t0 = time.monotonic()
                 try:
-                    r = requests.get(url, headers=CSV_ACCEPT, timeout=90)
+                    r = requests.get(url, headers=CSV_ACCEPT, timeout=120)
                     r.raise_for_status()
                     df = pd.read_csv(io.StringIO(r.text), dtype=str, low_memory=False)
                     dt = time.monotonic() - t0
@@ -676,11 +676,17 @@ def build_tasso_occupazione(df_raw: pd.DataFrame) -> dict:
 
 # ── 5. REDDITO DISPONIBILE FAMIGLIE ────────────────────────────────
 def build_reddito(df_raw: pd.DataFrame) -> dict:
-    # National accounts are quarterly — try Q first, fall back to no filter
+    # National accounts are quarterly — try Q first, fall back to A, then no filter
     df = _norm(df_raw, freq="Q")
+    if df.empty:
+        df = _norm(df_raw, freq="A")
     if df.empty:
         df = _norm(df_raw, freq=None)
     _diag(df, "REDDITO")
+
+    if df.empty:
+        print("  ⚠ No reddito data available — returning empty")
+        return {"reddito_disponibile": [], "base_period_reddito": None}
 
     # Filter for territory = Italy if available
     if "ITTER107" in df.columns:
@@ -711,7 +717,8 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
         households = df_it.copy()
 
     # Find disposable income indicator (B6G = gross disposable income in ESA 2010)
-    tipo_col = _col(households, "TIPO_DATO_CNT", "TIPO_DATO", "AGGREGATO", "TIPO_CONTO")
+    tipo_col = _col(households, "TIPO_DATO_CNT", "TIPO_DATO", "AGGREGATO",
+                     "TIPO_CONTO", "TIPO_OPERAZIONE", "CONTO")
     if tipo_col:
         tipo_vals = sorted(households[tipo_col].unique().tolist())
         print(f"  {tipo_col} values: {tipo_vals[:30]}")
@@ -763,6 +770,10 @@ def build_reddito(df_raw: pd.DataFrame) -> dict:
 
     reddito = _dedup_total(reddito)
 
+    if reddito.empty:
+        print("  ⚠ No reddito rows after filtering — returning empty")
+        return {"reddito_disponibile": [], "base_period_reddito": None}
+
     # Base‑100 index (first 2023 period available)
     periods = reddito["TIME_PERIOD"].astype(str)
     base_mask = periods.str.startswith("2023")
@@ -796,7 +807,7 @@ def main():
                 "152_928|152_879|DCCV_INATTIV1",
                 "152_913|152_878|DCCV_TAXINATT1",
                 "150_915|150_872|DCCV_TAXOCCU1",
-                "175_634|DCCN_ISTITUZ_TNA",
+                "162_1064|94_1063|DCCN_ISTITUZ_QNA1",
             ],
         }
     }
@@ -809,7 +820,7 @@ def main():
         (["152_928", "152_879", "DCCV_INATTIV1", "DCCV_INATTIVMENS1"], START_PERIOD),
         (["152_913", "152_878", "DCCV_TAXINATT1", "DCCV_TAXINATTMENS1"], START_PERIOD),
         (["150_915", "150_872", "DCCV_TAXOCCU1", "DCCV_TAXOCCUMENS1"], START_PERIOD),
-        (["175_634", "93_1095", "737_1093"], "2015-01"),
+        (["162_1064", "94_1063", "DCCN_ISTITUZ_QNA1", "DCCN_ISTITUZ_TNA"], "2015"),
     ]
     frames = []
     failed_dataflows = []
