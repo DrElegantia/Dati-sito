@@ -77,6 +77,103 @@ MONTHS_IT = {
     'settembre': 9, 'ottobre': 10, 'novembre': 11, 'dicembre': 12,
 }
 
+# Dati hardcoded come fallback quando Wikipedia non è raggiungibile
+FALLBACK_FESTIVAL_DATA = {
+    2015: {'dates': ('2015-02-10', '2015-02-14'), 'artists': [
+        'Il Volo', 'Nek', 'Malika Ayane', 'Dear Jack', 'Chiara',
+        'Nesli', 'Annalisa', 'Lorenzo Fragola', 'Nina Zilli',
+        'Gianluca Grignani', 'Marco Masini', 'Moreno', 'Alex Britti',
+        'Grazia Di Michele e Mauro Coruzzi', 'Bianca Atzei', 'Lara Fabian',
+        'Raf', 'Stadio', 'Nomadi', 'Federica Carta',
+    ]},
+    2016: {'dates': ('2016-02-09', '2016-02-13'), 'artists': [
+        'Stadio', 'Francesca Michielin', 'Deborah Iurato e Giovanni Caccamo',
+        'Enrico Ruggeri', 'Arisa', 'Noemi', 'Alessio Bernabei', 'Annalisa',
+        'Lorenzo Fragola', 'Rocco Hunt', 'Dear Jack', 'Elodie', 'Bluvertigo',
+        'Dolcenera', 'Valerio Scanu', 'Neffa', 'Patty Pravo',
+        'Irene Fornaciari', 'Clementino', 'Zero Assoluto',
+    ]},
+    2017: {'dates': ('2017-02-07', '2017-02-11'), 'artists': [
+        'Francesco Gabbani', 'Fiorella Mannoia', 'Ermal Meta',
+        'Michele Bravi', 'Fabrizio Moro', 'Elodie', 'Paola Turci',
+        'Sergio Sylvestre', 'Ron', 'Gigi D\'Alessio', 'Al Bano',
+        'Bianca Atzei', 'Clementino', 'Samuel', 'Giusy Ferreri',
+        'Lodovica Comello', 'Raige e Giulia Luzi', 'Nesli',
+        'Michele Zarrillo', 'Chiara', 'Marco Masini', 'Lele',
+    ]},
+    2018: {'dates': ('2018-02-06', '2018-02-10'), 'artists': [
+        'Ermal Meta e Fabrizio Moro', 'Lo Stato Sociale', 'Annalisa',
+        'Ultimo', 'Max Gazzè', 'Ron', 'Nina Zilli', 'Noemi',
+        'Le Vibrazioni', 'Diodato e Roy Paci', 'Ornella Vanoni',
+        'Gio Evan', 'Luca Barbarossa', 'Decibel', 'Roby Facchinetti e Riccardo Fogli',
+        'Red Canzian', 'Renzo Rubino', 'Mario Biondi',
+    ]},
+    2019: {'dates': ('2019-02-05', '2019-02-09'), 'artists': [
+        'Mahmood', 'Ultimo', 'Il Volo', 'Irama', 'Loredana Bertè',
+        'Simone Cristicchi', 'Daniele Silvestri', 'Arisa', 'Achille Lauro',
+        'Boomdabash', 'Federica Carta e Shade', 'Ex-Otago', 'Ghemon',
+        'Zen Circus', 'Enrico Nigiotti', 'Paola Turci', 'Francesco Renga',
+        'Anna Tatangelo', 'Nek', 'Negrita', 'Motta', 'Einar',
+        'Nino D\'Angelo e Livio Cori', 'Patty Pravo e Briga',
+    ]},
+    2020: {'dates': ('2020-02-04', '2020-02-08'), 'artists': [
+        'Diodato', 'Francesco Gabbani', 'Pinguini Tattici Nucleari',
+        'Le Vibrazioni', 'Piero Pelù', 'Tosca', 'Elodie', 'Achille Lauro',
+        'Irene Grandi', 'Rancore', 'Raphael Gualazzi', 'Levante',
+        'Anastasio', 'Alberto Urso', 'Marco Masini', 'Paolo Jannacci',
+        'Rita Pavone', 'Michele Zarrillo', 'Enrico Nigiotti', 'Giordana Angi',
+        'Elettra Lamborghini', 'Junior Cally', 'Riki', 'Bugo e Morgan',
+    ]},
+    2021: {'dates': ('2021-03-02', '2021-03-06'), 'artists': [
+        'Maneskin', 'Fedez e Francesca Michielin', 'Ermal Meta',
+        'Colapesce Dimartino', 'Irama', 'Annalisa', 'Willie Peyote',
+        'Madame', 'Arisa', 'Lo Stato Sociale', 'Malika Ayane', 'Noemi',
+        'Coma_Cose', 'La Rappresentante di Lista', 'Extraliscio feat. Davide Toffolo',
+        'Gaia', 'Fasma', 'Fulminacci', 'Orietta Berti', 'Max Gazzè',
+        'Ghemon', 'Gio Evan', 'Francesco Renga', 'Bugo', 'Random', 'Aiello',
+    ]},
+    2022: {'dates': ('2022-02-01', '2022-02-05'), 'artists': [
+        'Mahmood e Blanco', 'Elisa', 'Gianni Morandi', 'Irama',
+        'Sangiovanni', 'Emma', 'La Rappresentante di Lista', 'Massimo Ranieri',
+        'Dargen D\'Amico', 'Michele Bravi', 'Rkomi', 'Fabrizio Moro',
+        'Achille Lauro', 'Aka 7even', 'Noemi', 'Ditonellapiaga e Rettore',
+        'Matteo Romano', 'Highsnob e Hu', 'Le Vibrazioni', 'Giusy Ferreri',
+        'Iva Zanicchi', 'Giovanni Truppi', 'Yuman', 'Ana Mena', 'Tananai',
+    ]},
+    2023: {'dates': ('2023-02-07', '2023-02-11'), 'artists': [
+        'Marco Mengoni', 'Lazza', 'Mr.Rain', 'Ultimo', 'Tananai',
+        'Madame', 'Giorgia', 'Colapesce Dimartino', 'Elodie', 'Articolo 31',
+        'Levante', 'Modà', 'Gianluca Grignani', 'Rosa Chemical',
+        'Paola e Chiara', 'Ariete', 'LDA', 'Leo Gassman', 'Colla Zio',
+        'gIANMARIA', 'Mara Sattei', 'Olly', 'Cugini di Campagna',
+        'Anna Oxa', 'Shari', 'Will', 'Sethu',
+    ]},
+    2024: {'dates': ('2024-02-06', '2024-02-10'), 'artists': [
+        'Angelina Mango', 'Geolier', 'Annalisa', 'Ghali', 'Irama',
+        'Negramaro', 'The Kolors', 'Mahmood', 'Il Volo', 'Emma',
+        'Renga Nek', 'Loredana Bertè', 'Alessandra Amoroso',
+        'Ricchi e Poveri', 'Fiorella Mannoia', 'Dargen D\'Amico', 'Mr.Rain',
+        'Clara', 'La Sad', 'Rose Villain', 'Sangiovanni', 'Diodato',
+        'Santi Francesi', 'BigMama', 'Fred De Palma', 'Alfa', 'Bnkr44',
+        'Petit', 'gIANMARIA', 'Il Tre',
+    ]},
+    2025: {'dates': ('2025-02-11', '2025-02-15'), 'artists': [
+        'Olly', 'Lucio Corsi', 'Brunori Sas', 'Fedez', 'Simone Cristicchi',
+        'Giorgia', 'Achille Lauro', 'Francesco Gabbani', 'Irama', 'Coma_Cose',
+        'Bresh', 'Elodie', 'Noemi', 'The Kolors', 'Rocco Hunt',
+        'Willie Peyote', 'Sarah Toscano', 'Shablo feat. Gue, Joshua e Tormento',
+        'Rose Villain', 'Joan Thiele', 'Francesca Michielin', 'Modà',
+        'Massimo Ranieri', 'Serena Brancale', 'Tony Effe', 'Gaia', 'Clara',
+        'Rkomi', 'Marcella Bella',
+    ]},
+    2026: {'dates': ('2026-02-24', '2026-02-28'), 'artists': [
+        'Patty Pravo', 'LDA', 'Aka 7even', 'Enrico Nigiotti',
+        'Tommaso Paradiso', 'Elettra Lamborghini', 'Ermal Meta', 'Levante',
+        'Bambole di pezza', 'Chiello', 'J-Ax', 'Nayt', 'Fulminacci',
+        'Fedez', 'Marco Masini', 'Dargen D\'Amico', 'Ditonellapiaga',
+    ]},
+}
+
 
 # ============================================================
 # Wikipedia: date festival + lista artisti
@@ -117,39 +214,66 @@ def get_wikipedia_data(year):
     r.raise_for_status()
     html = r.text
 
-    # Parse periodo from infobox
-    infoboxes = pd.read_html(html, attrs={'class': 'sinottico'})
+    # Try multiple infobox class names (Wikipedia changes these)
+    infoboxes = []
+    for cls in ('sinottico', 'infobox', 'infobox vevent'):
+        try:
+            infoboxes = pd.read_html(html, attrs={'class': cls})
+            if infoboxes:
+                break
+        except ValueError:
+            continue
+
+    # Last resort: scan all tables
     if not infoboxes:
-        infoboxes = pd.read_html(html)
+        try:
+            infoboxes = pd.read_html(html)
+        except ValueError:
+            raise RuntimeError(f'Nessuna tabella trovata su Wikipedia per {year}')
 
     periodo = None
-    for df in infoboxes[:5]:
+    for df in infoboxes[:10]:
         if df.shape[1] >= 2:
             for _, row in df.iterrows():
                 k = norm_text(row.iloc[0]).lower()
-                if k == 'periodo':
+                if 'periodo' in k:
                     periodo = norm_text(row.iloc[1])
                     break
         if periodo:
             break
     if not periodo:
-        raise RuntimeError(f'Periodo non trovato su Wikipedia per {year}')
+        raise RuntimeError(f'Campo "Periodo" non trovato su Wikipedia per {year}')
 
     start, end = parse_periodo(year, periodo)
 
     # Parse artists from tables with "Interprete" column
-    tables = pd.read_html(html)
+    try:
+        tables = pd.read_html(html)
+    except ValueError:
+        tables = []
     artists = set()
     for df in tables:
         cols = [str(c).strip().lower() for c in df.columns]
-        if 'interprete' in cols:
-            col = df.columns[cols.index('interprete')]
-            for x in df[col].dropna().tolist():
-                name = clean_artist_name(x)
-                if name and len(name) < 80 and not name[0].isdigit():
-                    artists.add(name)
+        for col_name in ('interprete', 'artista', 'cantante'):
+            if col_name in cols:
+                col = df.columns[cols.index(col_name)]
+                for x in df[col].dropna().tolist():
+                    name = clean_artist_name(x)
+                    if name and len(name) < 80 and not name[0].isdigit():
+                        artists.add(name)
 
     return start, end, sorted(artists)
+
+
+def get_fallback_data(year):
+    """Return hardcoded festival data as fallback."""
+    if year not in FALLBACK_FESTIVAL_DATA:
+        return None, None, []
+    data = FALLBACK_FESTIVAL_DATA[year]
+    start_str, end_str = data['dates']
+    start = date.fromisoformat(start_str)
+    end = date.fromisoformat(end_str)
+    return start, end, list(data.get('artists', []))
 
 
 # ============================================================
@@ -377,18 +501,22 @@ def process_year(year, browser='chrome', gdl_path=None,
     yeardir = os.path.join(OUTPUT_ROOT, str(year))
     os.makedirs(yeardir, exist_ok=True)
 
-    # 1) Wikipedia data
-    print(f'  [1] Fetching Wikipedia data...')
+    # 1) Festival data: Wikipedia → fallback hardcoded
+    print(f'  [1] Fetching dati festival...')
+    start = end = None
+    artists = []
     try:
         start, end, artists = get_wikipedia_data(year)
-        print(f'      Date: {start} → {end}')
-        print(f'      Artisti trovati: {len(artists)}')
+        print(f'      [Wikipedia] Date: {start} → {end}')
+        print(f'      [Wikipedia] Artisti trovati: {len(artists)}')
     except Exception as e:
-        print(f'      ERRORE Wikipedia: {e}')
-        print(f'      Uso dati repo esistenti come fallback...')
-        # Fallback: use existing repo data
-        artists = []
-        start = end = None
+        print(f'      ⚠ Wikipedia non disponibile: {e}')
+        start, end, artists = get_fallback_data(year)
+        if start:
+            print(f'      [Fallback] Date: {start} → {end}')
+            print(f'      [Fallback] Artisti: {len(artists)}')
+        else:
+            print(f'      ✗ Nessun dato disponibile per {year} (né Wikipedia né fallback)')
 
     # Save metadata
     meta = {
