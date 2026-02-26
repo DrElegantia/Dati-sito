@@ -214,17 +214,26 @@ def get_wikipedia_data(year):
     r.raise_for_status()
     html = r.text
 
-    # Try multiple infobox class names (Wikipedia changes these)
+    # Strategy 1: find the infobox by content ("Periodo")
+    # This avoids lxml XPath exact-match issues with multi-class attributes
+    # (e.g. class="sinottico tematica" != "sinottico")
     infoboxes = []
-    for cls in ('sinottico', 'infobox', 'infobox vevent'):
-        try:
-            infoboxes = pd.read_html(html, attrs={'class': cls})
-            if infoboxes:
-                break
-        except ValueError:
-            continue
+    try:
+        infoboxes = pd.read_html(html, match='Periodo')
+    except ValueError:
+        pass
 
-    # Last resort: scan all tables
+    # Strategy 2: try class-based selectors
+    if not infoboxes:
+        for cls in ('sinottico', 'infobox', 'infobox vevent'):
+            try:
+                infoboxes = pd.read_html(html, attrs={'class': cls})
+                if infoboxes:
+                    break
+            except ValueError:
+                continue
+
+    # Strategy 3: scan all tables
     if not infoboxes:
         try:
             infoboxes = pd.read_html(html)
@@ -253,6 +262,9 @@ def get_wikipedia_data(year):
         tables = []
     artists = set()
     for df in tables:
+        # Flatten MultiIndex columns (merged header rows on Wikipedia)
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = [' '.join(str(c) for c in col).strip() for col in df.columns]
         cols = [str(c).strip().lower() for c in df.columns]
         for col_name in ('interprete', 'artista', 'cantante'):
             if col_name in cols:
