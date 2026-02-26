@@ -26,6 +26,21 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+try:
+    from sklearn.ensemble import (
+        RandomForestRegressor, GradientBoostingRegressor,
+        RandomForestClassifier, GradientBoostingClassifier,
+    )
+    from sklearn.linear_model import LinearRegression, LogisticRegression
+    from sklearn.model_selection import (
+        cross_val_score, RepeatedKFold, RepeatedStratifiedKFold,
+        permutation_test_score,
+    )
+    from sklearn.preprocessing import StandardScaler
+    HAS_SKLEARN = True
+except ImportError:
+    HAS_SKLEARN = False
+
 warnings.filterwarnings("ignore")
 
 
@@ -543,6 +558,503 @@ def test_kruskal_per_serata(raw_df: pd.DataFrame) -> dict:
 
 
 # ============================================================
+# Test aggiuntivo: 5 fasce (quintili) per-serata
+# ============================================================
+
+FASCE_5_LABELS = [
+    "Q1 (0-20%)", "Q2 (20-40%)", "Q3 (40-60%)", "Q4 (60-80%)", "Q5 (80-100%)"
+]
+FASCE_5_BINS = [-0.001, 0.2, 0.4, 0.6, 0.8, 1.001]
+
+
+def test_5_fasce_per_serata(raw_df: pd.DataFrame) -> dict:
+    """
+    Kruskal-Wallis H test con 5 quintili calcolato per-serata.
+    Nella singola serata le posizioni sono distribuite uniformemente
+    tra 0 e 1, quindi le 5 fasce risultano naturalmente bilanciate.
+    Fisher combined test per il p-value globale.
+    """
+    n_per_year = raw_df.groupby("year")["classifica_finale"].max().to_dict()
+    raw_df = raw_df.copy()
+    raw_df["rank_norm"] = raw_df.apply(
+        lambda r: (r["classifica_finale"] - 1) / max(n_per_year.get(r["year"], 1) - 1, 1),
+        axis=1,
+    )
+
+    per_serata_results = []
+
+    for year in sorted(raw_df["year"].unique()):
+        for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
+            sdf = raw_df[(raw_df["year"] == year) & (raw_df["serata"] == serata)].copy()
+            if len(sdf) < 10:
+                continue
+
+            sdf["fascia_5"] = pd.cut(
+                sdf["posizione_relativa"],
+                bins=FASCE_5_BINS,
+                labels=FASCE_5_LABELS,
+            )
+
+            groups = []
+            labels_used = []
+            for fascia in FASCE_5_LABELS:
+                g = sdf[sdf["fascia_5"] == fascia]["rank_norm"]
+                if len(g) >= 2:
+                    groups.append(g.values)
+                    labels_used.append(fascia)
+
+            if len(groups) >= 3:
+                h_stat, p_val = stats.kruskal(*groups)
+            else:
+                h_stat, p_val = None, None
+
+            fasce_stats = {}
+            for fascia in FASCE_5_LABELS:
+                g = sdf[sdf["fascia_5"] == fascia]["rank_norm"]
+                if len(g) > 0:
+                    fasce_stats[fascia] = {
+                        "n": int(len(g)),
+                        "media": _safe_float(g.mean()),
+                        "mediana": _safe_float(g.median()),
+                    }
+
+            per_serata_results.append({
+                "anno": int(year),
+                "serata": int(serata),
+                "n": int(len(sdf)),
+                "H": _safe_float(h_stat),
+                "p_value": _safe_float(p_val),
+                "significativo": bool(p_val < 0.05) if p_val is not None else False,
+                "fasce": fasce_stats,
+            })
+
+    # Fisher combined probability test
+    valid_p = [r["p_value"] for r in per_serata_results if r["p_value"] is not None]
+    if len(valid_p) >= 2:
+        fisher_stat = -2 * sum(np.log(max(p, 1e-300)) for p in valid_p)
+        fisher_df = 2 * len(valid_p)
+        fisher_p = 1 - stats.chi2.cdf(fisher_stat, fisher_df)
+    else:
+        fisher_stat, fisher_df, fisher_p = None, None, None
+
+    # Aggregato su tutte le osservazioni pooled
+    raw_df["fascia_5_serata"] = pd.cut(
+        raw_df["posizione_relativa"],
+        bins=FASCE_5_BINS,
+        labels=FASCE_5_LABELS,
+    )
+
+    aggregate_stats = []
+    for fascia in FASCE_5_LABELS:
+        g = raw_df[raw_df["fascia_5_serata"] == fascia]
+        if len(g) > 0:
+            aggregate_stats.append({
+                "fascia": fascia,
+                "n": int(len(g)),
+                "rank_norm_media": _safe_float(g["rank_norm"].mean()),
+                "rank_norm_mediana": _safe_float(g["rank_norm"].median()),
+                "classifica_media": _safe_float(g["classifica_finale"].mean()),
+                "classifica_mediana": _safe_float(g["classifica_finale"].median()),
+            })
+
+    # KW globale su dati pooled
+    groups_all = []
+    for fascia in FASCE_5_LABELS:
+        g = raw_df[raw_df["fascia_5_serata"] == fascia]["rank_norm"]
+        if len(g) >= 2:
+            groups_all.append(g.values)
+
+    if len(groups_all) >= 3:
+        h_all, p_all = stats.kruskal(*groups_all)
+        N_all = sum(len(g) for g in groups_all)
+        k_all = len(groups_all)
+        eta_sq_all = (h_all - k_all + 1) / (N_all - k_all) if N_all > k_all else None
+    else:
+        h_all, p_all, eta_sq_all = None, None, None
+
+    n_sig = sum(1 for r in per_serata_results if r["significativo"])
+
+    return {
+        "test": "Kruskal-Wallis 5 quintili per-serata + Fisher combined",
+        "descrizione": (
+            "Kruskal-Wallis H test con 5 quintili di posizione (0-20%, 20-40%, 40-60%, "
+            "60-80%, 80-100%) calcolato per ogni singola serata. Nella singola serata "
+            "i 5 gruppi sono naturalmente bilanciati (~3-6 artisti ciascuno). "
+            "Fisher combined test per il p-value globale. "
+            "Test aggregato anche su tutte le osservazioni pooled."
+        ),
+        "ipotesi_nulla": "La distribuzione del ranking è identica tra i 5 quintili di posizione",
+        "n_serate_analizzate": len(per_serata_results),
+        "n_serate_significative": n_sig,
+        "fisher_combined": {
+            "chi2": _safe_float(fisher_stat),
+            "df": fisher_df,
+            "p_value": _safe_float(fisher_p),
+            "significativo": bool(fisher_p < 0.05) if fisher_p is not None else False,
+            "interpretazione": _interpret_p(fisher_p),
+        },
+        "aggregato_pooled": {
+            "H_statistic": _safe_float(h_all),
+            "p_value": _safe_float(p_all),
+            "eta_squared": _safe_float(eta_sq_all),
+            "significativo": bool(p_all < 0.05) if p_all is not None else False,
+            "interpretazione": _interpret_p(p_all),
+            "statistiche_per_fascia": aggregate_stats,
+        },
+        "dettaglio_per_serata": per_serata_results,
+    }
+
+
+# ============================================================
+# Probabilità per quintile
+# ============================================================
+
+def test_probabilita_per_fascia(raw_df: pd.DataFrame, data: pd.DataFrame) -> dict:
+    """
+    Per ognuno dei 5 quintili: P(top 3), P(top 5), P(top 10), P(vincitore).
+    Due livelli:
+      - per-osservazione (raw: un artista conta per ogni serata in cui si è esibito)
+      - per-artista (posizione media, ogni artista conta una volta per anno)
+    """
+    # --- Per-osservazione (per-serata) ---
+    raw = raw_df.copy()
+    raw["fascia_5"] = pd.cut(
+        raw["posizione_relativa"],
+        bins=FASCE_5_BINS,
+        labels=FASCE_5_LABELS,
+    )
+
+    per_obs = []
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]
+        if len(g) == 0:
+            continue
+        n = len(g)
+        per_obs.append({
+            "fascia": fascia,
+            "n_osservazioni": n,
+            "pct_top_3": _safe_float((g["classifica_finale"] <= 3).mean() * 100),
+            "pct_top_5": _safe_float((g["classifica_finale"] <= 5).mean() * 100),
+            "pct_top_10": _safe_float((g["classifica_finale"] <= 10).mean() * 100),
+            "pct_vincitore": _safe_float((g["classifica_finale"] == 1).mean() * 100),
+            "classifica_media": _safe_float(g["classifica_finale"].mean()),
+            "classifica_mediana": _safe_float(g["classifica_finale"].median()),
+        })
+
+    # --- Per-artista (posizione media) ---
+    art = data.copy()
+    art["fascia_5"] = pd.cut(
+        art["pos_rel_media"],
+        bins=FASCE_5_BINS,
+        labels=FASCE_5_LABELS,
+    )
+
+    per_art = []
+    for fascia in FASCE_5_LABELS:
+        g = art[art["fascia_5"] == fascia]
+        if len(g) == 0:
+            continue
+        n = len(g)
+        per_art.append({
+            "fascia": fascia,
+            "n_artisti": n,
+            "pct_top_3": _safe_float((g["classifica_finale"] <= 3).mean() * 100),
+            "pct_top_5": _safe_float((g["classifica_finale"] <= 5).mean() * 100),
+            "pct_top_10": _safe_float((g["classifica_finale"] <= 10).mean() * 100),
+            "pct_vincitore": _safe_float((g["classifica_finale"] == 1).mean() * 100),
+            "classifica_media": _safe_float(g["classifica_finale"].mean()),
+            "classifica_mediana": _safe_float(g["classifica_finale"].median()),
+        })
+
+    # --- Per-artista con qcut (quintili bilanciati per dimensione) ---
+    try:
+        art["fascia_5_qcut"] = pd.qcut(
+            art["pos_rel_media"], q=5,
+            labels=["Q1 (bottom)", "Q2", "Q3 (center)", "Q4", "Q5 (top)"],
+        )
+        per_art_qcut = []
+        for fascia in ["Q1 (bottom)", "Q2", "Q3 (center)", "Q4", "Q5 (top)"]:
+            g = art[art["fascia_5_qcut"] == fascia]
+            if len(g) == 0:
+                continue
+            per_art_qcut.append({
+                "fascia": fascia,
+                "n_artisti": int(len(g)),
+                "pos_rel_range": f"{g['pos_rel_media'].min():.3f}-{g['pos_rel_media'].max():.3f}",
+                "pct_top_3": _safe_float((g["classifica_finale"] <= 3).mean() * 100),
+                "pct_top_5": _safe_float((g["classifica_finale"] <= 5).mean() * 100),
+                "pct_top_10": _safe_float((g["classifica_finale"] <= 10).mean() * 100),
+                "pct_vincitore": _safe_float((g["classifica_finale"] == 1).mean() * 100),
+                "classifica_media": _safe_float(g["classifica_finale"].mean()),
+            })
+    except ValueError:
+        per_art_qcut = []
+
+    # Chi² test: top 5 vs non-top-5 across 5 bands (per-osservazione)
+    chi2_obs = None
+    ct_data = []
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]
+        if len(g) > 0:
+            ct_data.append([int((g["classifica_finale"] <= 5).sum()),
+                            int((g["classifica_finale"] > 5).sum())])
+    if len(ct_data) >= 2:
+        ct = np.array(ct_data)
+        if ct.sum() > 0 and ct.min() >= 0:
+            chi2, p, dof, _ = stats.chi2_contingency(ct)
+            n_total = ct.sum()
+            min_dim = min(ct.shape) - 1
+            cramers_v = np.sqrt(chi2 / (n_total * max(min_dim, 1)))
+            chi2_obs = {
+                "chi2": _safe_float(chi2),
+                "p_value": _safe_float(p),
+                "dof": int(dof),
+                "cramers_v": _safe_float(cramers_v),
+                "significativo": bool(p < 0.05),
+                "interpretazione": _interpret_p(p),
+            }
+
+    return {
+        "test": "Probabilità per fascia (5 quintili)",
+        "descrizione": (
+            "Per ogni quintile di posizione: percentuale di artisti in top 3/5/10 "
+            "e vincitori. Tre modalità: (a) per-osservazione (un artista conta per "
+            "ogni serata), (b) per-artista con fasce fisse (media posizione), "
+            "(c) per-artista con qcut (quintili bilanciati per numerosità). "
+            "Chi² sulla tabella di contingenza quintile × top 5."
+        ),
+        "per_osservazione_serata": per_obs,
+        "per_artista_fasce_fisse": per_art,
+        "per_artista_quintili_bilanciati": per_art_qcut,
+        "chi2_top5_per_osservazione": chi2_obs,
+    }
+
+
+# ============================================================
+# Machine Learning: la fascia predice il piazzamento?
+# ============================================================
+
+def ml_prediction_analysis(data: pd.DataFrame, raw_df: pd.DataFrame) -> dict:
+    """
+    ML models per verificare se la posizione di esibizione predice la classifica.
+      A) Regressione: predire classifica_finale
+      B) Classificazione: predire top 5 / top 10
+      C) Permutation test per significatività statistica
+    """
+    if not HAS_SKLEARN:
+        return {
+            "test": "Machine Learning — La fascia predice la classifica?",
+            "errore": "sklearn non disponibile",
+        }
+
+    results = {}
+
+    # Prepare features (per-artista)
+    df = data.copy()
+    df["fascia_5_ord"] = pd.cut(
+        df["pos_rel_media"],
+        bins=FASCE_5_BINS,
+        labels=[1, 2, 3, 4, 5],
+    ).astype(float)
+
+    feature_cols = ["pos_rel_media", "fascia_5_ord", "n_serate", "n_partecipanti"]
+    X = df[feature_cols].values
+    y_rank = df["classifica_finale"].values
+    y_top5 = (df["classifica_finale"] <= 5).astype(int).values
+    y_top10 = (df["classifica_finale"] <= 10).astype(int).values
+
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # ── A) Regressione ──
+    baseline_mae = float(np.abs(y_rank - y_rank.mean()).mean())
+
+    reg_models = {
+        "LinearRegression": LinearRegression(),
+        "RandomForest": RandomForestRegressor(n_estimators=200, max_depth=3, random_state=42),
+        "GradientBoosting": GradientBoostingRegressor(n_estimators=200, max_depth=2, random_state=42),
+    }
+
+    cv_reg = RepeatedKFold(n_splits=5, n_repeats=10, random_state=42)
+    reg_results = []
+
+    for name, model in reg_models.items():
+        mae_scores = cross_val_score(model, X_scaled, y_rank, cv=cv_reg, scoring="neg_mean_absolute_error")
+        r2_scores = cross_val_score(model, X_scaled, y_rank, cv=cv_reg, scoring="r2")
+        mae = float(-mae_scores.mean())
+        r2 = float(r2_scores.mean())
+        improvement = (baseline_mae - mae) / baseline_mae * 100
+
+        reg_results.append({
+            "modello": name,
+            "cv_mae": _safe_float(mae),
+            "cv_mae_std": _safe_float(mae_scores.std()),
+            "cv_r2": _safe_float(r2),
+            "cv_r2_std": _safe_float(r2_scores.std()),
+            "baseline_mae": _safe_float(baseline_mae),
+            "miglioramento_pct": _safe_float(improvement),
+        })
+
+    # Feature importance
+    rf = RandomForestRegressor(n_estimators=200, max_depth=3, random_state=42)
+    rf.fit(X_scaled, y_rank)
+    feat_imp = sorted(
+        [{"feature": f, "importance": _safe_float(i)}
+         for f, i in zip(feature_cols, rf.feature_importances_)],
+        key=lambda x: -x["importance"],
+    )
+
+    results["regressione"] = {
+        "descrizione": "Predire la classifica finale dalla posizione di esibizione",
+        "features": feature_cols,
+        "target": "classifica_finale",
+        "n_campioni": int(len(X)),
+        "baseline_mae": _safe_float(baseline_mae),
+        "modelli": reg_results,
+        "feature_importance_rf": feat_imp,
+    }
+
+    # ── B) Classificazione Top 5 ──
+    if y_top5.sum() >= 5 and (len(y_top5) - y_top5.sum()) >= 5:
+        baseline_acc_5 = float(max(y_top5.mean(), 1 - y_top5.mean()))
+        clf_models = {
+            "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+            "RandomForest": RandomForestClassifier(n_estimators=200, max_depth=3, random_state=42),
+            "GradientBoosting": GradientBoostingClassifier(n_estimators=200, max_depth=2, random_state=42),
+        }
+        cv_clf = RepeatedStratifiedKFold(n_splits=5, n_repeats=10, random_state=42)
+        clf5_results = []
+        for name, model in clf_models.items():
+            acc = cross_val_score(model, X_scaled, y_top5, cv=cv_clf, scoring="accuracy")
+            f1 = cross_val_score(model, X_scaled, y_top5, cv=cv_clf, scoring="f1")
+            roc = cross_val_score(model, X_scaled, y_top5, cv=cv_clf, scoring="roc_auc")
+            clf5_results.append({
+                "modello": name,
+                "cv_accuracy": _safe_float(acc.mean()),
+                "cv_accuracy_std": _safe_float(acc.std()),
+                "cv_f1": _safe_float(f1.mean()),
+                "cv_roc_auc": _safe_float(roc.mean()),
+                "baseline_accuracy": _safe_float(baseline_acc_5),
+            })
+        results["classificazione_top5"] = {
+            "descrizione": "Classificazione binaria: l'artista arriva in top 5?",
+            "features": feature_cols,
+            "n_campioni": int(len(X)),
+            "n_positivi": int(y_top5.sum()),
+            "baseline_accuracy": _safe_float(baseline_acc_5),
+            "modelli": clf5_results,
+        }
+
+    # ── C) Classificazione Top 10 ──
+    if y_top10.sum() >= 5 and (len(y_top10) - y_top10.sum()) >= 5:
+        baseline_acc_10 = float(max(y_top10.mean(), 1 - y_top10.mean()))
+        clf_models_10 = {
+            "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+            "RandomForest": RandomForestClassifier(n_estimators=200, max_depth=3, random_state=42),
+            "GradientBoosting": GradientBoostingClassifier(n_estimators=200, max_depth=2, random_state=42),
+        }
+        cv_clf_10 = RepeatedStratifiedKFold(n_splits=5, n_repeats=10, random_state=42)
+        clf10_results = []
+        for name, model in clf_models_10.items():
+            acc = cross_val_score(model, X_scaled, y_top10, cv=cv_clf_10, scoring="accuracy")
+            f1 = cross_val_score(model, X_scaled, y_top10, cv=cv_clf_10, scoring="f1")
+            roc = cross_val_score(model, X_scaled, y_top10, cv=cv_clf_10, scoring="roc_auc")
+            clf10_results.append({
+                "modello": name,
+                "cv_accuracy": _safe_float(acc.mean()),
+                "cv_accuracy_std": _safe_float(acc.std()),
+                "cv_f1": _safe_float(f1.mean()),
+                "cv_roc_auc": _safe_float(roc.mean()),
+                "baseline_accuracy": _safe_float(baseline_acc_10),
+            })
+        results["classificazione_top10"] = {
+            "descrizione": "Classificazione binaria: l'artista arriva in top 10?",
+            "features": feature_cols,
+            "n_campioni": int(len(X)),
+            "n_positivi": int(y_top10.sum()),
+            "baseline_accuracy": _safe_float(baseline_acc_10),
+            "modelli": clf10_results,
+        }
+
+    # ── D) Permutation test ──
+    rf_perm = RandomForestRegressor(n_estimators=100, max_depth=3, random_state=42)
+    score, perm_scores, p_perm = permutation_test_score(
+        rf_perm, X_scaled, y_rank, cv=5, scoring="r2",
+        n_permutations=200, random_state=42,
+    )
+
+    results["permutation_test"] = {
+        "descrizione": (
+            "Test di permutazione: le features vengono mescolate casualmente 200 volte "
+            "e si verifica se il modello RF ha R² significativamente migliore."
+        ),
+        "r2_originale": _safe_float(score),
+        "r2_permutazioni_media": _safe_float(float(np.mean(perm_scores))),
+        "r2_permutazioni_std": _safe_float(float(np.std(perm_scores))),
+        "p_value": _safe_float(float(p_perm)),
+        "significativo": bool(p_perm < 0.05),
+        "interpretazione": _interpret_p(float(p_perm)),
+    }
+
+    # ── E) Analisi per-serata con ML (più dati, non-indipendente) ──
+    n_per_year = raw_df.groupby("year")["classifica_finale"].max().to_dict()
+    rdf = raw_df.copy()
+    rdf["rank_norm"] = rdf.apply(
+        lambda r: (r["classifica_finale"] - 1) / max(n_per_year.get(r["year"], 1) - 1, 1),
+        axis=1,
+    )
+    rdf["fascia_5_ord"] = pd.cut(
+        rdf["posizione_relativa"],
+        bins=FASCE_5_BINS,
+        labels=[1, 2, 3, 4, 5],
+    ).astype(float)
+
+    feat_raw = ["posizione_relativa", "fascia_5_ord", "totale_serata", "serata"]
+    X_raw = rdf[feat_raw].values
+    y_raw = rdf["classifica_finale"].values
+    X_raw_sc = StandardScaler().fit_transform(X_raw)
+    baseline_raw = float(np.abs(y_raw - y_raw.mean()).mean())
+
+    rf_raw = RandomForestRegressor(n_estimators=200, max_depth=3, random_state=42)
+    cv_raw = RepeatedKFold(n_splits=5, n_repeats=10, random_state=42)
+    mae_raw = float(-cross_val_score(rf_raw, X_raw_sc, y_raw, cv=cv_raw, scoring="neg_mean_absolute_error").mean())
+    r2_raw = float(cross_val_score(rf_raw, X_raw_sc, y_raw, cv=cv_raw, scoring="r2").mean())
+
+    results["per_serata_rf"] = {
+        "descrizione": (
+            "RandomForest su osservazioni per-serata (non indipendenti: stesso artista "
+            "compare in più serate). Più dati ma correlazione intra-artista."
+        ),
+        "features": feat_raw,
+        "n_campioni": int(len(X_raw)),
+        "baseline_mae": _safe_float(baseline_raw),
+        "cv_mae": _safe_float(mae_raw),
+        "cv_r2": _safe_float(r2_raw),
+        "miglioramento_pct": _safe_float((baseline_raw - mae_raw) / baseline_raw * 100),
+    }
+
+    # Significatività complessiva ML
+    ml_significant = bool(p_perm < 0.05)
+    best_reg = min(reg_results, key=lambda x: x["cv_mae"])
+
+    return {
+        "test": "Machine Learning — La fascia predice la classifica?",
+        "descrizione": (
+            "Modelli ML (regressione e classificazione) per verificare se la posizione "
+            "di esibizione è predittiva della classifica finale. "
+            "Features: posizione relativa, quintile, n. serate, n. partecipanti. "
+            "Cross-validation ripetuta (5-fold × 10). "
+            "Permutation test (200 permutazioni) per significatività."
+        ),
+        "significativo": ml_significant,
+        "miglior_modello": best_reg["modello"],
+        "miglior_mae": best_reg["cv_mae"],
+        "miglioramento_su_baseline": best_reg["miglioramento_pct"],
+        "risultati": results,
+    }
+
+
+# ============================================================
 # Dati per visualizzazione
 # ============================================================
 
@@ -647,7 +1159,7 @@ def build_viz_data(data: pd.DataFrame) -> dict:
 # Sintesi e conclusioni
 # ============================================================
 
-def build_summary(test_results: list[dict], data: pd.DataFrame) -> dict:
+def build_summary(test_results: list[dict], data: pd.DataFrame, ml_result: dict | None = None) -> dict:
     """Sintesi testuale dei risultati."""
     n_sig = sum(
         1 for t in test_results
@@ -669,6 +1181,12 @@ def build_summary(test_results: list[dict], data: pd.DataFrame) -> dict:
             for key, val in t["risultati"].items():
                 if isinstance(val, dict) and val.get("significativo"):
                     sig_tests.append(f"{name} ({key})")
+        # Handle aggregato_pooled
+        if isinstance(t.get("aggregato_pooled"), dict) and t["aggregato_pooled"].get("significativo"):
+            sig_tests.append(f"{name} (aggregato)")
+
+    if ml_result and ml_result.get("significativo"):
+        sig_tests.append("ML Permutation Test")
 
     # Direzione dell'effetto
     vincitori = data[data["classifica_finale"] == 1]
@@ -689,16 +1207,16 @@ def build_summary(test_results: list[dict], data: pd.DataFrame) -> dict:
             "posizione": "posizione_relativa media nelle serate 1-4 (0=primo, 1=ultimo)",
             "ranking": "rank_normalizzato = (rank-1)/(N-1), dove N=partecipanti nell'anno",
         },
-        "n_test_eseguiti": len(test_results),
+        "n_test_eseguiti": len(test_results) + (1 if ml_result else 0),
         "test_significativi": sig_tests,
         "posizione_media_vincitori": _safe_float(pos_media_vincitori),
         "rank_medio_centro": _safe_float(centro.mean()) if len(centro) > 0 else None,
         "rank_medio_estremi": _safe_float(estremi.mean()) if len(estremi) > 0 else None,
-        "conclusione": _build_conclusion(test_results, pos_media_vincitori, centro, estremi),
+        "conclusione": _build_conclusion(test_results, pos_media_vincitori, centro, estremi, ml_result),
     }
 
 
-def _build_conclusion(tests, pos_media_vincitori, centro, estremi):
+def _build_conclusion(tests, pos_media_vincitori, centro, estremi, ml_result=None):
     sig_count = 0
     for t in tests:
         if t.get("significativo") or (
@@ -710,13 +1228,18 @@ def _build_conclusion(tests, pos_media_vincitori, centro, estremi):
                 if isinstance(val, dict) and val.get("significativo"):
                     sig_count += 1
                     break
+        # Handle aggregato_pooled from 5-fasce test
+        if isinstance(t.get("aggregato_pooled"), dict) and t["aggregato_pooled"].get("significativo"):
+            sig_count += 1
 
-    if sig_count >= 3:
+    if sig_count >= 4:
         strength = "forte"
-    elif sig_count >= 2:
+    elif sig_count >= 3:
         strength = "moderata"
-    elif sig_count >= 1:
+    elif sig_count >= 2:
         strength = "debole"
+    elif sig_count >= 1:
+        strength = "molto debole"
     else:
         strength = "assente"
 
@@ -728,10 +1251,23 @@ def _build_conclusion(tests, pos_media_vincitori, centro, estremi):
     else:
         direction = "Dati insufficienti per determinare la direzione"
 
+    ml_nota = ""
+    if ml_result:
+        imp = ml_result.get("miglioramento_su_baseline")
+        perm_sig = ml_result.get("significativo", False)
+        if perm_sig:
+            ml_nota = f" Il permutation test ML è significativo."
+        elif imp is not None:
+            ml_nota = f" I modelli ML non migliorano la baseline (miglior miglioramento: {imp:.1f}%)."
+
     return {
         "evidenza": strength,
         "direzione": direction,
-        "nota": f"Su {len(tests)} test statistici, {sig_count} risultano significativi (p < 0.05). La posizione media dei vincitori nelle serate competitive è {pos_media_vincitori:.2f} (0=primo, 1=ultimo).",
+        "nota": (
+            f"Su {len(tests)} test statistici + ML, {sig_count} risultano significativi (p < 0.05). "
+            f"La posizione media dei vincitori nelle serate competitive è {pos_media_vincitori:.2f} "
+            f"(0=primo, 1=ultimo).{ml_nota}"
+        ),
     }
 
 
@@ -744,19 +1280,19 @@ def main():
     print("SANREMO — ANALISI TIMING: CHI SI ESIBISCE A METÀ HA PIÙ CHANCE?")
     print("=" * 70)
 
-    print("\n[1/5] Caricamento dati...")
+    print("\n[1/7] Caricamento dati...")
     raw_df = load_data()
     print(f"  Righe con classifica finale (serate 1-4): {len(raw_df)}")
     print(f"  Anni: {sorted(raw_df['year'].unique())}")
 
-    print("\n[2/5] Preparazione dati (normalizzazione + fasce)...")
+    print("\n[2/7] Preparazione dati (normalizzazione + fasce)...")
     data = prepare_analysis_data(raw_df)
     print(f"  Artisti unici con dati completi: {len(data)}")
     for y in sorted(data["year"].unique()):
         ydf = data[data["year"] == y]
         print(f"    {y}: {len(ydf)} artisti, n_partecipanti={ydf['n_partecipanti'].iloc[0]}")
 
-    print("\n[3/5] Esecuzione test statistici...")
+    print("\n[3/7] Esecuzione test statistici (7 test classici)...")
 
     test_1 = test_spearman(data)
     print(f"  1) Spearman: rho={test_1['globale']['rho']}, p={test_1['globale']['p_value']}")
@@ -783,9 +1319,76 @@ def main():
     fc = test_7["fisher_combined"]
     print(f"  7) Kruskal per-serata + Fisher: {test_7['n_serate_analizzate']} serate, Fisher p={fc['p_value']}")
 
-    all_tests = [test_1, test_2, test_3, test_4, test_5, test_6, test_7]
+    print("\n[4/7] Test aggiuntivi: 5 quintili per-serata + probabilità...")
 
-    print("\n[4/5] Costruzione dati per visualizzazione...")
+    test_8 = test_5_fasce_per_serata(raw_df)
+    fc8 = test_8["fisher_combined"]
+    agg8 = test_8["aggregato_pooled"]
+    print(f"  8) KW 5-quintili per-serata: {test_8['n_serate_analizzate']} serate, "
+          f"{test_8['n_serate_significative']} significative")
+    print(f"     Fisher combined: p={fc8['p_value']}  |  Aggregato pooled: H={agg8['H_statistic']}, p={agg8['p_value']}")
+    for s in agg8.get("statistiche_per_fascia", []):
+        print(f"     {s['fascia']}: n={s['n']}, rank_norm_media={s['rank_norm_media']}, "
+              f"classifica_media={s['classifica_media']}")
+
+    test_9 = test_probabilita_per_fascia(raw_df, data)
+    print(f"  9) Probabilità per quintile:")
+    for p in test_9.get("per_osservazione_serata", []):
+        print(f"     {p['fascia']}: n={p['n_osservazioni']}, top5={p['pct_top_5']:.1f}%, "
+              f"top10={p['pct_top_10']:.1f}%, vincitore={p['pct_vincitore']:.1f}%")
+    chi2_9 = test_9.get("chi2_top5_per_osservazione")
+    if chi2_9:
+        print(f"     Chi² top5 tra quintili: chi²={chi2_9['chi2']}, p={chi2_9['p_value']}")
+
+    all_tests = [test_1, test_2, test_3, test_4, test_5, test_6, test_7, test_8, test_9]
+
+    print("\n[5/7] Machine Learning: la fascia predice la classifica?...")
+    ml_result = None
+    if HAS_SKLEARN:
+        test_10 = ml_prediction_analysis(data, raw_df)
+        ml_result = test_10
+        res = test_10.get("risultati", {})
+
+        reg = res.get("regressione", {})
+        print(f"  10) ML Regressione (n={reg.get('n_campioni')}, baseline MAE={reg.get('baseline_mae')}):")
+        for m in reg.get("modelli", []):
+            print(f"      {m['modello']}: MAE={m['cv_mae']}, R²={m['cv_r2']}, "
+                  f"miglioramento={m['miglioramento_pct']}%")
+
+        fi = reg.get("feature_importance_rf", [])
+        if fi:
+            print(f"      Feature importance (RF): ", end="")
+            print(", ".join(f"{f['feature']}={f['importance']}" for f in fi))
+
+        clf5 = res.get("classificazione_top5", {})
+        if clf5:
+            print(f"      Classificazione Top 5 (baseline acc={clf5.get('baseline_accuracy')}):")
+            for m in clf5.get("modelli", []):
+                print(f"        {m['modello']}: acc={m['cv_accuracy']}, F1={m['cv_f1']}, "
+                      f"ROC-AUC={m['cv_roc_auc']}")
+
+        clf10 = res.get("classificazione_top10", {})
+        if clf10:
+            print(f"      Classificazione Top 10 (baseline acc={clf10.get('baseline_accuracy')}):")
+            for m in clf10.get("modelli", []):
+                print(f"        {m['modello']}: acc={m['cv_accuracy']}, F1={m['cv_f1']}, "
+                      f"ROC-AUC={m['cv_roc_auc']}")
+
+        perm = res.get("permutation_test", {})
+        if perm:
+            print(f"      Permutation test: R²_orig={perm['r2_originale']}, "
+                  f"R²_perm_media={perm['r2_permutazioni_media']}, p={perm['p_value']}")
+
+        raw_rf = res.get("per_serata_rf", {})
+        if raw_rf:
+            print(f"      RF per-serata (n={raw_rf['n_campioni']}): "
+                  f"MAE={raw_rf['cv_mae']}, R²={raw_rf['cv_r2']}, "
+                  f"miglioramento={raw_rf['miglioramento_pct']}%")
+    else:
+        print("  sklearn non disponibile, ML saltato")
+        test_10 = None
+
+    print("\n[6/7] Costruzione dati per visualizzazione...")
     viz_data = build_viz_data(data)
     print(f"  Scatter points: {len(viz_data['scatter'])}")
     print(f"  Vincitori tracciati: {len(viz_data['vincitori'])}")
@@ -807,7 +1410,7 @@ def main():
     viz_data["scatter_per_serata"] = scatter_per_serata
     print(f"  Scatter per-serata: {len(scatter_per_serata)}")
 
-    # Boxplot per-serata: fasce nella singola serata
+    # Boxplot per-serata: 3 fasce nella singola serata
     boxplot_per_serata = []
     for year in sorted(raw_df["year"].unique()):
         for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
@@ -835,8 +1438,41 @@ def main():
                     })
     viz_data["boxplot_per_serata"] = boxplot_per_serata
 
-    print("\n[5/5] Generazione JSON...")
-    summary = build_summary(all_tests, data)
+    # Boxplot per-serata: 5 quintili nella singola serata
+    boxplot_5q_per_serata = []
+    for year in sorted(raw_df["year"].unique()):
+        for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
+            sdf = raw_df[(raw_df["year"] == year) & (raw_df["serata"] == serata)].copy()
+            if len(sdf) < 10:
+                continue
+            sdf["fascia_5"] = pd.cut(
+                sdf["posizione_relativa"],
+                bins=FASCE_5_BINS,
+                labels=FASCE_5_LABELS,
+            )
+            n = n_per_year.get(year, 1)
+            for fascia in FASCE_5_LABELS:
+                g = sdf[sdf["fascia_5"] == fascia]["classifica_finale"].apply(
+                    lambda r: (r - 1) / max(n - 1, 1)
+                )
+                if len(g) > 0:
+                    boxplot_5q_per_serata.append({
+                        "anno": int(year),
+                        "serata": int(serata),
+                        "fascia": fascia,
+                        "n": int(len(g)),
+                        "media": _safe_float(g.mean()),
+                        "mediana": _safe_float(g.median()),
+                    })
+    viz_data["boxplot_5_quintili_per_serata"] = boxplot_5q_per_serata
+    print(f"  Boxplot 5-quintili per-serata: {len(boxplot_5q_per_serata)} punti")
+
+    # Probabilità per quintile (per grafici)
+    viz_data["probabilita_5_quintili"] = test_9.get("per_osservazione_serata", [])
+    viz_data["probabilita_5_quintili_artista"] = test_9.get("per_artista_quintili_bilanciati", [])
+
+    print("\n[7/7] Generazione JSON...")
+    summary = build_summary(all_tests, data, ml_result)
 
     output = {
         "meta": {
@@ -846,8 +1482,9 @@ def main():
                 "Analisi statistica non parametrica sull'ordine di esibizione nelle serate "
                 "competitive (1-4) del Festival di Sanremo. Posizione e ranking normalizzati "
                 "per il numero di partecipanti. Fasce di esibizione usate come fattori categorici. "
-                "Due livelli di analisi: (a) posizione media per artista su tutte le serate, "
-                "(b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia)."
+                "Tre livelli di analisi: (a) posizione media per artista su tutte le serate, "
+                "(b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia), "
+                "(c) modelli ML (regressione e classificazione) con permutation test."
             ),
             "fonte_dati": "dati_sremo/sanremo_ordine_serate.csv",
             "anni_analizzati": sorted(int(y) for y in data["year"].unique()),
@@ -865,9 +1502,14 @@ def main():
             "friedman": test_5,
             "spearman_per_serata": test_6,
             "kruskal_per_serata_fisher": test_7,
+            "kruskal_5_quintili_per_serata": test_8,
+            "probabilita_per_fascia": test_9,
         },
         "visualizzazione": viz_data,
     }
+
+    if test_10:
+        output["machine_learning"] = test_10
 
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
