@@ -2,7 +2,7 @@
   "meta": {
     "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
     "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
-    "metodologia": "Analisi statistica non parametrica sull'ordine di esibizione nelle serate competitive (1-4) del Festival di Sanremo. Posizione e ranking normalizzati per il numero di partecipanti. Fasce di esibizione usate come fattori categorici. Due livelli di analisi: (a) posizione media per artista su tutte le serate, (b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia).",
+    "metodologia": "Analisi statistica non parametrica sull'ordine di esibizione nelle serate competitive (1-4) del Festival di Sanremo. Posizione e ranking normalizzati per il numero di partecipanti. Fasce di esibizione usate come fattori categorici. Tre livelli di analisi: (a) posizione media per artista su tutte le serate, (b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia), (c) modelli ML (regressione e classificazione) con permutation test.",
     "fonte_dati": "dati_sremo/sanremo_ordine_serate.csv",
     "anni_analizzati": [
       2021,
@@ -34,15 +34,17 @@
       "posizione": "posizione_relativa media nelle serate 1-4 (0=primo, 1=ultimo)",
       "ranking": "rank_normalizzato = (rank-1)/(N-1), dove N=partecipanti nell'anno"
     },
-    "n_test_eseguiti": 7,
-    "test_significativi": [],
+    "n_test_eseguiti": 10,
+    "test_significativi": [
+      "Kruskal-Wallis 5 quintili per-serata + Fisher combined (aggregato)"
+    ],
     "posizione_media_vincitori": 0.523975,
     "rank_medio_centro": 0.499021,
     "rank_medio_estremi": 0.516896,
     "conclusione": {
-      "evidenza": "assente",
+      "evidenza": "molto debole",
       "direzione": "Il centro sembra avere un leggero vantaggio",
-      "nota": "Su 7 test statistici, 0 risultano significativi (p < 0.05). La posizione media dei vincitori nelle serate competitive è 0.52 (0=primo, 1=ultimo)."
+      "nota": "Su 9 test statistici + ML, 1 risultano significativi (p < 0.05). La posizione media dei vincitori nelle serate competitive è 0.52 (0=primo, 1=ultimo). I modelli ML non migliorano la baseline (miglior miglioramento: -2.3%)."
     }
   },
   "test_statistici": {
@@ -1260,6 +1262,904 @@
           }
         }
       ]
+    },
+    "kruskal_5_quintili_per_serata": {
+      "test": "Kruskal-Wallis 5 quintili per-serata + Fisher combined",
+      "descrizione": "Kruskal-Wallis H test con 5 quintili di posizione (0-20%, 20-40%, 40-60%, 60-80%, 80-100%) calcolato per ogni singola serata. Nella singola serata i 5 gruppi sono naturalmente bilanciati (~3-6 artisti ciascuno). Fisher combined test per il p-value globale. Test aggregato anche su tutte le osservazioni pooled.",
+      "ipotesi_nulla": "La distribuzione del ranking è identica tra i 5 quintili di posizione",
+      "n_serate_analizzate": 19,
+      "n_serate_significative": 1,
+      "fisher_combined": {
+        "chi2": 54.073656,
+        "df": 38,
+        "p_value": 0.043836,
+        "significativo": true,
+        "interpretazione": "significativo (p < 0.05)"
+      },
+      "aggregato_pooled": {
+        "H_statistic": 23.247391,
+        "p_value": 0.000113,
+        "eta_squared": 0.05317,
+        "significativo": true,
+        "interpretazione": "altamente significativo (p < 0.001)",
+        "statistiche_per_fascia": [
+          {
+            "fascia": "Q1 (0-20%)",
+            "n": 78,
+            "rank_norm_media": 0.573173,
+            "rank_norm_mediana": 0.583333,
+            "classifica_media": 15.884615,
+            "classifica_mediana": 16.0
+          },
+          {
+            "fascia": "Q2 (20-40%)",
+            "n": 72,
+            "rank_norm_media": 0.420825,
+            "rank_norm_mediana": 0.3675,
+            "classifica_media": 12.125,
+            "classifica_mediana": 10.0
+          },
+          {
+            "fascia": "Q3 (40-60%)",
+            "n": 71,
+            "rank_norm_media": 0.423965,
+            "rank_norm_mediana": 0.4,
+            "classifica_media": 12.042254,
+            "classifica_mediana": 12.0
+          },
+          {
+            "fascia": "Q4 (60-80%)",
+            "n": 69,
+            "rank_norm_media": 0.464383,
+            "rank_norm_mediana": 0.384615,
+            "classifica_media": 13.130435,
+            "classifica_mediana": 11.0
+          },
+          {
+            "fascia": "Q5 (80-100%)",
+            "n": 77,
+            "rank_norm_media": 0.595159,
+            "rank_norm_mediana": 0.64,
+            "classifica_media": 16.545455,
+            "classifica_mediana": 18.0
+          }
+        ]
+      },
+      "dettaglio_per_serata": [
+        {
+          "anno": 2021,
+          "serata": 1,
+          "n": 11,
+          "H": 0.509091,
+          "p_value": 0.91689,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.48,
+              "mediana": 0.32
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.4,
+              "mediana": 0.4
+            },
+            "Q3 (40-60%)": {
+              "n": 2,
+              "media": 0.36,
+              "mediana": 0.36
+            },
+            "Q4 (60-80%)": {
+              "n": 1,
+              "media": 0.8,
+              "mediana": 0.8
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.573333,
+              "mediana": 0.64
+            }
+          }
+        },
+        {
+          "anno": 2021,
+          "serata": 2,
+          "n": 13,
+          "H": 6.373626,
+          "p_value": 0.172929,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.746667,
+              "mediana": 0.72
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.44,
+              "mediana": 0.44
+            },
+            "Q3 (40-60%)": {
+              "n": 3,
+              "media": 0.346667,
+              "mediana": 0.4
+            },
+            "Q4 (60-80%)": {
+              "n": 2,
+              "media": 0.82,
+              "mediana": 0.82
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.413333,
+              "mediana": 0.24
+            }
+          }
+        },
+        {
+          "anno": 2021,
+          "serata": 3,
+          "n": 24,
+          "H": 6.253333,
+          "p_value": 0.181011,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 6,
+              "media": 0.686667,
+              "mediana": 0.66
+            },
+            "Q2 (20-40%)": {
+              "n": 4,
+              "media": 0.35,
+              "mediana": 0.2
+            },
+            "Q3 (40-60%)": {
+              "n": 5,
+              "media": 0.64,
+              "mediana": 0.72
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.312,
+              "mediana": 0.28
+            },
+            "Q5 (80-100%)": {
+              "n": 4,
+              "media": 0.56,
+              "mediana": 0.58
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 1,
+          "n": 12,
+          "H": 4.820513,
+          "p_value": 0.306215,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.666667,
+              "mediana": 0.583333
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.166667,
+              "mediana": 0.166667
+            },
+            "Q3 (40-60%)": {
+              "n": 2,
+              "media": 0.333333,
+              "mediana": 0.333333
+            },
+            "Q4 (60-80%)": {
+              "n": 2,
+              "media": 0.479167,
+              "mediana": 0.479167
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.513889,
+              "mediana": 0.416667
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 2,
+          "n": 13,
+          "H": 1.450549,
+          "p_value": 0.835363,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.597222,
+              "mediana": 0.75
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.4375,
+              "mediana": 0.4375
+            },
+            "Q3 (40-60%)": {
+              "n": 3,
+              "media": 0.5,
+              "mediana": 0.625
+            },
+            "Q4 (60-80%)": {
+              "n": 2,
+              "media": 0.729167,
+              "mediana": 0.729167
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.458333,
+              "mediana": 0.541667
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 3,
+          "n": 25,
+          "H": 6.011077,
+          "p_value": 0.198323,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 5,
+              "media": 0.558333,
+              "mediana": 0.541667
+            },
+            "Q2 (20-40%)": {
+              "n": 5,
+              "media": 0.375,
+              "mediana": 0.375
+            },
+            "Q3 (40-60%)": {
+              "n": 5,
+              "media": 0.275,
+              "mediana": 0.083333
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.625,
+              "mediana": 0.666667
+            },
+            "Q5 (80-100%)": {
+              "n": 5,
+              "media": 0.666667,
+              "mediana": 0.75
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 4,
+          "n": 25,
+          "H": 6.601846,
+          "p_value": 0.158485,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 5,
+              "media": 0.658333,
+              "mediana": 0.75
+            },
+            "Q2 (20-40%)": {
+              "n": 5,
+              "media": 0.3,
+              "mediana": 0.208333
+            },
+            "Q3 (40-60%)": {
+              "n": 5,
+              "media": 0.558333,
+              "mediana": 0.625
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.325,
+              "mediana": 0.375
+            },
+            "Q5 (80-100%)": {
+              "n": 5,
+              "media": 0.658333,
+              "mediana": 0.708333
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 1,
+          "n": 12,
+          "H": 6.060606,
+          "p_value": 0.108699,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 2,
+              "media": 0.777778,
+              "mediana": 0.777778
+            },
+            "Q2 (20-40%)": {
+              "n": 3,
+              "media": 0.222222,
+              "mediana": 0.111111
+            },
+            "Q3 (40-60%)": {
+              "n": 1,
+              "media": 0.296296,
+              "mediana": 0.296296
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.62963,
+              "mediana": 0.62963
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.728395,
+              "mediana": 0.740741
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 2,
+          "n": 14,
+          "H": 8.780952,
+          "p_value": 0.066814,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.790123,
+              "mediana": 0.962963
+            },
+            "Q2 (20-40%)": {
+              "n": 3,
+              "media": 0.197531,
+              "mediana": 0.222222
+            },
+            "Q3 (40-60%)": {
+              "n": 2,
+              "media": 0.592593,
+              "mediana": 0.592593
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.234568,
+              "mediana": 0.185185
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.530864,
+              "mediana": 0.518519
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 3,
+          "n": 26,
+          "H": 12.472934,
+          "p_value": 0.01416,
+          "significativo": true,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 6,
+              "media": 0.450617,
+              "mediana": 0.462963
+            },
+            "Q2 (20-40%)": {
+              "n": 5,
+              "media": 0.244444,
+              "mediana": 0.185185
+            },
+            "Q3 (40-60%)": {
+              "n": 4,
+              "media": 0.287037,
+              "mediana": 0.240741
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.681481,
+              "mediana": 0.777778
+            },
+            "Q5 (80-100%)": {
+              "n": 6,
+              "media": 0.759259,
+              "mediana": 0.814815
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 4,
+          "n": 26,
+          "H": 5.335328,
+          "p_value": 0.254588,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 6,
+              "media": 0.45679,
+              "mediana": 0.425926
+            },
+            "Q2 (20-40%)": {
+              "n": 5,
+              "media": 0.496296,
+              "mediana": 0.444444
+            },
+            "Q3 (40-60%)": {
+              "n": 5,
+              "media": 0.4,
+              "mediana": 0.259259
+            },
+            "Q4 (60-80%)": {
+              "n": 4,
+              "media": 0.361111,
+              "mediana": 0.388889
+            },
+            "Q5 (80-100%)": {
+              "n": 6,
+              "media": 0.728395,
+              "mediana": 0.703704
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 1,
+          "n": 27,
+          "H": 6.910707,
+          "p_value": 0.140683,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 6,
+              "media": 0.487179,
+              "mediana": 0.596154
+            },
+            "Q2 (20-40%)": {
+              "n": 6,
+              "media": 0.301282,
+              "mediana": 0.230769
+            },
+            "Q3 (40-60%)": {
+              "n": 6,
+              "media": 0.397436,
+              "mediana": 0.384615
+            },
+            "Q4 (60-80%)": {
+              "n": 4,
+              "media": 0.576923,
+              "mediana": 0.480769
+            },
+            "Q5 (80-100%)": {
+              "n": 5,
+              "media": 0.753846,
+              "mediana": 0.846154
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 2,
+          "n": 14,
+          "H": 5.228571,
+          "p_value": 0.264638,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.75641,
+              "mediana": 0.923077
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.442308,
+              "mediana": 0.442308
+            },
+            "Q3 (40-60%)": {
+              "n": 3,
+              "media": 0.5,
+              "mediana": 0.346154
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.230769,
+              "mediana": 0.230769
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.294872,
+              "mediana": 0.153846
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 3,
+          "n": 13,
+          "H": 4.593407,
+          "p_value": 0.331615,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 2,
+              "media": 0.653846,
+              "mediana": 0.653846
+            },
+            "Q2 (20-40%)": {
+              "n": 2,
+              "media": 0.788462,
+              "mediana": 0.788462
+            },
+            "Q3 (40-60%)": {
+              "n": 3,
+              "media": 0.320513,
+              "mediana": 0.461538
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.371795,
+              "mediana": 0.192308
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.666667,
+              "mediana": 0.692308
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 4,
+          "n": 27,
+          "H": 2.992448,
+          "p_value": 0.55909,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 5,
+              "media": 0.553846,
+              "mediana": 0.730769
+            },
+            "Q2 (20-40%)": {
+              "n": 6,
+              "media": 0.525641,
+              "mediana": 0.519231
+            },
+            "Q3 (40-60%)": {
+              "n": 6,
+              "media": 0.358974,
+              "mediana": 0.442308
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.384615,
+              "mediana": 0.307692
+            },
+            "Q5 (80-100%)": {
+              "n": 5,
+              "media": 0.638462,
+              "mediana": 0.692308
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 1,
+          "n": 30,
+          "H": 0.542056,
+          "p_value": 0.96928,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 6,
+              "media": 0.52381,
+              "mediana": 0.375
+            },
+            "Q2 (20-40%)": {
+              "n": 6,
+              "media": 0.452381,
+              "mediana": 0.375
+            },
+            "Q3 (40-60%)": {
+              "n": 6,
+              "media": 0.541667,
+              "mediana": 0.607143
+            },
+            "Q4 (60-80%)": {
+              "n": 6,
+              "media": 0.452381,
+              "mediana": 0.428571
+            },
+            "Q5 (80-100%)": {
+              "n": 6,
+              "media": 0.547619,
+              "mediana": 0.535714
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 2,
+          "n": 15,
+          "H": 4.8,
+          "p_value": 0.308441,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.309524,
+              "mediana": 0.392857
+            },
+            "Q2 (20-40%)": {
+              "n": 3,
+              "media": 0.464286,
+              "mediana": 0.464286
+            },
+            "Q3 (40-60%)": {
+              "n": 3,
+              "media": 0.619048,
+              "mediana": 0.714286
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.25,
+              "mediana": 0.214286
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.714286,
+              "mediana": 0.642857
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 3,
+          "n": 15,
+          "H": 3.209899,
+          "p_value": 0.523334,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 3,
+              "media": 0.52381,
+              "mediana": 0.571429
+            },
+            "Q2 (20-40%)": {
+              "n": 4,
+              "media": 0.669643,
+              "mediana": 0.642857
+            },
+            "Q3 (40-60%)": {
+              "n": 2,
+              "media": 0.214286,
+              "mediana": 0.214286
+            },
+            "Q4 (60-80%)": {
+              "n": 3,
+              "media": 0.642857,
+              "mediana": 0.75
+            },
+            "Q5 (80-100%)": {
+              "n": 3,
+              "media": 0.47619,
+              "mediana": 0.285714
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 4,
+          "n": 25,
+          "H": 5.095385,
+          "p_value": 0.27765,
+          "significativo": false,
+          "fasce": {
+            "Q1 (0-20%)": {
+              "n": 5,
+              "media": 0.55,
+              "mediana": 0.642857
+            },
+            "Q2 (20-40%)": {
+              "n": 5,
+              "media": 0.692857,
+              "mediana": 0.821429
+            },
+            "Q3 (40-60%)": {
+              "n": 5,
+              "media": 0.328571,
+              "mediana": 0.25
+            },
+            "Q4 (60-80%)": {
+              "n": 5,
+              "media": 0.4,
+              "mediana": 0.321429
+            },
+            "Q5 (80-100%)": {
+              "n": 5,
+              "media": 0.335714,
+              "mediana": 0.357143
+            }
+          }
+        }
+      ]
+    },
+    "probabilita_per_fascia": {
+      "test": "Probabilità per fascia (5 quintili)",
+      "descrizione": "Per ogni quintile di posizione: percentuale di artisti in top 3/5/10 e vincitori. Tre modalità: (a) per-osservazione (un artista conta per ogni serata), (b) per-artista con fasce fisse (media posizione), (c) per-artista con qcut (quintili bilanciati per numerosità). Chi² sulla tabella di contingenza quintile × top 5.",
+      "per_osservazione_serata": [
+        {
+          "fascia": "Q1 (0-20%)",
+          "n_osservazioni": 78,
+          "pct_top_3": 6.410256,
+          "pct_top_5": 15.384615,
+          "pct_top_10": 25.641026,
+          "pct_vincitore": 0.0,
+          "classifica_media": 15.884615,
+          "classifica_mediana": 16.0
+        },
+        {
+          "fascia": "Q2 (20-40%)",
+          "n_osservazioni": 72,
+          "pct_top_3": 13.888889,
+          "pct_top_5": 26.388889,
+          "pct_top_10": 51.388889,
+          "pct_vincitore": 1.388889,
+          "classifica_media": 12.125,
+          "classifica_mediana": 10.0
+        },
+        {
+          "fascia": "Q3 (40-60%)",
+          "n_osservazioni": 71,
+          "pct_top_3": 18.309859,
+          "pct_top_5": 22.535211,
+          "pct_top_10": 47.887324,
+          "pct_vincitore": 11.267606,
+          "classifica_media": 12.042254,
+          "classifica_mediana": 12.0
+        },
+        {
+          "fascia": "Q4 (60-80%)",
+          "n_osservazioni": 69,
+          "pct_top_3": 8.695652,
+          "pct_top_5": 15.942029,
+          "pct_top_10": 44.927536,
+          "pct_vincitore": 4.347826,
+          "classifica_media": 13.130435,
+          "classifica_mediana": 11.0
+        },
+        {
+          "fascia": "Q5 (80-100%)",
+          "n_osservazioni": 77,
+          "pct_top_3": 3.896104,
+          "pct_top_5": 9.090909,
+          "pct_top_10": 20.779221,
+          "pct_vincitore": 0.0,
+          "classifica_media": 16.545455,
+          "classifica_mediana": 18.0
+        }
+      ],
+      "per_artista_fasce_fisse": [
+        {
+          "fascia": "Q1 (0-20%)",
+          "n_artisti": 3,
+          "pct_top_3": 0.0,
+          "pct_top_5": 0.0,
+          "pct_top_10": 0.0,
+          "pct_vincitore": 0.0,
+          "classifica_media": 19.333333,
+          "classifica_mediana": 21.0
+        },
+        {
+          "fascia": "Q2 (20-40%)",
+          "n_artisti": 29,
+          "pct_top_3": 17.241379,
+          "pct_top_5": 27.586207,
+          "pct_top_10": 34.482759,
+          "pct_vincitore": 0.0,
+          "classifica_media": 13.586207,
+          "classifica_mediana": 13.0
+        },
+        {
+          "fascia": "Q3 (40-60%)",
+          "n_artisti": 72,
+          "pct_top_3": 9.722222,
+          "pct_top_5": 16.666667,
+          "pct_top_10": 44.444444,
+          "pct_vincitore": 5.555556,
+          "classifica_media": 13.138889,
+          "classifica_mediana": 12.0
+        },
+        {
+          "fascia": "Q4 (60-80%)",
+          "n_artisti": 30,
+          "pct_top_3": 3.333333,
+          "pct_top_5": 10.0,
+          "pct_top_10": 26.666667,
+          "pct_vincitore": 0.0,
+          "classifica_media": 16.3,
+          "classifica_mediana": 18.0
+        },
+        {
+          "fascia": "Q5 (80-100%)",
+          "n_artisti": 3,
+          "pct_top_3": 0.0,
+          "pct_top_5": 0.0,
+          "pct_top_10": 0.0,
+          "pct_vincitore": 0.0,
+          "classifica_media": 16.666667,
+          "classifica_mediana": 19.0
+        }
+      ],
+      "per_artista_quintili_bilanciati": [
+        {
+          "fascia": "Q1 (bottom)",
+          "n_artisti": 28,
+          "pos_rel_range": "0.120-0.378",
+          "pct_top_3": 17.857143,
+          "pct_top_5": 25.0,
+          "pct_top_10": 32.142857,
+          "pct_vincitore": 0.0,
+          "classifica_media": 14.321429
+        },
+        {
+          "fascia": "Q2",
+          "n_artisti": 27,
+          "pos_rel_range": "0.392-0.462",
+          "pct_top_3": 3.703704,
+          "pct_top_5": 22.222222,
+          "pct_top_10": 44.444444,
+          "pct_vincitore": 3.703704,
+          "classifica_media": 13.222222
+        },
+        {
+          "fascia": "Q3 (center)",
+          "n_artisti": 27,
+          "pos_rel_range": "0.463-0.525",
+          "pct_top_3": 11.111111,
+          "pct_top_5": 14.814815,
+          "pct_top_10": 51.851852,
+          "pct_vincitore": 3.703704,
+          "classifica_media": 12.888889
+        },
+        {
+          "fascia": "Q4",
+          "n_artisti": 28,
+          "pos_rel_range": "0.526-0.621",
+          "pct_top_3": 10.714286,
+          "pct_top_5": 10.714286,
+          "pct_top_10": 32.142857,
+          "pct_vincitore": 7.142857,
+          "classifica_media": 14.214286
+        },
+        {
+          "fascia": "Q5 (top)",
+          "n_artisti": 27,
+          "pos_rel_range": "0.625-0.920",
+          "pct_top_3": 3.703704,
+          "pct_top_5": 11.111111,
+          "pct_top_10": 22.222222,
+          "pct_vincitore": 0.0,
+          "classifica_media": 16.037037
+        }
+      ],
+      "chi2_top5_per_osservazione": {
+        "chi2": 9.217598,
+        "p_value": 0.055885,
+        "dof": 4,
+        "cramers_v": 0.158481,
+        "significativo": false,
+        "interpretazione": "non significativo (p >= 0.05)"
+      }
     }
   },
   "visualizzazione": {
@@ -6271,6 +7171,1040 @@
         "media": 0.373016,
         "mediana": 0.357143
       }
+    ],
+    "boxplot_5_quintili_per_serata": [
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.48,
+        "mediana": 0.32
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.4,
+        "mediana": 0.4
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Q3 (40-60%)",
+        "n": 2,
+        "media": 0.36,
+        "mediana": 0.36
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Q4 (60-80%)",
+        "n": 1,
+        "media": 0.8,
+        "mediana": 0.8
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.573333,
+        "mediana": 0.64
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.746667,
+        "mediana": 0.72
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.44,
+        "mediana": 0.44
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Q3 (40-60%)",
+        "n": 3,
+        "media": 0.346667,
+        "mediana": 0.4
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Q4 (60-80%)",
+        "n": 2,
+        "media": 0.82,
+        "mediana": 0.82
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.413333,
+        "mediana": 0.24
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Q1 (0-20%)",
+        "n": 6,
+        "media": 0.686667,
+        "mediana": 0.66
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Q2 (20-40%)",
+        "n": 4,
+        "media": 0.35,
+        "mediana": 0.2
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Q3 (40-60%)",
+        "n": 5,
+        "media": 0.64,
+        "mediana": 0.72
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.312,
+        "mediana": 0.28
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Q5 (80-100%)",
+        "n": 4,
+        "media": 0.56,
+        "mediana": 0.58
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.666667,
+        "mediana": 0.583333
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.166667,
+        "mediana": 0.166667
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Q3 (40-60%)",
+        "n": 2,
+        "media": 0.333333,
+        "mediana": 0.333333
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Q4 (60-80%)",
+        "n": 2,
+        "media": 0.479167,
+        "mediana": 0.479167
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.513889,
+        "mediana": 0.416667
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.597222,
+        "mediana": 0.75
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.4375,
+        "mediana": 0.4375
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Q3 (40-60%)",
+        "n": 3,
+        "media": 0.5,
+        "mediana": 0.625
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Q4 (60-80%)",
+        "n": 2,
+        "media": 0.729167,
+        "mediana": 0.729167
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.458333,
+        "mediana": 0.541667
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Q1 (0-20%)",
+        "n": 5,
+        "media": 0.558333,
+        "mediana": 0.541667
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Q2 (20-40%)",
+        "n": 5,
+        "media": 0.375,
+        "mediana": 0.375
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Q3 (40-60%)",
+        "n": 5,
+        "media": 0.275,
+        "mediana": 0.083333
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.625,
+        "mediana": 0.666667
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Q5 (80-100%)",
+        "n": 5,
+        "media": 0.666667,
+        "mediana": 0.75
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Q1 (0-20%)",
+        "n": 5,
+        "media": 0.658333,
+        "mediana": 0.75
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Q2 (20-40%)",
+        "n": 5,
+        "media": 0.3,
+        "mediana": 0.208333
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Q3 (40-60%)",
+        "n": 5,
+        "media": 0.558333,
+        "mediana": 0.625
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.325,
+        "mediana": 0.375
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Q5 (80-100%)",
+        "n": 5,
+        "media": 0.658333,
+        "mediana": 0.708333
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Q1 (0-20%)",
+        "n": 2,
+        "media": 0.777778,
+        "mediana": 0.777778
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Q2 (20-40%)",
+        "n": 3,
+        "media": 0.222222,
+        "mediana": 0.111111
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Q3 (40-60%)",
+        "n": 1,
+        "media": 0.296296,
+        "mediana": 0.296296
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.62963,
+        "mediana": 0.62963
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.728395,
+        "mediana": 0.740741
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.790123,
+        "mediana": 0.962963
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Q2 (20-40%)",
+        "n": 3,
+        "media": 0.197531,
+        "mediana": 0.222222
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Q3 (40-60%)",
+        "n": 2,
+        "media": 0.592593,
+        "mediana": 0.592593
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.234568,
+        "mediana": 0.185185
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.530864,
+        "mediana": 0.518519
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Q1 (0-20%)",
+        "n": 6,
+        "media": 0.450617,
+        "mediana": 0.462963
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Q2 (20-40%)",
+        "n": 5,
+        "media": 0.244444,
+        "mediana": 0.185185
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Q3 (40-60%)",
+        "n": 4,
+        "media": 0.287037,
+        "mediana": 0.240741
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.681481,
+        "mediana": 0.777778
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Q5 (80-100%)",
+        "n": 6,
+        "media": 0.759259,
+        "mediana": 0.814815
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Q1 (0-20%)",
+        "n": 6,
+        "media": 0.45679,
+        "mediana": 0.425926
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Q2 (20-40%)",
+        "n": 5,
+        "media": 0.496296,
+        "mediana": 0.444444
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Q3 (40-60%)",
+        "n": 5,
+        "media": 0.4,
+        "mediana": 0.259259
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Q4 (60-80%)",
+        "n": 4,
+        "media": 0.361111,
+        "mediana": 0.388889
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Q5 (80-100%)",
+        "n": 6,
+        "media": 0.728395,
+        "mediana": 0.703704
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Q1 (0-20%)",
+        "n": 6,
+        "media": 0.487179,
+        "mediana": 0.596154
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Q2 (20-40%)",
+        "n": 6,
+        "media": 0.301282,
+        "mediana": 0.230769
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Q3 (40-60%)",
+        "n": 6,
+        "media": 0.397436,
+        "mediana": 0.384615
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Q4 (60-80%)",
+        "n": 4,
+        "media": 0.576923,
+        "mediana": 0.480769
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Q5 (80-100%)",
+        "n": 5,
+        "media": 0.753846,
+        "mediana": 0.846154
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.75641,
+        "mediana": 0.923077
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.442308,
+        "mediana": 0.442308
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Q3 (40-60%)",
+        "n": 3,
+        "media": 0.5,
+        "mediana": 0.346154
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.230769,
+        "mediana": 0.230769
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.294872,
+        "mediana": 0.153846
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Q1 (0-20%)",
+        "n": 2,
+        "media": 0.653846,
+        "mediana": 0.653846
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Q2 (20-40%)",
+        "n": 2,
+        "media": 0.788462,
+        "mediana": 0.788462
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Q3 (40-60%)",
+        "n": 3,
+        "media": 0.320513,
+        "mediana": 0.461538
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.371795,
+        "mediana": 0.192308
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.666667,
+        "mediana": 0.692308
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Q1 (0-20%)",
+        "n": 5,
+        "media": 0.553846,
+        "mediana": 0.730769
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Q2 (20-40%)",
+        "n": 6,
+        "media": 0.525641,
+        "mediana": 0.519231
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Q3 (40-60%)",
+        "n": 6,
+        "media": 0.358974,
+        "mediana": 0.442308
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.384615,
+        "mediana": 0.307692
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Q5 (80-100%)",
+        "n": 5,
+        "media": 0.638462,
+        "mediana": 0.692308
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Q1 (0-20%)",
+        "n": 6,
+        "media": 0.52381,
+        "mediana": 0.375
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Q2 (20-40%)",
+        "n": 6,
+        "media": 0.452381,
+        "mediana": 0.375
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Q3 (40-60%)",
+        "n": 6,
+        "media": 0.541667,
+        "mediana": 0.607143
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Q4 (60-80%)",
+        "n": 6,
+        "media": 0.452381,
+        "mediana": 0.428571
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Q5 (80-100%)",
+        "n": 6,
+        "media": 0.547619,
+        "mediana": 0.535714
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.309524,
+        "mediana": 0.392857
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Q2 (20-40%)",
+        "n": 3,
+        "media": 0.464286,
+        "mediana": 0.464286
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Q3 (40-60%)",
+        "n": 3,
+        "media": 0.619048,
+        "mediana": 0.714286
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.25,
+        "mediana": 0.214286
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.714286,
+        "mediana": 0.642857
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Q1 (0-20%)",
+        "n": 3,
+        "media": 0.52381,
+        "mediana": 0.571429
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Q2 (20-40%)",
+        "n": 4,
+        "media": 0.669643,
+        "mediana": 0.642857
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Q3 (40-60%)",
+        "n": 2,
+        "media": 0.214286,
+        "mediana": 0.214286
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Q4 (60-80%)",
+        "n": 3,
+        "media": 0.642857,
+        "mediana": 0.75
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Q5 (80-100%)",
+        "n": 3,
+        "media": 0.47619,
+        "mediana": 0.285714
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Q1 (0-20%)",
+        "n": 5,
+        "media": 0.55,
+        "mediana": 0.642857
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Q2 (20-40%)",
+        "n": 5,
+        "media": 0.692857,
+        "mediana": 0.821429
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Q3 (40-60%)",
+        "n": 5,
+        "media": 0.328571,
+        "mediana": 0.25
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Q4 (60-80%)",
+        "n": 5,
+        "media": 0.4,
+        "mediana": 0.321429
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Q5 (80-100%)",
+        "n": 5,
+        "media": 0.335714,
+        "mediana": 0.357143
+      }
+    ],
+    "probabilita_5_quintili": [
+      {
+        "fascia": "Q1 (0-20%)",
+        "n_osservazioni": 78,
+        "pct_top_3": 6.410256,
+        "pct_top_5": 15.384615,
+        "pct_top_10": 25.641026,
+        "pct_vincitore": 0.0,
+        "classifica_media": 15.884615,
+        "classifica_mediana": 16.0
+      },
+      {
+        "fascia": "Q2 (20-40%)",
+        "n_osservazioni": 72,
+        "pct_top_3": 13.888889,
+        "pct_top_5": 26.388889,
+        "pct_top_10": 51.388889,
+        "pct_vincitore": 1.388889,
+        "classifica_media": 12.125,
+        "classifica_mediana": 10.0
+      },
+      {
+        "fascia": "Q3 (40-60%)",
+        "n_osservazioni": 71,
+        "pct_top_3": 18.309859,
+        "pct_top_5": 22.535211,
+        "pct_top_10": 47.887324,
+        "pct_vincitore": 11.267606,
+        "classifica_media": 12.042254,
+        "classifica_mediana": 12.0
+      },
+      {
+        "fascia": "Q4 (60-80%)",
+        "n_osservazioni": 69,
+        "pct_top_3": 8.695652,
+        "pct_top_5": 15.942029,
+        "pct_top_10": 44.927536,
+        "pct_vincitore": 4.347826,
+        "classifica_media": 13.130435,
+        "classifica_mediana": 11.0
+      },
+      {
+        "fascia": "Q5 (80-100%)",
+        "n_osservazioni": 77,
+        "pct_top_3": 3.896104,
+        "pct_top_5": 9.090909,
+        "pct_top_10": 20.779221,
+        "pct_vincitore": 0.0,
+        "classifica_media": 16.545455,
+        "classifica_mediana": 18.0
+      }
+    ],
+    "probabilita_5_quintili_artista": [
+      {
+        "fascia": "Q1 (bottom)",
+        "n_artisti": 28,
+        "pos_rel_range": "0.120-0.378",
+        "pct_top_3": 17.857143,
+        "pct_top_5": 25.0,
+        "pct_top_10": 32.142857,
+        "pct_vincitore": 0.0,
+        "classifica_media": 14.321429
+      },
+      {
+        "fascia": "Q2",
+        "n_artisti": 27,
+        "pos_rel_range": "0.392-0.462",
+        "pct_top_3": 3.703704,
+        "pct_top_5": 22.222222,
+        "pct_top_10": 44.444444,
+        "pct_vincitore": 3.703704,
+        "classifica_media": 13.222222
+      },
+      {
+        "fascia": "Q3 (center)",
+        "n_artisti": 27,
+        "pos_rel_range": "0.463-0.525",
+        "pct_top_3": 11.111111,
+        "pct_top_5": 14.814815,
+        "pct_top_10": 51.851852,
+        "pct_vincitore": 3.703704,
+        "classifica_media": 12.888889
+      },
+      {
+        "fascia": "Q4",
+        "n_artisti": 28,
+        "pos_rel_range": "0.526-0.621",
+        "pct_top_3": 10.714286,
+        "pct_top_5": 10.714286,
+        "pct_top_10": 32.142857,
+        "pct_vincitore": 7.142857,
+        "classifica_media": 14.214286
+      },
+      {
+        "fascia": "Q5 (top)",
+        "n_artisti": 27,
+        "pos_rel_range": "0.625-0.920",
+        "pct_top_3": 3.703704,
+        "pct_top_5": 11.111111,
+        "pct_top_10": 22.222222,
+        "pct_vincitore": 0.0,
+        "classifica_media": 16.037037
+      }
     ]
+  },
+  "machine_learning": {
+    "test": "Machine Learning — La fascia predice la classifica?",
+    "descrizione": "Modelli ML (regressione e classificazione) per verificare se la posizione di esibizione è predittiva della classifica finale. Features: posizione relativa, quintile, n. serate, n. partecipanti. Cross-validation ripetuta (5-fold × 10). Permutation test (200 permutazioni) per significatività.",
+    "significativo": false,
+    "miglior_modello": "LinearRegression",
+    "miglior_mae": 6.774657,
+    "miglioramento_su_baseline": -2.251267,
+    "risultati": {
+      "regressione": {
+        "descrizione": "Predire la classifica finale dalla posizione di esibizione",
+        "features": [
+          "pos_rel_media",
+          "fascia_5_ord",
+          "n_serate",
+          "n_partecipanti"
+        ],
+        "target": "classifica_finale",
+        "n_campioni": 137,
+        "baseline_mae": 6.625499,
+        "modelli": [
+          {
+            "modello": "LinearRegression",
+            "cv_mae": 6.774657,
+            "cv_mae_std": 0.676728,
+            "cv_r2": -0.099354,
+            "cv_r2_std": 0.105948,
+            "baseline_mae": 6.625499,
+            "miglioramento_pct": -2.251267
+          },
+          {
+            "modello": "RandomForest",
+            "cv_mae": 6.944112,
+            "cv_mae_std": 0.737465,
+            "cv_r2": -0.156573,
+            "cv_r2_std": 0.105469,
+            "baseline_mae": 6.625499,
+            "miglioramento_pct": -4.80888
+          },
+          {
+            "modello": "GradientBoosting",
+            "cv_mae": 7.748621,
+            "cv_mae_std": 0.925157,
+            "cv_r2": -0.510542,
+            "cv_r2_std": 0.249561,
+            "baseline_mae": 6.625499,
+            "miglioramento_pct": -16.951506
+          }
+        ],
+        "feature_importance_rf": [
+          {
+            "feature": "pos_rel_media",
+            "importance": 0.772664
+          },
+          {
+            "feature": "n_partecipanti",
+            "importance": 0.136945
+          },
+          {
+            "feature": "n_serate",
+            "importance": 0.065314
+          },
+          {
+            "feature": "fascia_5_ord",
+            "importance": 0.025078
+          }
+        ]
+      },
+      "classificazione_top5": {
+        "descrizione": "Classificazione binaria: l'artista arriva in top 5?",
+        "features": [
+          "pos_rel_media",
+          "fascia_5_ord",
+          "n_serate",
+          "n_partecipanti"
+        ],
+        "n_campioni": 137,
+        "n_positivi": 23,
+        "baseline_accuracy": 0.832117,
+        "modelli": [
+          {
+            "modello": "LogisticRegression",
+            "cv_accuracy": 0.832275,
+            "cv_accuracy_std": 0.016166,
+            "cv_f1": 0.0,
+            "cv_roc_auc": 0.614949,
+            "baseline_accuracy": 0.832117
+          },
+          {
+            "modello": "RandomForest",
+            "cv_accuracy": 0.825714,
+            "cv_accuracy_std": 0.021917,
+            "cv_f1": 0.0,
+            "cv_roc_auc": 0.500245,
+            "baseline_accuracy": 0.832117
+          },
+          {
+            "modello": "GradientBoosting",
+            "cv_accuracy": 0.752328,
+            "cv_accuracy_std": 0.072484,
+            "cv_f1": 0.152891,
+            "cv_roc_auc": 0.488516,
+            "baseline_accuracy": 0.832117
+          }
+        ]
+      },
+      "classificazione_top10": {
+        "descrizione": "Classificazione binaria: l'artista arriva in top 10?",
+        "features": [
+          "pos_rel_media",
+          "fascia_5_ord",
+          "n_serate",
+          "n_partecipanti"
+        ],
+        "n_campioni": 137,
+        "n_positivi": 50,
+        "baseline_accuracy": 0.635036,
+        "modelli": [
+          {
+            "modello": "LogisticRegression",
+            "cv_accuracy": 0.623889,
+            "cv_accuracy_std": 0.026673,
+            "cv_f1": 0.021429,
+            "cv_roc_auc": 0.537448,
+            "baseline_accuracy": 0.635036
+          },
+          {
+            "modello": "RandomForest",
+            "cv_accuracy": 0.58582,
+            "cv_accuracy_std": 0.067441,
+            "cv_f1": 0.131971,
+            "cv_roc_auc": 0.533268,
+            "baseline_accuracy": 0.635036
+          },
+          {
+            "modello": "GradientBoosting",
+            "cv_accuracy": 0.536984,
+            "cv_accuracy_std": 0.086862,
+            "cv_f1": 0.307169,
+            "cv_roc_auc": 0.517693,
+            "baseline_accuracy": 0.635036
+          }
+        ]
+      },
+      "permutation_test": {
+        "descrizione": "Test di permutazione: le features vengono mescolate casualmente 200 volte e si verifica se il modello RF ha R² significativamente migliore.",
+        "r2_originale": -0.159137,
+        "r2_permutazioni_media": -0.1351,
+        "r2_permutazioni_std": 0.086057,
+        "p_value": 0.711443,
+        "significativo": false,
+        "interpretazione": "non significativo (p >= 0.05)"
+      },
+      "per_serata_rf": {
+        "descrizione": "RandomForest su osservazioni per-serata (non indipendenti: stesso artista compare in più serate). Più dati ma correlazione intra-artista.",
+        "features": [
+          "posizione_relativa",
+          "fascia_5_ord",
+          "totale_serata",
+          "serata"
+        ],
+        "n_campioni": 367,
+        "baseline_mae": 6.706724,
+        "cv_mae": 6.597832,
+        "cv_r2": -0.00024,
+        "miglioramento_pct": 1.62363
+      }
+    }
   }
 }
