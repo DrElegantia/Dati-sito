@@ -1,0 +1,90 @@
+{
+    "bitrate": 1280000,
+    "duration": 12.56,
+    "type": "video",
+    "width": 720,
+    "height": 720,
+    "description": null,
+    "sensitive_flags": [],
+    "source_id": 0,
+    "tweet_id": 1367201231677124613,
+    "retweet_id": 0,
+    "quote_id": 0,
+    "reply_id": 0,
+    "conversation_id": 1367201231677124613,
+    "date": "2021-03-03 19:52:29",
+    "author": {
+        "id": 868079792,
+        "name": "SanremoRai",
+        "nick": "Festival di Sanremo",
+        "date": "2012-10-08 14:25:44",
+        "profile_banner": "https://pbs.twimg.com/profile_banners/868079792/1765756880",
+        "favourites_count": 2202,
+        "followers_count": 340821,
+        "friends_count": 230,
+        "listed_count": 570,
+        "media_count": 6533,
+        "statuses_count": 13645,
+        "location": "",
+        "verified": false,
+        "protected": false,
+        "profile_image": "https://pbs.twimg.com/profile_images/2000355450122817543/gRd9h0Pd.jpg",
+        "description": "Profilo UFFICIALE del 76 ° Festival della Canzone Italiana #Sanremo2026",
+        "url": "https://bit.ly/Sanremo2026"
+    },
+    "user": {
+        "id": 868079792,
+        "name": "SanremoRai",
+        "nick": "Festival di Sanremo",
+        "date": "2012-10-08 14:25:44",
+        "profile_banner": "https://pbs.twimg.com/profile_banners/868079792/1765756880",
+        "favourites_count": 2202,
+        "followers_count": 340821,
+        "friends_count": 230,
+        "listed_count": 570,
+        "media_count": 6533,
+        "statuses_count": 13645,
+        "location": "",
+        "verified": false,
+        "protected": false,
+        "profile_image": "https://pbs.twimg.com/profile_images/2000355450122817543/gRd9h0Pd.jpg",
+        "description": "Profilo UFFICIALE del 76 ° Festival della Canzone Italiana #Sanremo2026",
+        "url": "https://bit.ly/Sanremo2026"
+    },
+    "lang": "it",
+    "source": "Twitter Media Studio",
+    "sensitive": false,
+    "favorite_count": 127,
+    "quote_count": 9,
+    "reply_count": 10,
+    "retweet_count": 34,
+    "bookmark_count": 1,
+    "view_count": 0,
+    "hashtags": [
+        "Sanremo2021"
+    ],
+    "mentions": [
+        {
+            "id": 1208394690,
+            "name": "RaiUno",
+            "nick": "Rai1"
+        },
+        {
+            "id": 94335911,
+            "name": "RaiRadio2",
+            "nick": "Rai Radio2"
+        },
+        {
+            "id": 44926477,
+            "name": "RaiPlay",
+            "nick": "RaiPlay"
+        }
+    ],
+    "content": "Puoi seguire la 2^ serata del Festival di Sanremo\n\n📺 su @RaiUno\n📻 su @RaiRadio2 \n💻 in streaming su @RaiPlay: http://bit.ly/38orVnx\n📱 su Radio2 visual: http://bit.ly/384N1XE\n👉 in Live LIS: http://bit.ly/2OnvtPm\n\ne su tutti i social Rai con hashtag #Sanremo2021",
+    "count": 1,
+    "category": "twitter",
+    "subcategory": "timeline",
+    "num": 1,
+    "filename": "F9bfqbo2hfsVy_Ks",
+    "extension": "mp4"
+}
