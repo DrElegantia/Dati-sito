@@ -21,6 +21,7 @@ Uso:
 
 import argparse
 import csv
+import io
 import json
 import os
 import re
@@ -123,11 +124,16 @@ def scrape_year(year):
 
     serata_sections.sort()
 
-    # Parse all tables
+    # Parse all tables -- use StringIO so pandas doesn't misinterpret the
+    # raw HTML string as a URL/path.  Catch ImportError (missing lxml) and
+    # any other parsing failure.
     try:
-        all_tables = pd.read_html(html)
-    except ValueError:
-        print(f'  [Wikipedia] Nessuna tabella trovata per {year}')
+        all_tables = pd.read_html(io.StringIO(html))
+    except (ValueError, ImportError) as e:
+        print(f'  [Wikipedia] Nessuna tabella trovata per {year}: {e}')
+        return []
+    except Exception as e:
+        print(f'  [Wikipedia] Errore parsing tabelle {year}: {e}')
         return []
 
     # Find table positions in HTML for mapping to sections
