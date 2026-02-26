@@ -2,13 +2,17 @@
 """
 Sanremo — Chi si esibisce a metà serata ha più possibilità di vincere?
 
-Analisi statistica con:
-  1) Spearman rank correlation
-  2) Kruskal-Wallis H test (fasce di esibizione)
+Analisi statistica + ML con:
+  1) Spearman rank correlation (globale e per-anno)
+  2) Kruskal-Wallis H test (5 fasce, per-serata)
   3) Chi² test (proporzione top finishers per fascia)
   4) Mann-Whitney U test (centro vs estremi)
   5) Friedman test (variabilità tra anni, anno come blocco)
+  6) Spearman per-serata
+  7) Kruskal-Wallis per-serata + Fisher combined
+  8) ML: Random Forest + Logistic Regression (la fascia predice il piazzamento?)
 
+Divisione primaria in 5 fasce per-serata (fasce bilanciate).
 Tutti i risultati normalizzati per numero partecipanti.
 Output: docs/sanremo_timing_analysis.json
 
@@ -16,15 +20,18 @@ Uso:
     python3 scripts/analisi_timing_sanremo.py
 """
 
-import csv
 import json
 import os
-import sys
 import warnings
 
 import numpy as np
 import pandas as pd
 from scipy import stats
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.model_selection import LeaveOneGroupOut, cross_val_predict
+from sklearn.preprocessing import LabelEncoder
 
 warnings.filterwarnings("ignore")
 
@@ -47,6 +54,9 @@ DATA_DIR = os.path.join(BASE_DIR, "dati_sremo")
 INPUT_CSV = os.path.join(DATA_DIR, "sanremo_ordine_serate.csv")
 OUTPUT_JSON = os.path.join(BASE_DIR, "docs", "sanremo_timing_analysis.json")
 
+FASCE_5_LABELS = ["Apertura", "Seconda fascia", "Centro", "Quarta fascia", "Chiusura"]
+FASCE_5_BINS = [-0.001, 0.2, 0.4, 0.6, 0.8, 1.001]
+
 
 # ============================================================
 # Caricamento e preparazione dati
@@ -54,82 +64,78 @@ OUTPUT_JSON = os.path.join(BASE_DIR, "docs", "sanremo_timing_analysis.json")
 
 def load_data() -> pd.DataFrame:
     df = pd.read_csv(INPUT_CSV, dtype={"classifica_finale": str, "classifica_serata": str})
-
-    # Converti classifica_finale in numerico
     df["classifica_finale"] = pd.to_numeric(df["classifica_finale"], errors="coerce")
-
-    # Filtra solo righe con classifica finale valida
     df = df[df["classifica_finale"].notna()].copy()
     df["classifica_finale"] = df["classifica_finale"].astype(int)
 
-    # Filtra solo serate competitive (1-4), escludendo la finale (serata 5)
-    # perché nella finale l'ordine È la classifica
-    df = df[df["serata"].isin([1, 2, 3, 4])].copy()
-
-    # Filtra serate di nuove proposte / cover
+    # Solo serate competitive 1-4 (nella finale l'ordine È la classifica)
     serate_competitive = [
         "Prima serata", "Seconda serata", "Terza serata", "Quarta serata",
     ]
     df = df[df["serata_name"].isin(serate_competitive)].copy()
-
     return df
 
 
-def prepare_analysis_data(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Per ogni artista/anno: calcola la posizione relativa media nelle serate 1-4,
-    poi normalizza il ranking finale per il numero di partecipanti.
-    """
-    # Numero di partecipanti per anno (dalla classifica finale)
+def enrich_raw(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggiunge rank normalizzato e fasce a 5 livelli ai dati per-serata."""
+    df = df.copy()
+    n_per_year = df.groupby("year")["classifica_finale"].max().to_dict()
+    df["n_partecipanti"] = df["year"].map(n_per_year)
+    df["rank_norm"] = (df["classifica_finale"] - 1) / (df["n_partecipanti"] - 1).clip(lower=1)
+
+    df["fascia_5"] = pd.cut(
+        df["posizione_relativa"], bins=FASCE_5_BINS, labels=FASCE_5_LABELS,
+    )
+    df["fascia_3"] = pd.cut(
+        df["posizione_relativa"],
+        bins=[-0.001, 1/3, 2/3, 1.001],
+        labels=["Inizio", "Centro", "Fine"],
+    )
+    df["is_top5"] = df["classifica_finale"] <= 5
+    return df
+
+
+def prepare_artist_data(df: pd.DataFrame) -> pd.DataFrame:
+    """Per ogni artista/anno: posizione relativa media nelle serate 1-4."""
     n_per_year = df.groupby("year")["classifica_finale"].max().to_dict()
 
-    # Posizione relativa media per artista/anno (media sulle serate a cui ha partecipato)
     artist_data = (
         df.groupby(["year", "artist"])
         .agg(
             pos_rel_media=("posizione_relativa", "mean"),
             n_serate=("serata", "nunique"),
             classifica_finale=("classifica_finale", "first"),
-            serate_list=("serata", lambda x: sorted(x.unique().tolist())),
         )
         .reset_index()
     )
-
-    # Normalizza ranking: 0 = vincitore, 1 = ultimo
     artist_data["n_partecipanti"] = artist_data["year"].map(n_per_year)
     artist_data["rank_normalizzato"] = (
         (artist_data["classifica_finale"] - 1) /
         (artist_data["n_partecipanti"] - 1).clip(lower=1)
     )
-
-    # Fasce a 3 livelli
+    artist_data["fascia_5"] = pd.cut(
+        artist_data["pos_rel_media"], bins=FASCE_5_BINS, labels=FASCE_5_LABELS,
+    )
     artist_data["fascia_3"] = pd.cut(
         artist_data["pos_rel_media"],
         bins=[-0.001, 1/3, 2/3, 1.001],
         labels=["Inizio", "Centro", "Fine"],
     )
-
-    # Fasce a 5 livelli
-    artist_data["fascia_5"] = pd.cut(
-        artist_data["pos_rel_media"],
-        bins=[-0.001, 0.2, 0.4, 0.6, 0.8, 1.001],
-        labels=["Primo quinto", "Secondo quinto", "Terzo quinto", "Quarto quinto", "Ultimo quinto"],
-    )
-
     return artist_data
 
 
 # ============================================================
-# Test statistici
+# Utilità
 # ============================================================
 
-def _safe_float(x):
+def _sf(x):
+    """Safe float per JSON."""
     if x is None or (isinstance(x, float) and np.isnan(x)):
         return None
     return round(float(x), 6)
 
 
-def _interpret_p(p, alpha=0.05):
+def _interp(p, alpha=0.05):
     if p is None:
         return "non calcolabile"
     if p < 0.001:
@@ -141,377 +147,316 @@ def _interpret_p(p, alpha=0.05):
     return "non significativo (p >= 0.05)"
 
 
-def test_spearman(data: pd.DataFrame) -> dict:
-    """Test 1: Correlazione di Spearman tra posizione relativa media e ranking normalizzato."""
+def _desc_stats(series):
+    return {
+        "n": int(len(series)),
+        "media": _sf(series.mean()),
+        "mediana": _sf(series.median()),
+        "dev_std": _sf(series.std()),
+        "q25": _sf(series.quantile(0.25)),
+        "q75": _sf(series.quantile(0.75)),
+    }
 
-    # Globale
-    rho, p = stats.spearmanr(data["pos_rel_media"], data["rank_normalizzato"])
 
-    # Per anno
+# ============================================================
+# 1. Spearman
+# ============================================================
+
+def test_spearman(raw: pd.DataFrame, artist: pd.DataFrame) -> dict:
+    # Globale su dati per-serata
+    rho_raw, p_raw = stats.spearmanr(raw["posizione_relativa"], raw["rank_norm"])
+
+    # Globale su dati aggregati per artista
+    rho_agg, p_agg = stats.spearmanr(artist["pos_rel_media"], artist["rank_normalizzato"])
+
+    # Per anno (per-serata)
     per_anno = []
-    for year in sorted(data["year"].unique()):
-        ydf = data[data["year"] == year]
+    for year in sorted(raw["year"].unique()):
+        ydf = raw[raw["year"] == year]
         if len(ydf) < 5:
             continue
-        r, pv = stats.spearmanr(ydf["pos_rel_media"], ydf["rank_normalizzato"])
+        r, pv = stats.spearmanr(ydf["posizione_relativa"], ydf["rank_norm"])
         per_anno.append({
-            "anno": int(year),
-            "n": int(len(ydf)),
-            "rho": _safe_float(r),
-            "p_value": _safe_float(pv),
-            "significativo": pv < 0.05 if pv is not None else False,
-            "interpretazione": _interpret_p(pv),
+            "anno": int(year), "n": int(len(ydf)),
+            "rho": _sf(r), "p_value": _sf(pv),
+            "significativo": bool(pv < 0.05) if pv is not None else False,
+            "interpretazione": _interp(pv),
         })
 
     return {
         "test": "Spearman Rank Correlation",
-        "descrizione": "Correlazione tra posizione relativa media nell'ordine di esibizione e classifica finale normalizzata. rho > 0 = chi si esibisce tardi ha ranking peggiore (numero più alto). rho < 0 = chi si esibisce tardi ha ranking migliore.",
+        "descrizione": (
+            "Correlazione tra posizione relativa e ranking finale normalizzato. "
+            "rho > 0 = chi si esibisce tardi tende a piazzarsi peggio. "
+            "Calcolato sia per-serata (367 osservazioni) che aggregato per artista (137)."
+        ),
         "ipotesi_nulla": "Non c'è correlazione monotona tra ordine di esibizione e classifica finale",
-        "globale": {
-            "n": int(len(data)),
-            "rho": _safe_float(rho),
-            "p_value": _safe_float(p),
-            "significativo": bool(p < 0.05) if p is not None else False,
-            "interpretazione": _interpret_p(p),
+        "per_serata": {
+            "n": int(len(raw)),
+            "rho": _sf(rho_raw), "p_value": _sf(p_raw),
+            "significativo": bool(p_raw < 0.05),
+            "interpretazione": _interp(p_raw),
+        },
+        "aggregato_artista": {
+            "n": int(len(artist)),
+            "rho": _sf(rho_agg), "p_value": _sf(p_agg),
+            "significativo": bool(p_agg < 0.05),
+            "interpretazione": _interp(p_agg),
         },
         "per_anno": per_anno,
     }
 
 
-def test_kruskal_wallis(data: pd.DataFrame) -> dict:
-    """Test 2: Kruskal-Wallis H test sulle fasce di esibizione."""
-    results = {}
+# ============================================================
+# 2. Kruskal-Wallis (5 fasce, per-serata)
+# ============================================================
 
-    for n_fasce, col in [(3, "fascia_3"), (5, "fascia_5")]:
-        groups = []
-        labels = []
-        desc_stats = []
+def test_kruskal_wallis(raw: pd.DataFrame) -> dict:
+    """KW sulle 5 fasce, applicato ai dati per-serata (fasce bilanciate)."""
+    groups = []
+    desc = []
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]["rank_norm"]
+        if len(g) > 0:
+            groups.append(g.values)
+            desc.append({"fascia": fascia, **_desc_stats(g)})
 
-        for fascia in data[col].cat.categories:
-            g = data[data[col] == fascia]["rank_normalizzato"]
-            if len(g) > 0:
-                groups.append(g.values)
-                labels.append(str(fascia))
-                desc_stats.append({
-                    "fascia": str(fascia),
-                    "n": int(len(g)),
-                    "media": _safe_float(g.mean()),
-                    "mediana": _safe_float(g.median()),
-                    "dev_std": _safe_float(g.std()),
-                    "q25": _safe_float(g.quantile(0.25)),
-                    "q75": _safe_float(g.quantile(0.75)),
-                })
-
-        if len(groups) >= 2 and all(len(g) >= 2 for g in groups):
-            stat, p = stats.kruskal(*groups)
-            # Effect size: eta-squared = (H - k + 1) / (N - k)
-            N = sum(len(g) for g in groups)
-            k = len(groups)
-            eta_sq = (stat - k + 1) / (N - k) if N > k else None
-        else:
-            stat, p, eta_sq = None, None, None
-
-        results[f"fasce_{n_fasce}"] = {
-            "n_fasce": n_fasce,
-            "statistiche_descrittive": desc_stats,
-            "H_statistic": _safe_float(stat),
-            "p_value": _safe_float(p),
-            "eta_squared": _safe_float(eta_sq),
-            "significativo": bool(p < 0.05) if p is not None else False,
-            "interpretazione": _interpret_p(p),
-        }
+    if len(groups) >= 2 and all(len(g) >= 2 for g in groups):
+        H, p = stats.kruskal(*groups)
+        N = sum(len(g) for g in groups)
+        k = len(groups)
+        eta_sq = (H - k + 1) / (N - k) if N > k else None
+    else:
+        H, p, eta_sq = None, None, None
 
     return {
-        "test": "Kruskal-Wallis H Test",
-        "descrizione": "Test non parametrico sui ranghi per verificare se la distribuzione del ranking normalizzato differisce tra le fasce di esibizione. Equivalente non parametrico dell'ANOVA a una via.",
-        "ipotesi_nulla": "Le distribuzioni del ranking normalizzato sono identiche tra le fasce",
-        "risultati": results,
+        "test": "Kruskal-Wallis H Test (5 fasce, per-serata)",
+        "descrizione": (
+            "Test non parametrico sui ranghi: le 5 fasce di esibizione producono "
+            "distribuzioni diverse del ranking normalizzato? Calcolato sui dati "
+            "per-serata (non mediati) dove le fasce sono bilanciate."
+        ),
+        "ipotesi_nulla": "Le distribuzioni del ranking sono identiche tra le 5 fasce",
+        "statistiche_descrittive": desc,
+        "H_statistic": _sf(H),
+        "p_value": _sf(p),
+        "eta_squared": _sf(eta_sq),
+        "significativo": bool(p < 0.05) if p is not None else False,
+        "interpretazione": _interp(p),
     }
 
 
-def test_chi_squared(data: pd.DataFrame) -> dict:
-    """Test 3: Chi² test sulla proporzione di Top 5 per fascia."""
-    results = {}
+# ============================================================
+# 3. Chi² (5 fasce → Top 5)
+# ============================================================
 
-    for n_fasce, col in [(3, "fascia_3"), (5, "fascia_5")]:
-        n_per_year = data.groupby("year")["n_partecipanti"].first()
-        # Top 5 relativo: nel top 20% dei partecipanti
-        data_copy = data.copy()
-        data_copy["is_top"] = data_copy["classifica_finale"] <= 5
+def test_chi_squared(raw: pd.DataFrame) -> dict:
+    """Chi² sulla tabella di contingenza: fascia × Top 5."""
+    contingency = []
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]
+        if len(g) > 0:
+            nt = int(g["is_top5"].sum())
+            nn = int((~g["is_top5"]).sum())
+            contingency.append({
+                "fascia": fascia,
+                "top_5": nt, "non_top_5": nn,
+                "totale": nt + nn,
+                "pct_top_5": _sf(nt / (nt + nn) * 100),
+            })
 
-        contingency_data = []
-        for fascia in data_copy[col].cat.categories:
-            g = data_copy[data_copy[col] == fascia]
-            if len(g) > 0:
-                n_top = int(g["is_top"].sum())
-                n_not_top = int((~g["is_top"]).sum())
-                contingency_data.append({
-                    "fascia": str(fascia),
-                    "top_5": n_top,
-                    "non_top_5": n_not_top,
-                    "totale": n_top + n_not_top,
-                    "pct_top_5": _safe_float(n_top / (n_top + n_not_top) * 100),
-                })
-
-        if len(contingency_data) >= 2:
-            ct = np.array([[d["top_5"], d["non_top_5"]] for d in contingency_data])
-            if ct.min() >= 0 and ct.sum() > 0:
-                chi2, p, dof, expected = stats.chi2_contingency(ct)
-                # Cramér's V
-                n_total = ct.sum()
-                min_dim = min(ct.shape) - 1
-                cramers_v = np.sqrt(chi2 / (n_total * max(min_dim, 1))) if n_total > 0 else None
-            else:
-                chi2, p, dof, cramers_v = None, None, None, None
-        else:
-            chi2, p, dof, cramers_v = None, None, None, None
-
-        results[f"fasce_{n_fasce}"] = {
-            "n_fasce": n_fasce,
-            "contingenza": contingency_data,
-            "chi2": _safe_float(chi2),
-            "p_value": _safe_float(p),
-            "gradi_liberta": int(dof) if dof is not None else None,
-            "cramers_v": _safe_float(cramers_v),
-            "significativo": bool(p < 0.05) if p is not None else False,
-            "interpretazione": _interpret_p(p),
-        }
+    if len(contingency) >= 2:
+        ct = np.array([[d["top_5"], d["non_top_5"]] for d in contingency])
+        chi2, p, dof, _ = stats.chi2_contingency(ct)
+        n_total = ct.sum()
+        min_dim = min(ct.shape) - 1
+        cramers_v = np.sqrt(chi2 / (n_total * max(min_dim, 1)))
+    else:
+        chi2, p, dof, cramers_v = None, None, None, None
 
     return {
-        "test": "Chi-Squared Test of Independence",
-        "descrizione": "Test chi-quadrato sulla tabella di contingenza: fascia di esibizione × arrivo in Top 5. Verifica se la probabilità di arrivare in Top 5 è indipendente dalla fascia.",
-        "ipotesi_nulla": "La proporzione di Top 5 è uguale tra tutte le fasce",
-        "risultati": results,
+        "test": "Chi-Squared Test (5 fasce, per-serata)",
+        "descrizione": (
+            "Test chi² sulla tabella di contingenza: fascia × arrivo in Top 5. "
+            "Verifica se la probabilità di piazzarsi in Top 5 dipende dalla fascia."
+        ),
+        "ipotesi_nulla": "La proporzione di Top 5 è uguale tra le 5 fasce",
+        "contingenza": contingency,
+        "chi2": _sf(chi2),
+        "p_value": _sf(p),
+        "gradi_liberta": int(dof) if dof is not None else None,
+        "cramers_v": _sf(cramers_v),
+        "significativo": bool(p < 0.05) if p is not None else False,
+        "interpretazione": _interp(p),
     }
 
 
-def test_mann_whitney(data: pd.DataFrame) -> dict:
-    """Test 4: Mann-Whitney U test — Centro vs Estremi."""
-    centro = data[data["fascia_3"] == "Centro"]["rank_normalizzato"]
-    estremi = data[data["fascia_3"] != "Centro"]["rank_normalizzato"]
+# ============================================================
+# 4. Mann-Whitney U (centro vs estremi, 5 fasce)
+# ============================================================
+
+def test_mann_whitney(raw: pd.DataFrame) -> dict:
+    """Confronta le 3 fasce centrali (2-3-4) vs le 2 estreme (1+5)."""
+    centro = raw[raw["fascia_5"].isin(["Seconda fascia", "Centro", "Quarta fascia"])]["rank_norm"]
+    estremi = raw[raw["fascia_5"].isin(["Apertura", "Chiusura"])]["rank_norm"]
 
     if len(centro) >= 3 and len(estremi) >= 3:
-        stat, p = stats.mannwhitneyu(centro, estremi, alternative="two-sided")
-        # Rank-biserial correlation come effect size
+        U, p = stats.mannwhitneyu(centro, estremi, alternative="two-sided")
         n1, n2 = len(centro), len(estremi)
-        r_effect = 1 - (2 * stat) / (n1 * n2)
+        r_effect = 1 - (2 * U) / (n1 * n2)
     else:
-        stat, p, r_effect = None, None, None
+        U, p, r_effect = None, None, None
 
-    # Calcolo direzione
-    if centro.mean() < estremi.mean():
-        direzione = "Il centro ha ranking migliore (più basso) degli estremi"
+    if len(centro) > 0 and len(estremi) > 0:
+        if centro.mean() < estremi.mean():
+            direzione = "Le fasce centrali (2-3-4) hanno ranking migliore delle estreme (1+5)"
+        else:
+            direzione = "Le fasce centrali (2-3-4) NON hanno ranking migliore delle estreme (1+5)"
     else:
-        direzione = "Il centro ha ranking peggiore (più alto) degli estremi"
+        direzione = "Dati insufficienti"
 
     return {
-        "test": "Mann-Whitney U Test",
-        "descrizione": "Test non parametrico: confronto del ranking normalizzato tra chi si esibisce al centro (fascia 2/3) e chi agli estremi (fascia 1/3 + 3/3).",
+        "test": "Mann-Whitney U Test (centro 3 fasce vs estremi 2 fasce)",
+        "descrizione": (
+            "Confronto non parametrico: le 3 fasce centrali (Seconda/Centro/Quarta) "
+            "vs le 2 estreme (Apertura/Chiusura). Se il centro è vantaggioso, "
+            "dovrebbe avere ranking normalizzato più basso."
+        ),
         "ipotesi_nulla": "Le distribuzioni dei ranking sono identiche tra centro ed estremi",
-        "centro": {
-            "n": int(len(centro)),
-            "media": _safe_float(centro.mean()),
-            "mediana": _safe_float(centro.median()),
-            "dev_std": _safe_float(centro.std()),
-        },
-        "estremi": {
-            "n": int(len(estremi)),
-            "media": _safe_float(estremi.mean()),
-            "mediana": _safe_float(estremi.median()),
-            "dev_std": _safe_float(estremi.std()),
-        },
-        "U_statistic": _safe_float(stat),
-        "p_value": _safe_float(p),
-        "rank_biserial_r": _safe_float(r_effect),
+        "centro": {"fasce": ["Seconda fascia", "Centro", "Quarta fascia"], **_desc_stats(centro)},
+        "estremi": {"fasce": ["Apertura", "Chiusura"], **_desc_stats(estremi)},
+        "U_statistic": _sf(U),
+        "p_value": _sf(p),
+        "rank_biserial_r": _sf(r_effect),
         "significativo": bool(p < 0.05) if p is not None else False,
         "direzione": direzione,
-        "interpretazione": _interpret_p(p),
+        "interpretazione": _interp(p),
     }
 
 
-def test_friedman(data: pd.DataFrame) -> dict:
-    """
-    Test 5: Friedman test — variabilità tra anni.
+# ============================================================
+# 5. Friedman (5 fasce, anno come blocco)
+# ============================================================
 
-    Ogni anno è un blocco, le fasce sono i trattamenti.
-    Per ogni (anno, fascia) calcoliamo la mediana del ranking normalizzato.
-    Serve per controllare se l'effetto è stabile o varia tra anni.
-    """
-    results = {}
+def test_friedman(raw: pd.DataFrame) -> dict:
+    """Friedman test: anno come blocco, 5 fasce come trattamenti."""
+    years = sorted(raw["year"].unique())
+    matrix = []
+    years_used = []
+    detail = []
 
-    for n_fasce, col in [(3, "fascia_3"), (5, "fascia_5")]:
-        # Matrice: righe = anni, colonne = fasce
-        years = sorted(data["year"].unique())
-        fasce = list(data[col].cat.categories)
-
-        matrix = []
-        years_used = []
-        for year in years:
-            ydf = data[data["year"] == year]
-            row = []
-            complete = True
-            for fascia in fasce:
-                g = ydf[ydf[col] == fascia]["rank_normalizzato"]
-                if len(g) == 0:
-                    complete = False
-                    break
+    for year in years:
+        ydf = raw[raw["year"] == year]
+        row = []
+        complete = True
+        anno_detail = {"anno": int(year), "fasce": {}}
+        for fascia in FASCE_5_LABELS:
+            g = ydf[ydf["fascia_5"] == fascia]["rank_norm"]
+            if len(g) == 0:
+                complete = False
+            else:
                 row.append(g.median())
-            if complete:
-                matrix.append(row)
-                years_used.append(int(year))
+            anno_detail["fasce"][fascia] = {
+                "n": int(len(g)),
+                "mediana": _sf(g.median()) if len(g) > 0 else None,
+                "media": _sf(g.mean()) if len(g) > 0 else None,
+            }
+        detail.append(anno_detail)
+        if complete:
+            matrix.append(row)
+            years_used.append(int(year))
 
-        detail_per_anno = []
-        for year in years:
-            ydf = data[data["year"] == year]
-            anno_detail = {"anno": int(year), "fasce": {}}
-            for fascia in fasce:
-                g = ydf[ydf[col] == fascia]["rank_normalizzato"]
-                if len(g) > 0:
-                    anno_detail["fasce"][str(fascia)] = {
-                        "n": int(len(g)),
-                        "mediana": _safe_float(g.median()),
-                        "media": _safe_float(g.mean()),
-                    }
-            detail_per_anno.append(anno_detail)
-
-        if len(matrix) >= 3:  # Friedman richiede almeno 3 blocchi
-            matrix_np = np.array(matrix)
-            stat, p = stats.friedmanchisquare(*[matrix_np[:, i] for i in range(matrix_np.shape[1])])
-            # Effect size: Kendall's W = chi2_F / (n * (k-1))
-            n_blocks = len(matrix)
-            k_treatments = len(fasce)
-            kendall_w = stat / (n_blocks * (k_treatments - 1)) if n_blocks > 0 and k_treatments > 1 else None
-        else:
-            stat, p, kendall_w = None, None, None
-
-        results[f"fasce_{n_fasce}"] = {
-            "n_fasce": n_fasce,
-            "n_anni_usati": len(years_used),
-            "anni_usati": years_used,
-            "friedman_chi2": _safe_float(stat),
-            "p_value": _safe_float(p),
-            "kendall_w": _safe_float(kendall_w),
-            "significativo": bool(p < 0.05) if p is not None else False,
-            "interpretazione": _interpret_p(p),
-            "dettaglio_per_anno": detail_per_anno,
-        }
+    if len(matrix) >= 3:
+        m = np.array(matrix)
+        stat, p = stats.friedmanchisquare(*[m[:, i] for i in range(m.shape[1])])
+        W = stat / (len(matrix) * (m.shape[1] - 1))
+    else:
+        stat, p, W = None, None, None
 
     return {
-        "test": "Friedman Test",
-        "descrizione": "Test non parametrico per misure ripetute: ogni anno è un blocco, le fasce di esibizione sono i trattamenti. Verifica se l'effetto della fascia è coerente tra anni diversi. Kendall's W misura la concordanza (0 = nessun accordo, 1 = accordo perfetto).",
-        "ipotesi_nulla": "Non c'è differenza sistematica tra le fasce, al netto della variabilità tra anni",
-        "risultati": results,
+        "test": "Friedman Test (5 fasce, anno come blocco)",
+        "descrizione": (
+            "Test non parametrico per misure ripetute. Ogni anno è un blocco, "
+            "le 5 fasce sono i trattamenti. Kendall's W misura la concordanza "
+            "tra anni (0 = nessun accordo, 1 = accordo perfetto)."
+        ),
+        "ipotesi_nulla": "Non c'è differenza sistematica tra le fasce al netto della variabilità tra anni",
+        "n_anni_usati": len(years_used),
+        "anni_usati": years_used,
+        "friedman_chi2": _sf(stat),
+        "p_value": _sf(p),
+        "kendall_w": _sf(W),
+        "significativo": bool(p < 0.05) if p is not None else False,
+        "interpretazione": _interp(p),
+        "dettaglio_per_anno": detail,
     }
 
 
 # ============================================================
-# Test aggiuntivo: analisi per-serata
+# 6. Spearman per-serata
 # ============================================================
 
-def test_per_serata(raw_df: pd.DataFrame) -> dict:
-    """
-    Analisi Spearman per ogni singola serata (1-4) di ogni anno.
-    Usa la posizione relativa nella serata vs classifica finale normalizzata.
-    """
-    n_per_year = raw_df.groupby("year")["classifica_finale"].max().to_dict()
-    raw_df = raw_df.copy()
-    raw_df["rank_norm"] = raw_df.apply(
-        lambda r: (r["classifica_finale"] - 1) / max(n_per_year.get(r["year"], 1) - 1, 1),
-        axis=1,
-    )
-
+def test_spearman_per_serata(raw: pd.DataFrame) -> dict:
     per_serata = []
-    for year in sorted(raw_df["year"].unique()):
-        for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
-            sdf = raw_df[(raw_df["year"] == year) & (raw_df["serata"] == serata)]
+    for year in sorted(raw["year"].unique()):
+        for serata in sorted(raw[raw["year"] == year]["serata"].unique()):
+            sdf = raw[(raw["year"] == year) & (raw["serata"] == serata)]
             if len(sdf) < 5:
                 continue
             rho, p = stats.spearmanr(sdf["posizione_relativa"], sdf["rank_norm"])
             per_serata.append({
-                "anno": int(year),
-                "serata": int(serata),
+                "anno": int(year), "serata": int(serata),
                 "serata_name": sdf["serata_name"].iloc[0],
                 "n": int(len(sdf)),
-                "rho": _safe_float(rho),
-                "p_value": _safe_float(p),
+                "rho": _sf(rho), "p_value": _sf(p),
                 "significativo": bool(p < 0.05) if p is not None else False,
-                "interpretazione": _interpret_p(p),
+                "interpretazione": _interp(p),
             })
 
     n_sig = sum(1 for s in per_serata if s["significativo"])
     return {
         "test": "Spearman per-serata",
-        "descrizione": "Correlazione di Spearman calcolata separatamente per ogni serata di ogni anno. Permette di identificare se l'effetto dell'ordine varia tra le serate.",
+        "descrizione": "Correlazione di Spearman calcolata per ogni singola serata.",
         "n_serate_analizzate": len(per_serata),
         "n_serate_significative": n_sig,
         "dettaglio": per_serata,
     }
 
 
-def test_kruskal_per_serata(raw_df: pd.DataFrame) -> dict:
-    """
-    Kruskal-Wallis sulle fasce, ma calcolato per-serata (senza mediare).
-    Con 12-25 artisti per serata, 3 fasce danno ~4-8 artisti per fascia: ben bilanciate.
-    Poi aggreghiamo i p-value con il metodo di Fisher per un test globale.
-    """
-    n_per_year = raw_df.groupby("year")["classifica_finale"].max().to_dict()
-    raw_df = raw_df.copy()
-    raw_df["rank_norm"] = raw_df.apply(
-        lambda r: (r["classifica_finale"] - 1) / max(n_per_year.get(r["year"], 1) - 1, 1),
-        axis=1,
-    )
+# ============================================================
+# 7. Kruskal-Wallis per-serata + Fisher combined
+# ============================================================
 
-    # Fasce per serata (3 e 5)
-    per_serata_results = []
-
-    for year in sorted(raw_df["year"].unique()):
-        for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
-            sdf = raw_df[(raw_df["year"] == year) & (raw_df["serata"] == serata)].copy()
+def test_kruskal_per_serata(raw: pd.DataFrame) -> dict:
+    """KW 5 fasce per ogni serata, poi Fisher combined."""
+    results = []
+    for year in sorted(raw["year"].unique()):
+        for serata in sorted(raw[raw["year"] == year]["serata"].unique()):
+            sdf = raw[(raw["year"] == year) & (raw["serata"] == serata)]
             if len(sdf) < 6:
                 continue
 
-            sdf["fascia_3"] = pd.cut(
-                sdf["posizione_relativa"],
-                bins=[-0.001, 1/3, 2/3, 1.001],
-                labels=["Inizio", "Centro", "Fine"],
-            )
-
             groups = []
-            labels = []
-            for fascia in ["Inizio", "Centro", "Fine"]:
-                g = sdf[sdf["fascia_3"] == fascia]["rank_norm"]
+            fasce_stats = {}
+            for fascia in FASCE_5_LABELS:
+                g = sdf[sdf["fascia_5"] == fascia]["rank_norm"]
                 if len(g) >= 2:
                     groups.append(g.values)
-                    labels.append(fascia)
+                fasce_stats[fascia] = {"n": int(len(g)), "media": _sf(g.mean()) if len(g) > 0 else None}
 
             if len(groups) >= 2:
-                h_stat, p_val = stats.kruskal(*groups)
+                H, pv = stats.kruskal(*groups)
             else:
-                h_stat, p_val = None, None
+                H, pv = None, None
 
-            # Statistiche per fascia
-            fasce_stats = {}
-            for fascia in ["Inizio", "Centro", "Fine"]:
-                g = sdf[sdf["fascia_3"] == fascia]["rank_norm"]
-                if len(g) > 0:
-                    fasce_stats[fascia] = {
-                        "n": int(len(g)),
-                        "media": _safe_float(g.mean()),
-                        "mediana": _safe_float(g.median()),
-                    }
-
-            per_serata_results.append({
-                "anno": int(year),
-                "serata": int(serata),
-                "n": int(len(sdf)),
-                "H": _safe_float(h_stat),
-                "p_value": _safe_float(p_val),
-                "significativo": bool(p_val < 0.05) if p_val is not None else False,
+            results.append({
+                "anno": int(year), "serata": int(serata), "n": int(len(sdf)),
+                "H": _sf(H), "p_value": _sf(pv),
+                "significativo": bool(pv < 0.05) if pv is not None else False,
                 "fasce": fasce_stats,
             })
 
-    # Fisher's combined probability test per un p-value globale
-    valid_p = [r["p_value"] for r in per_serata_results if r["p_value"] is not None]
+    valid_p = [r["p_value"] for r in results if r["p_value"] is not None and r["p_value"] > 0]
     if len(valid_p) >= 2:
         fisher_stat = -2 * sum(np.log(p) for p in valid_p)
         fisher_df = 2 * len(valid_p)
@@ -519,26 +464,132 @@ def test_kruskal_per_serata(raw_df: pd.DataFrame) -> dict:
     else:
         fisher_stat, fisher_df, fisher_p = None, None, None
 
-    n_sig = sum(1 for r in per_serata_results if r["significativo"])
+    return {
+        "test": "Kruskal-Wallis per-serata (5 fasce) + Fisher combined",
+        "descrizione": (
+            "KW con 5 fasce calcolato per ogni serata singolarmente (fasce bilanciate). "
+            "I p-value vengono combinati con il metodo di Fisher per un test globale."
+        ),
+        "ipotesi_nulla": "In nessuna serata la fascia influenza la classifica",
+        "n_serate": len(results),
+        "n_significative": sum(1 for r in results if r["significativo"]),
+        "fisher_combined": {
+            "chi2": _sf(fisher_stat), "df": fisher_df, "p_value": _sf(fisher_p),
+            "significativo": bool(fisher_p < 0.05) if fisher_p is not None else False,
+            "interpretazione": _interp(fisher_p),
+        },
+        "dettaglio": results,
+    }
+
+
+# ============================================================
+# 8. ML: la fascia predice il piazzamento?
+# ============================================================
+
+def test_ml(raw: pd.DataFrame) -> dict:
+    """
+    Machine Learning: la fascia di esibizione predice il piazzamento in Top 5?
+
+    - Features: fascia_5 (one-hot), posizione_relativa, serata
+    - Target: is_top5 (classificazione binaria)
+    - Validazione: Leave-One-Year-Out (LOYO) cross-validation
+    - Baseline: frequenza della classe maggioritaria
+    - Modelli: Logistic Regression, Random Forest, Gradient Boosting
+    """
+    df = raw.reset_index(drop=True).copy()
+
+    # Features
+    fascia_dummies = pd.get_dummies(df["fascia_5"].astype(str), prefix="fascia", dtype=float)
+    X = pd.concat([
+        fascia_dummies.reset_index(drop=True),
+        df[["posizione_relativa", "serata"]].reset_index(drop=True),
+    ], axis=1)
+    y = df["is_top5"].astype(int).values
+    groups = df["year"].values
+
+    baseline_acc = max(y.mean(), 1 - y.mean())
+    baseline_label = "non_top5" if (1 - y.mean()) > y.mean() else "top5"
+
+    models = {
+        "Logistic Regression": LogisticRegression(max_iter=1000, random_state=42),
+        "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "Gradient Boosting": GradientBoostingClassifier(n_estimators=100, random_state=42),
+    }
+
+    logo = LeaveOneGroupOut()
+    model_results = []
+
+    for name, model in models.items():
+        y_pred = cross_val_predict(model, X, y, cv=logo, groups=groups)
+        try:
+            y_proba = cross_val_predict(model, X, y, cv=logo, groups=groups, method="predict_proba")[:, 1]
+            auc = roc_auc_score(y, y_proba)
+        except Exception:
+            auc = None
+
+        acc = accuracy_score(y, y_pred)
+        f1 = f1_score(y, y_pred, zero_division=0)
+
+        # Feature importance (fit su tutto per capire quali feature contano)
+        model.fit(X, y)
+        if hasattr(model, "feature_importances_"):
+            imp = dict(zip(X.columns, model.feature_importances_))
+        elif hasattr(model, "coef_"):
+            imp = dict(zip(X.columns, np.abs(model.coef_[0])))
+        else:
+            imp = {}
+
+        # Ordina per importanza
+        imp_sorted = sorted(imp.items(), key=lambda x: -x[1])
+
+        model_results.append({
+            "modello": name,
+            "accuracy": _sf(acc),
+            "f1_score": _sf(f1),
+            "auc_roc": _sf(auc),
+            "miglioramento_su_baseline": _sf((acc - baseline_acc) / baseline_acc * 100),
+            "feature_importance": [
+                {"feature": k, "importanza": _sf(v)} for k, v in imp_sorted
+            ],
+        })
+
+    # Analisi per fascia: probabilità predetta media di Top 5
+    best_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    best_model.fit(X, y)
+    df["prob_top5"] = best_model.predict_proba(X)[:, 1]
+
+    prob_per_fascia = []
+    for fascia in FASCE_5_LABELS:
+        g = df[df["fascia_5"] == fascia]
+        if len(g) > 0:
+            prob_per_fascia.append({
+                "fascia": fascia,
+                "prob_media_top5": _sf(g["prob_top5"].mean()),
+                "prob_mediana_top5": _sf(g["prob_top5"].median()),
+                "pct_effettiva_top5": _sf(g["is_top5"].mean() * 100),
+                "n": int(len(g)),
+            })
 
     return {
-        "test": "Kruskal-Wallis per-serata + Fisher combined",
+        "test": "Machine Learning — La fascia predice il Top 5?",
         "descrizione": (
-            "Kruskal-Wallis H test calcolato separatamente per ogni serata (non mediato). "
-            "Con 12-25 artisti per serata le 3 fasce sono bilanciate (~4-8 per fascia). "
-            "I p-value individuali vengono poi combinati con il metodo di Fisher per un test globale."
+            "Classificazione binaria (Top 5 sì/no) usando come features la fascia "
+            "di esibizione (one-hot 5 livelli), la posizione relativa e la serata. "
+            "Validazione Leave-One-Year-Out per evitare data leakage temporale. "
+            "Se i modelli non battono il baseline, la fascia non ha potere predittivo."
         ),
-        "ipotesi_nulla": "In nessuna serata la fascia di esibizione influenza la classifica",
-        "n_serate_analizzate": len(per_serata_results),
-        "n_serate_significative": n_sig,
-        "fisher_combined": {
-            "chi2": _safe_float(fisher_stat),
-            "df": fisher_df,
-            "p_value": _safe_float(fisher_p),
-            "significativo": bool(fisher_p < 0.05) if fisher_p is not None else False,
-            "interpretazione": _interpret_p(fisher_p),
+        "dataset": {
+            "n_osservazioni": int(len(df)),
+            "n_top5": int(y.sum()),
+            "pct_top5": _sf(y.mean() * 100),
+            "n_anni": int(len(np.unique(groups))),
         },
-        "dettaglio": per_serata_results,
+        "baseline": {
+            "strategia": f"Predici sempre '{baseline_label}' (classe maggioritaria)",
+            "accuracy": _sf(baseline_acc),
+        },
+        "modelli": model_results,
+        "probabilita_top5_per_fascia": prob_per_fascia,
     }
 
 
@@ -546,171 +597,130 @@ def test_kruskal_per_serata(raw_df: pd.DataFrame) -> dict:
 # Dati per visualizzazione
 # ============================================================
 
-def build_viz_data(data: pd.DataFrame) -> dict:
-    """Dati strutturati per grafici sul frontend."""
-
-    # Scatter: posizione relativa vs ranking normalizzato
-    scatter = []
-    for _, row in data.iterrows():
-        scatter.append({
-            "anno": int(row["year"]),
-            "artista": row["artist"],
-            "posizione_relativa": _safe_float(row["pos_rel_media"]),
-            "rank_normalizzato": _safe_float(row["rank_normalizzato"]),
-            "classifica_finale": int(row["classifica_finale"]),
-            "n_partecipanti": int(row["n_partecipanti"]),
-            "fascia_3": str(row["fascia_3"]),
-            "fascia_5": str(row["fascia_5"]),
+def build_viz_data(raw: pd.DataFrame, artist: pd.DataFrame) -> dict:
+    # Scatter per-serata
+    scatter_ps = []
+    for _, r in raw.iterrows():
+        scatter_ps.append({
+            "anno": int(r["year"]), "serata": int(r["serata"]),
+            "artista": r["artist"],
+            "posizione_relativa": _sf(r["posizione_relativa"]),
+            "rank_normalizzato": _sf(r["rank_norm"]),
+            "classifica_finale": int(r["classifica_finale"]),
+            "fascia_5": str(r["fascia_5"]),
         })
 
-    # Boxplot data: per ogni fascia
-    boxplot_3 = []
-    for fascia in data["fascia_3"].cat.categories:
-        g = data[data["fascia_3"] == fascia]["rank_normalizzato"]
-        if len(g) > 0:
-            boxplot_3.append({
-                "fascia": str(fascia),
-                "n": int(len(g)),
-                "min": _safe_float(g.min()),
-                "q25": _safe_float(g.quantile(0.25)),
-                "mediana": _safe_float(g.median()),
-                "q75": _safe_float(g.quantile(0.75)),
-                "max": _safe_float(g.max()),
-                "media": _safe_float(g.mean()),
-            })
+    # Scatter aggregato per artista
+    scatter_agg = []
+    for _, r in artist.iterrows():
+        scatter_agg.append({
+            "anno": int(r["year"]), "artista": r["artist"],
+            "posizione_relativa": _sf(r["pos_rel_media"]),
+            "rank_normalizzato": _sf(r["rank_normalizzato"]),
+            "classifica_finale": int(r["classifica_finale"]),
+            "fascia_5": str(r["fascia_5"]),
+        })
 
+    # Boxplot 5 fasce (per-serata)
     boxplot_5 = []
-    for fascia in data["fascia_5"].cat.categories:
-        g = data[data["fascia_5"] == fascia]["rank_normalizzato"]
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]["rank_norm"]
         if len(g) > 0:
             boxplot_5.append({
-                "fascia": str(fascia),
-                "n": int(len(g)),
-                "min": _safe_float(g.min()),
-                "q25": _safe_float(g.quantile(0.25)),
-                "mediana": _safe_float(g.median()),
-                "q75": _safe_float(g.quantile(0.75)),
-                "max": _safe_float(g.max()),
-                "media": _safe_float(g.mean()),
+                "fascia": fascia, "n": int(len(g)),
+                "min": _sf(g.min()), "q25": _sf(g.quantile(0.25)),
+                "mediana": _sf(g.median()), "q75": _sf(g.quantile(0.75)),
+                "max": _sf(g.max()), "media": _sf(g.mean()),
             })
 
-    # Heatmap: anno x fascia → mediana rank
-    heatmap_data = []
-    for year in sorted(data["year"].unique()):
-        for fascia in data["fascia_3"].cat.categories:
-            g = data[(data["year"] == year) & (data["fascia_3"] == fascia)]["rank_normalizzato"]
+    # Heatmap 5 fasce: anno × fascia → mediana rank (per-serata)
+    heatmap = []
+    for year in sorted(raw["year"].unique()):
+        for fascia in FASCE_5_LABELS:
+            g = raw[(raw["year"] == year) & (raw["fascia_5"] == fascia)]["rank_norm"]
             if len(g) > 0:
-                heatmap_data.append({
-                    "anno": int(year),
-                    "fascia": str(fascia),
-                    "mediana_rank": _safe_float(g.median()),
-                    "media_rank": _safe_float(g.mean()),
+                heatmap.append({
+                    "anno": int(year), "fascia": fascia,
+                    "mediana_rank": _sf(g.median()), "media_rank": _sf(g.mean()),
                     "n": int(len(g)),
                 })
 
-    # Percentuale Top 5 per fascia
-    top5_by_band = []
-    for fascia in data["fascia_3"].cat.categories:
-        g = data[data["fascia_3"] == fascia]
+    # Top 5 per fascia (per-serata)
+    top5 = []
+    for fascia in FASCE_5_LABELS:
+        g = raw[raw["fascia_5"] == fascia]
         if len(g) > 0:
-            pct = (g["classifica_finale"] <= 5).mean() * 100
-            top5_by_band.append({
-                "fascia": str(fascia),
-                "pct_top_5": _safe_float(pct),
-                "n_top_5": int((g["classifica_finale"] <= 5).sum()),
+            top5.append({
+                "fascia": fascia,
+                "pct_top_5": _sf(g["is_top5"].mean() * 100),
+                "n_top_5": int(g["is_top5"].sum()),
                 "n_totale": int(len(g)),
             })
 
-    # Vincitori: in quale fascia si sono esibiti?
-    vincitori = data[data["classifica_finale"] == 1].copy()
+    # Vincitori: dove si sono esibiti?
+    vincitori = artist[artist["classifica_finale"] == 1]
     vincitori_data = []
-    for _, row in vincitori.iterrows():
+    for _, r in vincitori.iterrows():
         vincitori_data.append({
-            "anno": int(row["year"]),
-            "artista": row["artist"],
-            "posizione_relativa": _safe_float(row["pos_rel_media"]),
-            "fascia_3": str(row["fascia_3"]),
-            "fascia_5": str(row["fascia_5"]),
+            "anno": int(r["year"]), "artista": r["artist"],
+            "posizione_relativa": _sf(r["pos_rel_media"]),
+            "fascia_5": str(r["fascia_5"]),
         })
 
+    # Boxplot per singola serata (5 fasce)
+    boxplot_per_serata = []
+    for year in sorted(raw["year"].unique()):
+        for serata in sorted(raw[raw["year"] == year]["serata"].unique()):
+            sdf = raw[(raw["year"] == year) & (raw["serata"] == serata)]
+            if len(sdf) < 6:
+                continue
+            for fascia in FASCE_5_LABELS:
+                g = sdf[sdf["fascia_5"] == fascia]["rank_norm"]
+                if len(g) > 0:
+                    boxplot_per_serata.append({
+                        "anno": int(year), "serata": int(serata),
+                        "fascia": fascia, "n": int(len(g)),
+                        "media": _sf(g.mean()), "mediana": _sf(g.median()),
+                    })
+
     return {
-        "scatter": scatter,
-        "boxplot_3_fasce": boxplot_3,
+        "scatter_per_serata": scatter_ps,
+        "scatter_aggregato": scatter_agg,
         "boxplot_5_fasce": boxplot_5,
-        "heatmap_anno_fascia": heatmap_data,
-        "top5_per_fascia": top5_by_band,
+        "heatmap_anno_fascia": heatmap,
+        "top5_per_fascia": top5,
         "vincitori": vincitori_data,
+        "boxplot_per_serata": boxplot_per_serata,
     }
 
 
 # ============================================================
-# Sintesi e conclusioni
+# Sintesi
 # ============================================================
 
-def build_summary(test_results: list[dict], data: pd.DataFrame) -> dict:
-    """Sintesi testuale dei risultati."""
-    n_sig = sum(
-        1 for t in test_results
-        if t.get("significativo") or (
-            isinstance(t.get("risultati"), dict) and
-            any(v.get("significativo") for v in t["risultati"].values() if isinstance(v, dict))
-        )
-    )
-
-    # Conta significatività aggregata
+def build_summary(tests: list[dict], raw: pd.DataFrame, artist: pd.DataFrame) -> dict:
     sig_tests = []
-    for t in test_results:
+    for t in tests:
         name = t.get("test", "")
-        if "globale" in t and t["globale"].get("significativo"):
+        # Test con campo diretto
+        if t.get("significativo"):
             sig_tests.append(name)
-        elif t.get("significativo"):
-            sig_tests.append(name)
-        elif isinstance(t.get("risultati"), dict):
-            for key, val in t["risultati"].items():
-                if isinstance(val, dict) and val.get("significativo"):
-                    sig_tests.append(f"{name} ({key})")
+        # Spearman con sotto-campi
+        elif "per_serata" in t and isinstance(t["per_serata"], dict) and t["per_serata"].get("significativo"):
+            sig_tests.append(f"{name} (per-serata)")
+        elif "aggregato_artista" in t and isinstance(t["aggregato_artista"], dict) and t["aggregato_artista"].get("significativo"):
+            sig_tests.append(f"{name} (aggregato)")
+        # Fisher combined
+        elif "fisher_combined" in t and t["fisher_combined"].get("significativo"):
+            sig_tests.append(f"{name} (Fisher)")
 
-    # Direzione dell'effetto
-    vincitori = data[data["classifica_finale"] == 1]
+    vincitori = artist[artist["classifica_finale"] == 1]
     pos_media_vincitori = vincitori["pos_rel_media"].mean()
 
-    centro = data[data["fascia_3"] == "Centro"]["rank_normalizzato"]
-    estremi = data[data["fascia_3"] != "Centro"]["rank_normalizzato"]
+    centro_raw = raw[raw["fascia_5"].isin(["Seconda fascia", "Centro", "Quarta fascia"])]["rank_norm"]
+    estremi_raw = raw[raw["fascia_5"].isin(["Apertura", "Chiusura"])]["rank_norm"]
 
-    return {
-        "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
-        "dataset": {
-            "n_artisti": int(len(data)),
-            "n_anni": int(data["year"].nunique()),
-            "anni": sorted(int(y) for y in data["year"].unique()),
-            "serate_analizzate": "1-4 (competitive, esclusa la finale)",
-        },
-        "normalizzazione": {
-            "posizione": "posizione_relativa media nelle serate 1-4 (0=primo, 1=ultimo)",
-            "ranking": "rank_normalizzato = (rank-1)/(N-1), dove N=partecipanti nell'anno",
-        },
-        "n_test_eseguiti": len(test_results),
-        "test_significativi": sig_tests,
-        "posizione_media_vincitori": _safe_float(pos_media_vincitori),
-        "rank_medio_centro": _safe_float(centro.mean()) if len(centro) > 0 else None,
-        "rank_medio_estremi": _safe_float(estremi.mean()) if len(estremi) > 0 else None,
-        "conclusione": _build_conclusion(test_results, pos_media_vincitori, centro, estremi),
-    }
-
-
-def _build_conclusion(tests, pos_media_vincitori, centro, estremi):
-    sig_count = 0
-    for t in tests:
-        if t.get("significativo") or (
-            t.get("globale", {}).get("significativo")
-        ):
-            sig_count += 1
-        elif isinstance(t.get("risultati"), dict):
-            for val in t["risultati"].values():
-                if isinstance(val, dict) and val.get("significativo"):
-                    sig_count += 1
-                    break
-
+    sig_count = len(sig_tests)
     if sig_count >= 3:
         strength = "forte"
     elif sig_count >= 2:
@@ -720,18 +730,43 @@ def _build_conclusion(tests, pos_media_vincitori, centro, estremi):
     else:
         strength = "assente"
 
-    if len(centro) > 0 and len(estremi) > 0:
-        if centro.mean() < estremi.mean():
-            direction = "Il centro sembra avere un leggero vantaggio"
+    if len(centro_raw) > 0 and len(estremi_raw) > 0:
+        diff = estremi_raw.mean() - centro_raw.mean()
+        if centro_raw.mean() < estremi_raw.mean():
+            direction = f"Le fasce centrali hanno ranking medio migliore degli estremi (differenza: {diff:.3f})"
         else:
-            direction = "Il centro non sembra avere un vantaggio"
+            direction = f"Le fasce centrali NON hanno ranking migliore degli estremi (differenza: {diff:.3f})"
     else:
-        direction = "Dati insufficienti per determinare la direzione"
+        direction = "Dati insufficienti"
 
     return {
-        "evidenza": strength,
-        "direzione": direction,
-        "nota": f"Su {len(tests)} test statistici, {sig_count} risultano significativi (p < 0.05). La posizione media dei vincitori nelle serate competitive è {pos_media_vincitori:.2f} (0=primo, 1=ultimo).",
+        "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
+        "dataset": {
+            "n_osservazioni_per_serata": int(len(raw)),
+            "n_artisti_unici": int(len(artist)),
+            "n_anni": int(raw["year"].nunique()),
+            "anni": sorted(int(y) for y in raw["year"].unique()),
+            "serate_analizzate": "1-4 (competitive, esclusa la finale)",
+        },
+        "normalizzazione": {
+            "posizione": "posizione_relativa nella serata (0=primo, 1=ultimo)",
+            "ranking": "rank_normalizzato = (rank-1)/(N-1), dove N = partecipanti nell'anno",
+            "fasce": "5 fasce equispaziate sulla posizione relativa (Apertura/Seconda/Centro/Quarta/Chiusura)",
+        },
+        "n_test_eseguiti": len(tests),
+        "test_significativi": sig_tests,
+        "posizione_media_vincitori": _sf(pos_media_vincitori),
+        "rank_medio_centro": _sf(centro_raw.mean()),
+        "rank_medio_estremi": _sf(estremi_raw.mean()),
+        "conclusione": {
+            "evidenza": strength,
+            "direzione": direction,
+            "nota": (
+                f"Su {len(tests)} test statistici + ML, {sig_count} risultano significativi (p < 0.05). "
+                f"La posizione media dei vincitori nelle serate competitive è "
+                f"{pos_media_vincitori:.2f} (0=primo, 1=ultimo)."
+            ),
+        },
     }
 
 
@@ -744,146 +779,108 @@ def main():
     print("SANREMO — ANALISI TIMING: CHI SI ESIBISCE A METÀ HA PIÙ CHANCE?")
     print("=" * 70)
 
-    print("\n[1/5] Caricamento dati...")
+    print("\n[1/6] Caricamento dati...")
     raw_df = load_data()
     print(f"  Righe con classifica finale (serate 1-4): {len(raw_df)}")
     print(f"  Anni: {sorted(raw_df['year'].unique())}")
 
-    print("\n[2/5] Preparazione dati (normalizzazione + fasce)...")
-    data = prepare_analysis_data(raw_df)
-    print(f"  Artisti unici con dati completi: {len(data)}")
-    for y in sorted(data["year"].unique()):
-        ydf = data[data["year"] == y]
-        print(f"    {y}: {len(ydf)} artisti, n_partecipanti={ydf['n_partecipanti'].iloc[0]}")
+    print("\n[2/6] Preparazione dati (5 fasce per-serata)...")
+    raw = enrich_raw(raw_df)
+    artist = prepare_artist_data(raw_df)
+    print(f"  Osservazioni per-serata: {len(raw)}")
+    print(f"  Artisti unici: {len(artist)}")
+    print(f"  Distribuzione fasce per-serata:")
+    for f in FASCE_5_LABELS:
+        n = (raw["fascia_5"] == f).sum()
+        print(f"    {f}: {n}")
 
-    print("\n[3/5] Esecuzione test statistici...")
+    print("\n[3/6] Test statistici...")
 
-    test_1 = test_spearman(data)
-    print(f"  1) Spearman: rho={test_1['globale']['rho']}, p={test_1['globale']['p_value']}")
+    t1 = test_spearman(raw, artist)
+    print(f"  1) Spearman per-serata: rho={t1['per_serata']['rho']}, p={t1['per_serata']['p_value']}")
+    print(f"     Spearman aggregato:  rho={t1['aggregato_artista']['rho']}, p={t1['aggregato_artista']['p_value']}")
 
-    test_2 = test_kruskal_wallis(data)
-    for k, v in test_2["risultati"].items():
-        print(f"  2) Kruskal-Wallis ({k}): H={v['H_statistic']}, p={v['p_value']}")
+    t2 = test_kruskal_wallis(raw)
+    print(f"  2) Kruskal-Wallis 5 fasce: H={t2['H_statistic']}, p={t2['p_value']}")
 
-    test_3 = test_chi_squared(data)
-    for k, v in test_3["risultati"].items():
-        print(f"  3) Chi² ({k}): chi²={v['chi2']}, p={v['p_value']}")
+    t3 = test_chi_squared(raw)
+    print(f"  3) Chi² 5 fasce: chi²={t3['chi2']}, p={t3['p_value']}")
 
-    test_4 = test_mann_whitney(data)
-    print(f"  4) Mann-Whitney: U={test_4['U_statistic']}, p={test_4['p_value']}")
+    t4 = test_mann_whitney(raw)
+    print(f"  4) Mann-Whitney centro vs estremi: U={t4['U_statistic']}, p={t4['p_value']}")
 
-    test_5 = test_friedman(data)
-    for k, v in test_5["risultati"].items():
-        print(f"  5) Friedman ({k}): chi²={v['friedman_chi2']}, p={v['p_value']}, W={v['kendall_w']}")
+    t5 = test_friedman(raw)
+    print(f"  5) Friedman 5 fasce: chi²={t5['friedman_chi2']}, p={t5['p_value']}, W={t5['kendall_w']}")
 
-    test_6 = test_per_serata(raw_df)
-    print(f"  6) Spearman per-serata: {test_6['n_serate_analizzate']} serate, {test_6['n_serate_significative']} significative")
+    t6 = test_spearman_per_serata(raw)
+    print(f"  6) Spearman per-serata: {t6['n_serate_analizzate']} serate, {t6['n_serate_significative']} significative")
 
-    test_7 = test_kruskal_per_serata(raw_df)
-    fc = test_7["fisher_combined"]
-    print(f"  7) Kruskal per-serata + Fisher: {test_7['n_serate_analizzate']} serate, Fisher p={fc['p_value']}")
+    t7 = test_kruskal_per_serata(raw)
+    print(f"  7) Kruskal per-serata + Fisher: p_Fisher={t7['fisher_combined']['p_value']}")
 
-    all_tests = [test_1, test_2, test_3, test_4, test_5, test_6, test_7]
+    all_tests = [t1, t2, t3, t4, t5, t6, t7]
 
-    print("\n[4/5] Costruzione dati per visualizzazione...")
-    viz_data = build_viz_data(data)
-    print(f"  Scatter points: {len(viz_data['scatter'])}")
-    print(f"  Vincitori tracciati: {len(viz_data['vincitori'])}")
+    print("\n[4/6] Machine Learning...")
+    t8 = test_ml(raw)
+    for m in t8["modelli"]:
+        print(f"  {m['modello']}: acc={m['accuracy']}, f1={m['f1_score']}, AUC={m['auc_roc']}, "
+              f"vs baseline={t8['baseline']['accuracy']}")
+    print(f"  Probabilità Top 5 per fascia (RF):")
+    for f in t8["probabilita_top5_per_fascia"]:
+        print(f"    {f['fascia']}: prob={f['prob_media_top5']:.3f}, effettiva={f['pct_effettiva_top5']:.1f}%")
+    all_tests.append(t8)
 
-    # Aggiungi scatter per-serata (senza media) per visualizzazioni più granulari
-    n_per_year = raw_df.groupby("year")["classifica_finale"].max().to_dict()
-    scatter_per_serata = []
-    for _, row in raw_df.iterrows():
-        n = n_per_year.get(row["year"], 1)
-        rn = (row["classifica_finale"] - 1) / max(n - 1, 1)
-        scatter_per_serata.append({
-            "anno": int(row["year"]),
-            "serata": int(row["serata"]),
-            "artista": row["artist"],
-            "posizione_relativa": _safe_float(row["posizione_relativa"]),
-            "rank_normalizzato": _safe_float(rn),
-            "classifica_finale": int(row["classifica_finale"]),
-        })
-    viz_data["scatter_per_serata"] = scatter_per_serata
-    print(f"  Scatter per-serata: {len(scatter_per_serata)}")
+    print("\n[5/6] Visualizzazione...")
+    viz = build_viz_data(raw, artist)
+    for k, v in viz.items():
+        print(f"  {k}: {len(v)} items")
 
-    # Boxplot per-serata: fasce nella singola serata
-    boxplot_per_serata = []
-    for year in sorted(raw_df["year"].unique()):
-        for serata in sorted(raw_df[raw_df["year"] == year]["serata"].unique()):
-            sdf = raw_df[(raw_df["year"] == year) & (raw_df["serata"] == serata)].copy()
-            if len(sdf) < 6:
-                continue
-            sdf["fascia"] = pd.cut(
-                sdf["posizione_relativa"],
-                bins=[-0.001, 1/3, 2/3, 1.001],
-                labels=["Inizio", "Centro", "Fine"],
-            )
-            n = n_per_year.get(year, 1)
-            for fascia in ["Inizio", "Centro", "Fine"]:
-                g = sdf[sdf["fascia"] == fascia]["classifica_finale"].apply(
-                    lambda r: (r - 1) / max(n - 1, 1)
-                )
-                if len(g) > 0:
-                    boxplot_per_serata.append({
-                        "anno": int(year),
-                        "serata": int(serata),
-                        "fascia": fascia,
-                        "n": int(len(g)),
-                        "media": _safe_float(g.mean()),
-                        "mediana": _safe_float(g.median()),
-                    })
-    viz_data["boxplot_per_serata"] = boxplot_per_serata
-
-    print("\n[5/5] Generazione JSON...")
-    summary = build_summary(all_tests, data)
+    print("\n[6/6] Generazione JSON...")
+    summary = build_summary(all_tests, raw, artist)
 
     output = {
         "meta": {
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
             "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
             "metodologia": (
-                "Analisi statistica non parametrica sull'ordine di esibizione nelle serate "
-                "competitive (1-4) del Festival di Sanremo. Posizione e ranking normalizzati "
-                "per il numero di partecipanti. Fasce di esibizione usate come fattori categorici. "
-                "Due livelli di analisi: (a) posizione media per artista su tutte le serate, "
-                "(b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia)."
+                "Analisi non parametrica + ML sull'ordine di esibizione nelle serate "
+                "competitive (1-4) del Festival di Sanremo. 5 fasce equispaziate come fattori. "
+                "Due livelli: (a) per-serata con fasce bilanciate, (b) aggregato per artista. "
+                "ML con Leave-One-Year-Out cross-validation."
             ),
             "fonte_dati": "dati_sremo/sanremo_ordine_serate.csv",
-            "anni_analizzati": sorted(int(y) for y in data["year"].unique()),
-            "n_artisti_totali": int(len(data)),
-            "n_osservazioni_per_serata": int(len(raw_df)),
-            "serate_incluse": "1-4 (competitive)",
-            "serate_escluse": "5 (finale — l'ordine è la classifica stessa)",
+            "anni_analizzati": sorted(int(y) for y in raw["year"].unique()),
+            "n_osservazioni": int(len(raw)),
+            "n_artisti": int(len(artist)),
+            "fasce": FASCE_5_LABELS,
         },
         "sintesi": summary,
         "test_statistici": {
-            "spearman": test_1,
-            "kruskal_wallis": test_2,
-            "chi_squared": test_3,
-            "mann_whitney": test_4,
-            "friedman": test_5,
-            "spearman_per_serata": test_6,
-            "kruskal_per_serata_fisher": test_7,
+            "spearman": t1,
+            "kruskal_wallis_5fasce": t2,
+            "chi_squared_5fasce": t3,
+            "mann_whitney_centro_estremi": t4,
+            "friedman_5fasce": t5,
+            "spearman_per_serata": t6,
+            "kruskal_per_serata_fisher": t7,
+            "machine_learning": t8,
         },
-        "visualizzazione": viz_data,
+        "visualizzazione": viz,
     }
 
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2, cls=NumpyEncoder)
 
-    print(f"\n  JSON salvato: {OUTPUT_JSON}")
+    print(f"\n  Output: {OUTPUT_JSON}")
 
-    # Stampa sintesi
     print("\n" + "=" * 70)
     print("SINTESI")
     print("=" * 70)
-    print(f"  Domanda: {summary['domanda']}")
-    print(f"  Evidenza: {summary['conclusione']['evidenza']}")
-    print(f"  Direzione: {summary['conclusione']['direzione']}")
-    print(f"  {summary['conclusione']['nota']}")
-    print(f"  Posizione media vincitori: {summary['posizione_media_vincitori']:.2f}")
+    c = summary["conclusione"]
+    print(f"  Evidenza: {c['evidenza']}")
+    print(f"  Direzione: {c['direzione']}")
+    print(f"  {c['nota']}")
     if summary["test_significativi"]:
         print(f"  Test significativi: {', '.join(summary['test_significativi'])}")
     else:
