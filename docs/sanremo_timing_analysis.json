@@ -1,0 +1,6276 @@
+{
+  "meta": {
+    "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
+    "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
+    "metodologia": "Analisi statistica non parametrica sull'ordine di esibizione nelle serate competitive (1-4) del Festival di Sanremo. Posizione e ranking normalizzati per il numero di partecipanti. Fasce di esibizione usate come fattori categorici. Due livelli di analisi: (a) posizione media per artista su tutte le serate, (b) analisi per-serata con fasce bilanciate (~4-8 artisti per fascia).",
+    "fonte_dati": "dati_sremo/sanremo_ordine_serate.csv",
+    "anni_analizzati": [
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "n_artisti_totali": 137,
+    "n_osservazioni_per_serata": 367,
+    "serate_incluse": "1-4 (competitive)",
+    "serate_escluse": "5 (finale — l'ordine è la classifica stessa)"
+  },
+  "sintesi": {
+    "domanda": "È vero che chi si esibisce a metà serata ha più possibilità di vincere?",
+    "dataset": {
+      "n_artisti": 137,
+      "n_anni": 5,
+      "anni": [
+        2021,
+        2022,
+        2023,
+        2024,
+        2025
+      ],
+      "serate_analizzate": "1-4 (competitive, esclusa la finale)"
+    },
+    "normalizzazione": {
+      "posizione": "posizione_relativa media nelle serate 1-4 (0=primo, 1=ultimo)",
+      "ranking": "rank_normalizzato = (rank-1)/(N-1), dove N=partecipanti nell'anno"
+    },
+    "n_test_eseguiti": 7,
+    "test_significativi": [],
+    "posizione_media_vincitori": 0.523975,
+    "rank_medio_centro": 0.499021,
+    "rank_medio_estremi": 0.516896,
+    "conclusione": {
+      "evidenza": "assente",
+      "direzione": "Il centro sembra avere un leggero vantaggio",
+      "nota": "Su 7 test statistici, 0 risultano significativi (p < 0.05). La posizione media dei vincitori nelle serate competitive è 0.52 (0=primo, 1=ultimo)."
+    }
+  },
+  "test_statistici": {
+    "spearman": {
+      "test": "Spearman Rank Correlation",
+      "descrizione": "Correlazione tra posizione relativa media nell'ordine di esibizione e classifica finale normalizzata. rho > 0 = chi si esibisce tardi ha ranking peggiore (numero più alto). rho < 0 = chi si esibisce tardi ha ranking migliore.",
+      "ipotesi_nulla": "Non c'è correlazione monotona tra ordine di esibizione e classifica finale",
+      "globale": {
+        "n": 137,
+        "rho": 0.082285,
+        "p_value": 0.339111,
+        "significativo": false,
+        "interpretazione": "non significativo (p >= 0.05)"
+      },
+      "per_anno": [
+        {
+          "anno": 2021,
+          "n": 25,
+          "rho": -0.076553,
+          "p_value": 0.716079,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2022,
+          "n": 26,
+          "rho": 0.199692,
+          "p_value": 0.328047,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2023,
+          "n": 26,
+          "rho": 0.553599,
+          "p_value": 0.003348,
+          "significativo": true,
+          "interpretazione": "molto significativo (p < 0.01)"
+        },
+        {
+          "anno": 2024,
+          "n": 27,
+          "rho": 0.03771,
+          "p_value": 0.851864,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2025,
+          "n": 33,
+          "rho": -0.146941,
+          "p_value": 0.414496,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        }
+      ]
+    },
+    "kruskal_wallis": {
+      "test": "Kruskal-Wallis H Test",
+      "descrizione": "Test non parametrico sui ranghi per verificare se la distribuzione del ranking normalizzato differisce tra le fasce di esibizione. Equivalente non parametrico dell'ANOVA a una via.",
+      "ipotesi_nulla": "Le distribuzioni del ranking normalizzato sono identiche tra le fasce",
+      "risultati": {
+        "fasce_3": {
+          "n_fasce": 3,
+          "statistiche_descrittive": [
+            {
+              "fascia": "Inizio",
+              "n": 18,
+              "media": 0.447585,
+              "mediana": 0.428571,
+              "dev_std": 0.297647,
+              "q25": 0.199074,
+              "q75": 0.718571
+            },
+            {
+              "fascia": "Centro",
+              "n": 103,
+              "media": 0.499021,
+              "mediana": 0.5,
+              "dev_std": 0.290784,
+              "q25": 0.25463,
+              "q75": 0.735755
+            },
+            {
+              "fascia": "Fine",
+              "n": 16,
+              "media": 0.59487,
+              "mediana": 0.690476,
+              "dev_std": 0.310222,
+              "q25": 0.321429,
+              "q75": 0.844286
+            }
+          ],
+          "H_statistic": 2.11903,
+          "p_value": 0.346624,
+          "eta_squared": 0.000888,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        "fasce_5": {
+          "n_fasce": 5,
+          "statistiche_descrittive": [
+            {
+              "fascia": "Primo quinto",
+              "n": 3,
+              "media": 0.687619,
+              "mediana": 0.714286,
+              "dev_std": 0.246797,
+              "q25": 0.571429,
+              "q75": 0.817143
+            },
+            {
+              "fascia": "Secondo quinto",
+              "n": 29,
+              "media": 0.488064,
+              "mediana": 0.5,
+              "dev_std": 0.31472,
+              "q25": 0.166667,
+              "q75": 0.76
+            },
+            {
+              "fascia": "Terzo quinto",
+              "n": 72,
+              "media": 0.463395,
+              "mediana": 0.440705,
+              "dev_std": 0.291113,
+              "q25": 0.228632,
+              "q75": 0.675926
+            },
+            {
+              "fascia": "Quarto quinto",
+              "n": 30,
+              "media": 0.586955,
+              "mediana": 0.642857,
+              "dev_std": 0.282038,
+              "q25": 0.35,
+              "q75": 0.809028
+            },
+            {
+              "fascia": "Ultimo quinto",
+              "n": 3,
+              "media": 0.594603,
+              "mediana": 0.666667,
+              "dev_std": 0.210875,
+              "q25": 0.511905,
+              "q75": 0.713333
+            }
+          ],
+          "H_statistic": 5.182043,
+          "p_value": 0.269124,
+          "eta_squared": 0.008955,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        }
+      }
+    },
+    "chi_squared": {
+      "test": "Chi-Squared Test of Independence",
+      "descrizione": "Test chi-quadrato sulla tabella di contingenza: fascia di esibizione × arrivo in Top 5. Verifica se la probabilità di arrivare in Top 5 è indipendente dalla fascia.",
+      "ipotesi_nulla": "La proporzione di Top 5 è uguale tra tutte le fasce",
+      "risultati": {
+        "fasce_3": {
+          "n_fasce": 3,
+          "contingenza": [
+            {
+              "fascia": "Inizio",
+              "top_5": 5,
+              "non_top_5": 13,
+              "totale": 18,
+              "pct_top_5": 27.777778
+            },
+            {
+              "fascia": "Centro",
+              "top_5": 16,
+              "non_top_5": 87,
+              "totale": 103,
+              "pct_top_5": 15.533981
+            },
+            {
+              "fascia": "Fine",
+              "top_5": 2,
+              "non_top_5": 14,
+              "totale": 16,
+              "pct_top_5": 12.5
+            }
+          ],
+          "chi2": 1.882712,
+          "p_value": 0.390099,
+          "gradi_liberta": 2,
+          "cramers_v": 0.117228,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        "fasce_5": {
+          "n_fasce": 5,
+          "contingenza": [
+            {
+              "fascia": "Primo quinto",
+              "top_5": 0,
+              "non_top_5": 3,
+              "totale": 3,
+              "pct_top_5": 0.0
+            },
+            {
+              "fascia": "Secondo quinto",
+              "top_5": 8,
+              "non_top_5": 21,
+              "totale": 29,
+              "pct_top_5": 27.586207
+            },
+            {
+              "fascia": "Terzo quinto",
+              "top_5": 12,
+              "non_top_5": 60,
+              "totale": 72,
+              "pct_top_5": 16.666667
+            },
+            {
+              "fascia": "Quarto quinto",
+              "top_5": 3,
+              "non_top_5": 27,
+              "totale": 30,
+              "pct_top_5": 10.0
+            },
+            {
+              "fascia": "Ultimo quinto",
+              "top_5": 0,
+              "non_top_5": 3,
+              "totale": 3,
+              "pct_top_5": 0.0
+            }
+          ],
+          "chi2": 4.621259,
+          "p_value": 0.32841,
+          "gradi_liberta": 4,
+          "cramers_v": 0.183662,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        }
+      }
+    },
+    "mann_whitney": {
+      "test": "Mann-Whitney U Test",
+      "descrizione": "Test non parametrico: confronto del ranking normalizzato tra chi si esibisce al centro (fascia 2/3) e chi agli estremi (fascia 1/3 + 3/3).",
+      "ipotesi_nulla": "Le distribuzioni dei ranking sono identiche tra centro ed estremi",
+      "centro": {
+        "n": 103,
+        "media": 0.499021,
+        "mediana": 0.5,
+        "dev_std": 0.290784
+      },
+      "estremi": {
+        "n": 34,
+        "media": 0.516896,
+        "mediana": 0.517857,
+        "dev_std": 0.308143
+      },
+      "U_statistic": 1689.0,
+      "p_value": 0.759244,
+      "rank_biserial_r": 0.035408,
+      "significativo": false,
+      "direzione": "Il centro ha ranking migliore (più basso) degli estremi",
+      "interpretazione": "non significativo (p >= 0.05)"
+    },
+    "friedman": {
+      "test": "Friedman Test",
+      "descrizione": "Test non parametrico per misure ripetute: ogni anno è un blocco, le fasce di esibizione sono i trattamenti. Verifica se l'effetto della fascia è coerente tra anni diversi. Kendall's W misura la concordanza (0 = nessun accordo, 1 = accordo perfetto).",
+      "ipotesi_nulla": "Non c'è differenza sistematica tra le fasce, al netto della variabilità tra anni",
+      "risultati": {
+        "fasce_3": {
+          "n_fasce": 3,
+          "n_anni_usati": 5,
+          "anni_usati": [
+            2021,
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "friedman_chi2": 2.8,
+          "p_value": 0.246597,
+          "kendall_w": 0.28,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)",
+          "dettaglio_per_anno": [
+            {
+              "anno": 2021,
+              "fasce": {
+                "Inizio": {
+                  "n": 6,
+                  "mediana": 0.58,
+                  "media": 0.533333
+                },
+                "Centro": {
+                  "n": 15,
+                  "mediana": 0.56,
+                  "media": 0.546667
+                },
+                "Fine": {
+                  "n": 4,
+                  "mediana": 0.48,
+                  "media": 0.47
+                }
+              }
+            },
+            {
+              "anno": 2022,
+              "fasce": {
+                "Inizio": {
+                  "n": 3,
+                  "mediana": 0.166667,
+                  "media": 0.25
+                },
+                "Centro": {
+                  "n": 21,
+                  "mediana": 0.5,
+                  "media": 0.490079
+                },
+                "Fine": {
+                  "n": 2,
+                  "mediana": 0.979167,
+                  "media": 0.979167
+                }
+              }
+            },
+            {
+              "anno": 2023,
+              "fasce": {
+                "Inizio": {
+                  "n": 3,
+                  "mediana": 0.111111,
+                  "media": 0.148148
+                },
+                "Centro": {
+                  "n": 21,
+                  "mediana": 0.518519,
+                  "media": 0.539683
+                },
+                "Fine": {
+                  "n": 2,
+                  "mediana": 0.62963,
+                  "media": 0.62963
+                }
+              }
+            },
+            {
+              "anno": 2024,
+              "fasce": {
+                "Inizio": {
+                  "n": 1,
+                  "mediana": 0.769231,
+                  "media": 0.769231
+                },
+                "Centro": {
+                  "n": 25,
+                  "mediana": 0.423077,
+                  "media": 0.461538
+                },
+                "Fine": {
+                  "n": 1,
+                  "mediana": 0.884615,
+                  "media": 0.884615
+                }
+              }
+            },
+            {
+              "anno": 2025,
+              "fasce": {
+                "Inizio": {
+                  "n": 5,
+                  "mediana": 0.428571,
+                  "media": 0.578571
+                },
+                "Centro": {
+                  "n": 21,
+                  "mediana": 0.5,
+                  "media": 0.477891
+                },
+                "Fine": {
+                  "n": 7,
+                  "mediana": 0.535714,
+                  "media": 0.505102
+                }
+              }
+            }
+          ]
+        },
+        "fasce_5": {
+          "n_fasce": 5,
+          "n_anni_usati": 2,
+          "anni_usati": [
+            2021,
+            2025
+          ],
+          "friedman_chi2": null,
+          "p_value": null,
+          "kendall_w": null,
+          "significativo": false,
+          "interpretazione": "non calcolabile",
+          "dettaglio_per_anno": [
+            {
+              "anno": 2021,
+              "fasce": {
+                "Primo quinto": {
+                  "n": 1,
+                  "mediana": 0.92,
+                  "media": 0.92
+                },
+                "Secondo quinto": {
+                  "n": 7,
+                  "mediana": 0.56,
+                  "media": 0.502857
+                },
+                "Terzo quinto": {
+                  "n": 10,
+                  "mediana": 0.62,
+                  "media": 0.616
+                },
+                "Quarto quinto": {
+                  "n": 6,
+                  "mediana": 0.22,
+                  "media": 0.32
+                },
+                "Ultimo quinto": {
+                  "n": 1,
+                  "mediana": 0.76,
+                  "media": 0.76
+                }
+              }
+            },
+            {
+              "anno": 2022,
+              "fasce": {
+                "Secondo quinto": {
+                  "n": 7,
+                  "mediana": 0.5,
+                  "media": 0.517857
+                },
+                "Terzo quinto": {
+                  "n": 12,
+                  "mediana": 0.333333,
+                  "media": 0.385417
+                },
+                "Quarto quinto": {
+                  "n": 7,
+                  "mediana": 0.708333,
+                  "media": 0.678571
+                }
+              }
+            },
+            {
+              "anno": 2023,
+              "fasce": {
+                "Secondo quinto": {
+                  "n": 7,
+                  "mediana": 0.296296,
+                  "media": 0.365079
+                },
+                "Terzo quinto": {
+                  "n": 13,
+                  "mediana": 0.407407,
+                  "media": 0.472934
+                },
+                "Quarto quinto": {
+                  "n": 5,
+                  "mediana": 0.740741,
+                  "media": 0.733333
+                },
+                "Ultimo quinto": {
+                  "n": 1,
+                  "mediana": 0.666667,
+                  "media": 0.666667
+                }
+              }
+            },
+            {
+              "anno": 2024,
+              "fasce": {
+                "Secondo quinto": {
+                  "n": 3,
+                  "mediana": 0.769231,
+                  "media": 0.615385
+                },
+                "Terzo quinto": {
+                  "n": 20,
+                  "mediana": 0.403846,
+                  "media": 0.426923
+                },
+                "Quarto quinto": {
+                  "n": 4,
+                  "mediana": 0.788462,
+                  "media": 0.701923
+                }
+              }
+            },
+            {
+              "anno": 2025,
+              "fasce": {
+                "Primo quinto": {
+                  "n": 2,
+                  "mediana": 0.571429,
+                  "media": 0.571429
+                },
+                "Secondo quinto": {
+                  "n": 5,
+                  "mediana": 0.428571,
+                  "media": 0.521429
+                },
+                "Terzo quinto": {
+                  "n": 17,
+                  "mediana": 0.464286,
+                  "media": 0.464286
+                },
+                "Quarto quinto": {
+                  "n": 8,
+                  "mediana": 0.642857,
+                  "media": 0.558036
+                },
+                "Ultimo quinto": {
+                  "n": 1,
+                  "mediana": 0.357143,
+                  "media": 0.357143
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "spearman_per_serata": {
+      "test": "Spearman per-serata",
+      "descrizione": "Correlazione di Spearman calcolata separatamente per ogni serata di ogni anno. Permette di identificare se l'effetto dell'ordine varia tra le serate.",
+      "n_serate_analizzate": 19,
+      "n_serate_significative": 1,
+      "dettaglio": [
+        {
+          "anno": 2021,
+          "serata": 1,
+          "serata_name": "Prima serata",
+          "n": 11,
+          "rho": 0.272727,
+          "p_value": 0.417141,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2021,
+          "serata": 2,
+          "serata_name": "Seconda serata",
+          "n": 13,
+          "rho": -0.230769,
+          "p_value": 0.448127,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2021,
+          "serata": 3,
+          "serata_name": "Terza serata",
+          "n": 24,
+          "rho": -0.18087,
+          "p_value": 0.397674,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2022,
+          "serata": 1,
+          "serata_name": "Prima serata",
+          "n": 12,
+          "rho": -0.013986,
+          "p_value": 0.96559,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2022,
+          "serata": 2,
+          "serata_name": "Seconda serata",
+          "n": 13,
+          "rho": -0.082418,
+          "p_value": 0.788951,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2022,
+          "serata": 3,
+          "serata_name": "Terza serata",
+          "n": 25,
+          "rho": 0.206923,
+          "p_value": 0.320982,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2022,
+          "serata": 4,
+          "serata_name": "Quarta serata",
+          "n": 25,
+          "rho": 0.052308,
+          "p_value": 0.803888,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2023,
+          "serata": 1,
+          "serata_name": "Prima serata",
+          "n": 12,
+          "rho": 0.160839,
+          "p_value": 0.617523,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2023,
+          "serata": 2,
+          "serata_name": "Seconda serata",
+          "n": 14,
+          "rho": -0.098901,
+          "p_value": 0.736585,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2023,
+          "serata": 3,
+          "serata_name": "Terza serata",
+          "n": 26,
+          "rho": 0.45641,
+          "p_value": 0.019095,
+          "significativo": true,
+          "interpretazione": "significativo (p < 0.05)"
+        },
+        {
+          "anno": 2023,
+          "serata": 4,
+          "serata_name": "Quarta serata",
+          "n": 26,
+          "rho": 0.203419,
+          "p_value": 0.318912,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2024,
+          "serata": 1,
+          "serata_name": "Prima serata",
+          "n": 27,
+          "rho": 0.336132,
+          "p_value": 0.086486,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2024,
+          "serata": 2,
+          "serata_name": "Seconda serata",
+          "n": 14,
+          "rho": -0.49011,
+          "p_value": 0.07522,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2024,
+          "serata": 3,
+          "serata_name": "Terza serata",
+          "n": 13,
+          "rho": -0.164835,
+          "p_value": 0.590479,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2024,
+          "serata": 4,
+          "serata_name": "Quarta serata",
+          "n": 27,
+          "rho": 0.012517,
+          "p_value": 0.95059,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2025,
+          "serata": 1,
+          "serata_name": "Prima serata",
+          "n": 30,
+          "rho": 0.026702,
+          "p_value": 0.888609,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2025,
+          "serata": 2,
+          "serata_name": "Seconda serata",
+          "n": 15,
+          "rho": 0.239286,
+          "p_value": 0.390379,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2025,
+          "serata": 3,
+          "serata_name": "Terza serata",
+          "n": 15,
+          "rho": -0.084079,
+          "p_value": 0.76577,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        },
+        {
+          "anno": 2025,
+          "serata": 4,
+          "serata_name": "Quarta serata",
+          "n": 25,
+          "rho": -0.333077,
+          "p_value": 0.103744,
+          "significativo": false,
+          "interpretazione": "non significativo (p >= 0.05)"
+        }
+      ]
+    },
+    "kruskal_per_serata_fisher": {
+      "test": "Kruskal-Wallis per-serata + Fisher combined",
+      "descrizione": "Kruskal-Wallis H test calcolato separatamente per ogni serata (non mediato). Con 12-25 artisti per serata le 3 fasce sono bilanciate (~4-8 per fascia). I p-value individuali vengono poi combinati con il metodo di Fisher per un test globale.",
+      "ipotesi_nulla": "In nessuna serata la fascia di esibizione influenza la classifica",
+      "n_serate_analizzate": 19,
+      "n_serate_significative": 2,
+      "fisher_combined": {
+        "chi2": 49.232067,
+        "df": 38,
+        "p_value": 0.104827,
+        "significativo": false,
+        "interpretazione": "non significativo (p >= 0.05)"
+      },
+      "dettaglio": [
+        {
+          "anno": 2021,
+          "serata": 1,
+          "n": 11,
+          "H": 0.913636,
+          "p_value": 0.633295,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.448,
+              "mediana": 0.32
+            },
+            "Centro": {
+              "n": 2,
+              "media": 0.36,
+              "mediana": 0.36
+            },
+            "Fine": {
+              "n": 4,
+              "media": 0.63,
+              "mediana": 0.72
+            }
+          }
+        },
+        {
+          "anno": 2021,
+          "serata": 2,
+          "n": 13,
+          "H": 1.854945,
+          "p_value": 0.395552,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.624,
+              "mediana": 0.6
+            },
+            "Centro": {
+              "n": 3,
+              "media": 0.346667,
+              "mediana": 0.4
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.576,
+              "mediana": 0.68
+            }
+          }
+        },
+        {
+          "anno": 2021,
+          "serata": 3,
+          "n": 24,
+          "H": 0.945,
+          "p_value": 0.623442,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 8,
+              "media": 0.54,
+              "mediana": 0.6
+            },
+            "Centro": {
+              "n": 8,
+              "media": 0.585,
+              "mediana": 0.62
+            },
+            "Fine": {
+              "n": 8,
+              "media": 0.44,
+              "mediana": 0.38
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 1,
+          "n": 12,
+          "H": 4.307692,
+          "p_value": 0.116037,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 4,
+              "media": 0.520833,
+              "mediana": 0.541667
+            },
+            "Centro": {
+              "n": 4,
+              "media": 0.229167,
+              "mediana": 0.270833
+            },
+            "Fine": {
+              "n": 4,
+              "media": 0.625,
+              "mediana": 0.604167
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 2,
+          "n": 13,
+          "H": 0.140659,
+          "p_value": 0.932086,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.533333,
+              "mediana": 0.666667
+            },
+            "Centro": {
+              "n": 3,
+              "media": 0.5,
+              "mediana": 0.625
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.566667,
+              "mediana": 0.541667
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 3,
+          "n": 25,
+          "H": 2.732308,
+          "p_value": 0.255086,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 9,
+              "media": 0.472222,
+              "mediana": 0.458333
+            },
+            "Centro": {
+              "n": 7,
+              "media": 0.375,
+              "mediana": 0.25
+            },
+            "Fine": {
+              "n": 9,
+              "media": 0.625,
+              "mediana": 0.666667
+            }
+          }
+        },
+        {
+          "anno": 2022,
+          "serata": 4,
+          "n": 25,
+          "H": 0.27956,
+          "p_value": 0.869549,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 9,
+              "media": 0.458333,
+              "mediana": 0.5
+            },
+            "Centro": {
+              "n": 7,
+              "media": 0.535714,
+              "mediana": 0.625
+            },
+            "Fine": {
+              "n": 9,
+              "media": 0.513889,
+              "mediana": 0.458333
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 1,
+          "n": 12,
+          "H": 2.964103,
+          "p_value": 0.227171,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 4,
+              "media": 0.527778,
+              "mediana": 0.62963
+            },
+            "Centro": {
+              "n": 3,
+              "media": 0.345679,
+              "mediana": 0.296296
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.688889,
+              "mediana": 0.740741
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 2,
+          "n": 14,
+          "H": 0.771429,
+          "p_value": 0.679965,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.548148,
+              "mediana": 0.407407
+            },
+            "Centro": {
+              "n": 4,
+              "media": 0.398148,
+              "mediana": 0.240741
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.422222,
+              "mediana": 0.481481
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 3,
+          "n": 26,
+          "H": 10.010256,
+          "p_value": 0.006703,
+          "significativo": true,
+          "fasce": {
+            "Inizio": {
+              "n": 10,
+              "media": 0.362963,
+              "mediana": 0.407407
+            },
+            "Centro": {
+              "n": 6,
+              "media": 0.345679,
+              "mediana": 0.277778
+            },
+            "Fine": {
+              "n": 10,
+              "media": 0.733333,
+              "mediana": 0.796296
+            }
+          }
+        },
+        {
+          "anno": 2023,
+          "serata": 4,
+          "n": 26,
+          "H": 3.268159,
+          "p_value": 0.195132,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 10,
+              "media": 0.488889,
+              "mediana": 0.5
+            },
+            "Centro": {
+              "n": 7,
+              "media": 0.359788,
+              "mediana": 0.259259
+            },
+            "Fine": {
+              "n": 9,
+              "media": 0.625514,
+              "mediana": 0.592593
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 1,
+          "n": 27,
+          "H": 7.647743,
+          "p_value": 0.021843,
+          "significativo": true,
+          "fasce": {
+            "Inizio": {
+              "n": 10,
+              "media": 0.426923,
+              "mediana": 0.403846
+            },
+            "Centro": {
+              "n": 10,
+              "media": 0.357692,
+              "mediana": 0.365385
+            },
+            "Fine": {
+              "n": 7,
+              "media": 0.763736,
+              "mediana": 0.846154
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 2,
+          "n": 14,
+          "H": 3.651429,
+          "p_value": 0.161103,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.630769,
+              "mediana": 0.576923
+            },
+            "Centro": {
+              "n": 4,
+              "media": 0.432692,
+              "mediana": 0.307692
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.269231,
+              "mediana": 0.153846
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 3,
+          "n": 13,
+          "H": 1.854945,
+          "p_value": 0.395552,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 3,
+              "media": 0.717949,
+              "mediana": 0.846154
+            },
+            "Centro": {
+              "n": 5,
+              "media": 0.5,
+              "mediana": 0.5
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.461538,
+              "mediana": 0.538462
+            }
+          }
+        },
+        {
+          "anno": 2024,
+          "serata": 4,
+          "n": 27,
+          "H": 3.147345,
+          "p_value": 0.207283,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 9,
+              "media": 0.589744,
+              "mediana": 0.730769
+            },
+            "Centro": {
+              "n": 9,
+              "media": 0.337607,
+              "mediana": 0.423077
+            },
+            "Fine": {
+              "n": 9,
+              "media": 0.538462,
+              "mediana": 0.384615
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 1,
+          "n": 30,
+          "H": 0.265866,
+          "p_value": 0.875524,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 10,
+              "media": 0.467857,
+              "mediana": 0.303571
+            },
+            "Centro": {
+              "n": 10,
+              "media": 0.532143,
+              "mediana": 0.607143
+            },
+            "Fine": {
+              "n": 10,
+              "media": 0.510714,
+              "mediana": 0.535714
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 2,
+          "n": 15,
+          "H": 0.24,
+          "p_value": 0.88692,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.442857,
+              "mediana": 0.464286
+            },
+            "Centro": {
+              "n": 5,
+              "media": 0.464286,
+              "mediana": 0.357143
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.507143,
+              "mediana": 0.535714
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 3,
+          "n": 15,
+          "H": 1.823256,
+          "p_value": 0.401869,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 5,
+              "media": 0.607143,
+              "mediana": 0.678571
+            },
+            "Centro": {
+              "n": 5,
+              "media": 0.392857,
+              "mediana": 0.428571
+            },
+            "Fine": {
+              "n": 5,
+              "media": 0.607143,
+              "mediana": 0.75
+            }
+          }
+        },
+        {
+          "anno": 2025,
+          "serata": 4,
+          "n": 25,
+          "H": 2.41359,
+          "p_value": 0.299155,
+          "significativo": false,
+          "fasce": {
+            "Inizio": {
+              "n": 8,
+              "media": 0.59375,
+              "mediana": 0.678571
+            },
+            "Centro": {
+              "n": 8,
+              "media": 0.428571,
+              "mediana": 0.392857
+            },
+            "Fine": {
+              "n": 9,
+              "media": 0.373016,
+              "mediana": 0.357143
+            }
+          }
+        }
+      ]
+    }
+  },
+  "visualizzazione": {
+    "scatter": [
+      {
+        "anno": 2021,
+        "artista": "Aiello",
+        "posizione_relativa": 0.58335,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 26,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.77665,
+        "rank_normalizzato": 0.2,
+        "classifica_finale": 6,
+        "n_partecipanti": 26,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Arisa",
+        "posizione_relativa": 0.3,
+        "rank_normalizzato": 0.32,
+        "classifica_finale": 9,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Bugo",
+        "posizione_relativa": 0.14165,
+        "rank_normalizzato": 0.92,
+        "classifica_finale": 24,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Primo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.44165,
+        "rank_normalizzato": 0.12,
+        "classifica_finale": 4,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Ermal Meta",
+        "posizione_relativa": 0.73,
+        "rank_normalizzato": 0.08,
+        "classifica_finale": 3,
+        "n_partecipanti": 26,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Extraliscio con Davide Toffolo",
+        "posizione_relativa": 0.35165,
+        "rank_normalizzato": 0.56,
+        "classifica_finale": 15,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Fasma",
+        "posizione_relativa": 0.58,
+        "rank_normalizzato": 0.64,
+        "classifica_finale": 17,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Francesca Michielin e Fedez",
+        "posizione_relativa": 0.245,
+        "rank_normalizzato": 0.04,
+        "classifica_finale": 2,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Francesco Renga",
+        "posizione_relativa": 0.49835,
+        "rank_normalizzato": 0.88,
+        "classifica_finale": 23,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Fulminacci",
+        "posizione_relativa": 0.395,
+        "rank_normalizzato": 0.68,
+        "classifica_finale": 18,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Gaia",
+        "posizione_relativa": 0.46335,
+        "rank_normalizzato": 0.6,
+        "classifica_finale": 16,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Ghemon",
+        "posizione_relativa": 0.59335,
+        "rank_normalizzato": 0.8,
+        "classifica_finale": 21,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Gio Evan",
+        "posizione_relativa": 0.69835,
+        "rank_normalizzato": 0.84,
+        "classifica_finale": 22,
+        "n_partecipanti": 26,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Irama",
+        "posizione_relativa": 0.64,
+        "rank_normalizzato": 0.16,
+        "classifica_finale": 5,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.44665,
+        "rank_normalizzato": 0.52,
+        "classifica_finale": 14,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Lo Stato Sociale",
+        "posizione_relativa": 0.465,
+        "rank_normalizzato": 0.36,
+        "classifica_finale": 10,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Madame",
+        "posizione_relativa": 0.57,
+        "rank_normalizzato": 0.28,
+        "classifica_finale": 8,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Malika Ayane",
+        "posizione_relativa": 0.64835,
+        "rank_normalizzato": 0.4,
+        "classifica_finale": 11,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Max Gazzè",
+        "posizione_relativa": 0.92,
+        "rank_normalizzato": 0.76,
+        "classifica_finale": 20,
+        "n_partecipanti": 26,
+        "fascia_3": "Fine",
+        "fascia_5": "Ultimo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Max Gazzè e La Trifluoperazina Monstery Band",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.76,
+        "classifica_finale": 20,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Noemi",
+        "posizione_relativa": 0.20835,
+        "rank_normalizzato": 0.44,
+        "classifica_finale": 12,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Orietta Berti",
+        "posizione_relativa": 0.22,
+        "rank_normalizzato": 0.72,
+        "classifica_finale": 19,
+        "n_partecipanti": 26,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Random",
+        "posizione_relativa": 0.51335,
+        "rank_normalizzato": 0.96,
+        "classifica_finale": 25,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2021,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.61665,
+        "rank_normalizzato": 0.24,
+        "classifica_finale": 7,
+        "n_partecipanti": 26,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "AKA 7even",
+        "posizione_relativa": 0.611133,
+        "rank_normalizzato": 0.541667,
+        "classifica_finale": 14,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Achille Lauro",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 13,
+        "n_partecipanti": 25,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Achille Lauro con Harlem Gospel Choir",
+        "posizione_relativa": 0.33335,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 13,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Ana Mena",
+        "posizione_relativa": 0.673,
+        "rank_normalizzato": 0.958333,
+        "classifica_finale": 24,
+        "n_partecipanti": 25,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.664133,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 9,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Ditonellapiaga e Rettore",
+        "posizione_relativa": 0.416667,
+        "rank_normalizzato": 0.625,
+        "classifica_finale": 16,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Elisa",
+        "posizione_relativa": 0.472233,
+        "rank_normalizzato": 0.041667,
+        "classifica_finale": 2,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Emma",
+        "posizione_relativa": 0.430533,
+        "rank_normalizzato": 0.208333,
+        "classifica_finale": 6,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Fabrizio Moro",
+        "posizione_relativa": 0.569433,
+        "rank_normalizzato": 0.458333,
+        "classifica_finale": 12,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Gianni Morandi",
+        "posizione_relativa": 0.327,
+        "rank_normalizzato": 0.083333,
+        "classifica_finale": 3,
+        "n_partecipanti": 25,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Giovanni Truppi",
+        "posizione_relativa": 0.3611,
+        "rank_normalizzato": 0.875,
+        "classifica_finale": 22,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Giusy Ferreri",
+        "posizione_relativa": 0.6389,
+        "rank_normalizzato": 0.791667,
+        "classifica_finale": 20,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Highsnob e Hu",
+        "posizione_relativa": 0.625,
+        "rank_normalizzato": 0.708333,
+        "classifica_finale": 18,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Irama",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.125,
+        "classifica_finale": 4,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Iva Zanicchi",
+        "posizione_relativa": 0.5139,
+        "rank_normalizzato": 0.833333,
+        "classifica_finale": 21,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.510067,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 7,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Le Vibrazioni",
+        "posizione_relativa": 0.4028,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 19,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Mahmood e Blanco",
+        "posizione_relativa": 0.587133,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.445733,
+        "rank_normalizzato": 0.291667,
+        "classifica_finale": 8,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Matteo Romano",
+        "posizione_relativa": 0.4722,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 17,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Michele Bravi",
+        "posizione_relativa": 0.484833,
+        "rank_normalizzato": 0.375,
+        "classifica_finale": 10,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Noemi",
+        "posizione_relativa": 0.393933,
+        "rank_normalizzato": 0.583333,
+        "classifica_finale": 15,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.647733,
+        "rank_normalizzato": 0.416667,
+        "classifica_finale": 11,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.319467,
+        "rank_normalizzato": 0.166667,
+        "classifica_finale": 5,
+        "n_partecipanti": 25,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Tananai",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 25,
+        "n_partecipanti": 25,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2022,
+        "artista": "Yuman",
+        "posizione_relativa": 0.349733,
+        "rank_normalizzato": 0.916667,
+        "classifica_finale": 23,
+        "n_partecipanti": 25,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Anna Oxa",
+        "posizione_relativa": 0.5185,
+        "rank_normalizzato": 0.851852,
+        "classifica_finale": 24,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Ariete",
+        "posizione_relativa": 0.374167,
+        "rank_normalizzato": 0.555556,
+        "classifica_finale": 16,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Articolo 31",
+        "posizione_relativa": 0.459667,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 10,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.487167,
+        "rank_normalizzato": 0.259259,
+        "classifica_finale": 8,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Colla Zio",
+        "posizione_relativa": 0.801533,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 19,
+        "n_partecipanti": 28,
+        "fascia_3": "Fine",
+        "fascia_5": "Ultimo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Cugini di Campagna",
+        "posizione_relativa": 0.6135,
+        "rank_normalizzato": 0.814815,
+        "classifica_finale": 23,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Elodie",
+        "posizione_relativa": 0.327667,
+        "rank_normalizzato": 0.296296,
+        "classifica_finale": 9,
+        "n_partecipanti": 28,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Gianluca Grignani",
+        "posizione_relativa": 0.3922,
+        "rank_normalizzato": 0.444444,
+        "classifica_finale": 13,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Gianmaria",
+        "posizione_relativa": 0.519467,
+        "rank_normalizzato": 0.703704,
+        "classifica_finale": 20,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.412133,
+        "rank_normalizzato": 0.222222,
+        "classifica_finale": 7,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "LDA",
+        "posizione_relativa": 0.690433,
+        "rank_normalizzato": 0.592593,
+        "classifica_finale": 17,
+        "n_partecipanti": 28,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Lazza",
+        "posizione_relativa": 0.238367,
+        "rank_normalizzato": 0.037037,
+        "classifica_finale": 2,
+        "n_partecipanti": 28,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Leo Gassmann",
+        "posizione_relativa": 0.5261,
+        "rank_normalizzato": 0.62963,
+        "classifica_finale": 18,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Levante",
+        "posizione_relativa": 0.5394,
+        "rank_normalizzato": 0.37037,
+        "classifica_finale": 11,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Madame",
+        "posizione_relativa": 0.513767,
+        "rank_normalizzato": 0.185185,
+        "classifica_finale": 6,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Mara Sattei",
+        "posizione_relativa": 0.6543,
+        "rank_normalizzato": 0.740741,
+        "classifica_finale": 21,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Marco Mengoni",
+        "posizione_relativa": 0.4226,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Modà",
+        "posizione_relativa": 0.593533,
+        "rank_normalizzato": 0.407407,
+        "classifica_finale": 12,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Olly",
+        "posizione_relativa": 0.553667,
+        "rank_normalizzato": 0.777778,
+        "classifica_finale": 22,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Paola & Chiara",
+        "posizione_relativa": 0.654333,
+        "rank_normalizzato": 0.518519,
+        "classifica_finale": 15,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Rosa Chemical",
+        "posizione_relativa": 0.541333,
+        "rank_normalizzato": 0.481481,
+        "classifica_finale": 14,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Sethu",
+        "posizione_relativa": 0.6192,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 28,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Shari",
+        "posizione_relativa": 0.562233,
+        "rank_normalizzato": 0.925926,
+        "classifica_finale": 26,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Tananai",
+        "posizione_relativa": 0.3922,
+        "rank_normalizzato": 0.148148,
+        "classifica_finale": 5,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Ultimo",
+        "posizione_relativa": 0.288667,
+        "rank_normalizzato": 0.111111,
+        "classifica_finale": 4,
+        "n_partecipanti": 28,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Will",
+        "posizione_relativa": 0.345667,
+        "rank_normalizzato": 0.962963,
+        "classifica_finale": 27,
+        "n_partecipanti": 28,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Alessandra Amoroso",
+        "posizione_relativa": 0.4647,
+        "rank_normalizzato": 0.461538,
+        "classifica_finale": 13,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Alfa",
+        "posizione_relativa": 0.426933,
+        "rank_normalizzato": 0.961538,
+        "classifica_finale": 26,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Angelina Mango",
+        "posizione_relativa": 0.5238,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.377667,
+        "rank_normalizzato": 0.076923,
+        "classifica_finale": 3,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "BigMama",
+        "posizione_relativa": 0.673233,
+        "rank_normalizzato": 0.884615,
+        "classifica_finale": 24,
+        "n_partecipanti": 27,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Bnkr44",
+        "posizione_relativa": 0.357967,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 27,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Clara",
+        "posizione_relativa": 0.471267,
+        "rank_normalizzato": 0.653846,
+        "classifica_finale": 18,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.5312,
+        "rank_normalizzato": 0.576923,
+        "classifica_finale": 16,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Diodato",
+        "posizione_relativa": 0.5821,
+        "rank_normalizzato": 0.807692,
+        "classifica_finale": 22,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Emma",
+        "posizione_relativa": 0.591133,
+        "rank_normalizzato": 0.346154,
+        "classifica_finale": 10,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Fiorella Mannoia",
+        "posizione_relativa": 0.400667,
+        "rank_normalizzato": 0.538462,
+        "classifica_finale": 15,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Fred De Palma",
+        "posizione_relativa": 0.6207,
+        "rank_normalizzato": 0.923077,
+        "classifica_finale": 25,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Geolier",
+        "posizione_relativa": 0.525467,
+        "rank_normalizzato": 0.038462,
+        "classifica_finale": 2,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Ghali",
+        "posizione_relativa": 0.422,
+        "rank_normalizzato": 0.115385,
+        "classifica_finale": 4,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Il Tre",
+        "posizione_relativa": 0.6207,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Il Volo",
+        "posizione_relativa": 0.5205,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Irama",
+        "posizione_relativa": 0.435967,
+        "rank_normalizzato": 0.153846,
+        "classifica_finale": 5,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "La Sad",
+        "posizione_relativa": 0.643667,
+        "rank_normalizzato": 0.692308,
+        "classifica_finale": 19,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Loredana Bertè",
+        "posizione_relativa": 0.526267,
+        "rank_normalizzato": 0.423077,
+        "classifica_finale": 12,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Mahmood",
+        "posizione_relativa": 0.465533,
+        "rank_normalizzato": 0.269231,
+        "classifica_finale": 8,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Negramaro",
+        "posizione_relativa": 0.560767,
+        "rank_normalizzato": 0.192308,
+        "classifica_finale": 6,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Renga Nek",
+        "posizione_relativa": 0.575533,
+        "rank_normalizzato": 0.384615,
+        "classifica_finale": 11,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Ricchi e Poveri",
+        "posizione_relativa": 0.477,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 14,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.4179,
+        "rank_normalizzato": 0.730769,
+        "classifica_finale": 20,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.321033,
+        "rank_normalizzato": 0.769231,
+        "classifica_finale": 21,
+        "n_partecipanti": 27,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Santi Francesi",
+        "posizione_relativa": 0.462233,
+        "rank_normalizzato": 0.846154,
+        "classifica_finale": 23,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.4097,
+        "rank_normalizzato": 0.230769,
+        "classifica_finale": 7,
+        "n_partecipanti": 27,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Achille Lauro",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.214286,
+        "classifica_finale": 7,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Bresh",
+        "posizione_relativa": 0.8081,
+        "rank_normalizzato": 0.357143,
+        "classifica_finale": 11,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Ultimo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Brunori Sas",
+        "posizione_relativa": 0.533267,
+        "rank_normalizzato": 0.071429,
+        "classifica_finale": 3,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Clara",
+        "posizione_relativa": 0.264767,
+        "rank_normalizzato": 0.928571,
+        "classifica_finale": 27,
+        "n_partecipanti": 29,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Coma_Cose",
+        "posizione_relativa": 0.478,
+        "rank_normalizzato": 0.321429,
+        "classifica_finale": 10,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Elodie",
+        "posizione_relativa": 0.26785,
+        "rank_normalizzato": 0.392857,
+        "classifica_finale": 12,
+        "n_partecipanti": 29,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Elodie e Achille Lauro",
+        "posizione_relativa": 0.76,
+        "rank_normalizzato": 0.214286,
+        "classifica_finale": 7,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Fedez",
+        "posizione_relativa": 0.6757,
+        "rank_normalizzato": 0.107143,
+        "classifica_finale": 4,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Francesca Michielin",
+        "posizione_relativa": 0.69645,
+        "rank_normalizzato": 0.714286,
+        "classifica_finale": 21,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Francesco Gabbani",
+        "posizione_relativa": 0.4796,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 8,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Gaia",
+        "posizione_relativa": 0.44,
+        "rank_normalizzato": 0.892857,
+        "classifica_finale": 26,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.542367,
+        "rank_normalizzato": 0.178571,
+        "classifica_finale": 6,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Irama",
+        "posizione_relativa": 0.423033,
+        "rank_normalizzato": 0.285714,
+        "classifica_finale": 9,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Joan Thiele",
+        "posizione_relativa": 0.626867,
+        "rank_normalizzato": 0.678571,
+        "classifica_finale": 20,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Lucio Corsi",
+        "posizione_relativa": 0.3762,
+        "rank_normalizzato": 0.035714,
+        "classifica_finale": 2,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Marcella Bella",
+        "posizione_relativa": 0.407133,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 29,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.522167,
+        "rank_normalizzato": 0.785714,
+        "classifica_finale": 23,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Moda",
+        "posizione_relativa": 0.68545,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 22,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Noemi",
+        "posizione_relativa": 0.2843,
+        "rank_normalizzato": 0.428571,
+        "classifica_finale": 13,
+        "n_partecipanti": 29,
+        "fascia_3": "Inizio",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Noemi e Tony Effe",
+        "posizione_relativa": 0.12,
+        "rank_normalizzato": 0.428571,
+        "classifica_finale": 13,
+        "n_partecipanti": 29,
+        "fascia_3": "Inizio",
+        "fascia_5": "Primo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Olly",
+        "posizione_relativa": 0.562367,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.46425,
+        "rank_normalizzato": 0.964286,
+        "classifica_finale": 28,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Rkomi e Francesca Michielin",
+        "posizione_relativa": 0.16,
+        "rank_normalizzato": 0.714286,
+        "classifica_finale": 21,
+        "n_partecipanti": 29,
+        "fascia_3": "Inizio",
+        "fascia_5": "Primo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Rocco Hunt",
+        "posizione_relativa": 0.4562,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 15,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.4405,
+        "rank_normalizzato": 0.642857,
+        "classifica_finale": 19,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Sarah Toscano",
+        "posizione_relativa": 0.536967,
+        "rank_normalizzato": 0.571429,
+        "classifica_finale": 17,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Serena Brancale",
+        "posizione_relativa": 0.3776,
+        "rank_normalizzato": 0.821429,
+        "classifica_finale": 24,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Secondo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Shablo con Guè, Joshua e Tormento",
+        "posizione_relativa": 0.6282,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Shablo feat. Gue, Joshua e Tormento",
+        "posizione_relativa": 0.4423,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Simone Cristicchi",
+        "posizione_relativa": 0.424767,
+        "rank_normalizzato": 0.142857,
+        "classifica_finale": 5,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.524767,
+        "rank_normalizzato": 0.464286,
+        "classifica_finale": 14,
+        "n_partecipanti": 29,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Tony Effe",
+        "posizione_relativa": 0.6703,
+        "rank_normalizzato": 0.857143,
+        "classifica_finale": 25,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.732367,
+        "rank_normalizzato": 0.535714,
+        "classifica_finale": 16,
+        "n_partecipanti": 29,
+        "fascia_3": "Fine",
+        "fascia_5": "Quarto quinto"
+      }
+    ],
+    "boxplot_3_fasce": [
+      {
+        "fascia": "Inizio",
+        "n": 18,
+        "min": 0.037037,
+        "q25": 0.199074,
+        "mediana": 0.428571,
+        "q75": 0.718571,
+        "max": 0.928571,
+        "media": 0.447585
+      },
+      {
+        "fascia": "Centro",
+        "n": 103,
+        "min": 0.0,
+        "q25": 0.25463,
+        "mediana": 0.5,
+        "q75": 0.735755,
+        "max": 1.0,
+        "media": 0.499021
+      },
+      {
+        "fascia": "Fine",
+        "n": 16,
+        "min": 0.08,
+        "q25": 0.321429,
+        "mediana": 0.690476,
+        "q75": 0.844286,
+        "max": 1.0,
+        "media": 0.59487
+      }
+    ],
+    "boxplot_5_fasce": [
+      {
+        "fascia": "Primo quinto",
+        "n": 3,
+        "min": 0.428571,
+        "q25": 0.571429,
+        "mediana": 0.714286,
+        "q75": 0.817143,
+        "max": 0.92,
+        "media": 0.687619
+      },
+      {
+        "fascia": "Secondo quinto",
+        "n": 29,
+        "min": 0.035714,
+        "q25": 0.166667,
+        "mediana": 0.5,
+        "q75": 0.76,
+        "max": 1.0,
+        "media": 0.488064
+      },
+      {
+        "fascia": "Terzo quinto",
+        "n": 72,
+        "min": 0.0,
+        "q25": 0.228632,
+        "mediana": 0.440705,
+        "q75": 0.675926,
+        "max": 1.0,
+        "media": 0.463395
+      },
+      {
+        "fascia": "Quarto quinto",
+        "n": 30,
+        "min": 0.08,
+        "q25": 0.35,
+        "mediana": 0.642857,
+        "q75": 0.809028,
+        "max": 1.0,
+        "media": 0.586955
+      },
+      {
+        "fascia": "Ultimo quinto",
+        "n": 3,
+        "min": 0.357143,
+        "q25": 0.511905,
+        "mediana": 0.666667,
+        "q75": 0.713333,
+        "max": 0.76,
+        "media": 0.594603
+      }
+    ],
+    "heatmap_anno_fascia": [
+      {
+        "anno": 2021,
+        "fascia": "Inizio",
+        "mediana_rank": 0.58,
+        "media_rank": 0.533333,
+        "n": 6
+      },
+      {
+        "anno": 2021,
+        "fascia": "Centro",
+        "mediana_rank": 0.56,
+        "media_rank": 0.546667,
+        "n": 15
+      },
+      {
+        "anno": 2021,
+        "fascia": "Fine",
+        "mediana_rank": 0.48,
+        "media_rank": 0.47,
+        "n": 4
+      },
+      {
+        "anno": 2022,
+        "fascia": "Inizio",
+        "mediana_rank": 0.166667,
+        "media_rank": 0.25,
+        "n": 3
+      },
+      {
+        "anno": 2022,
+        "fascia": "Centro",
+        "mediana_rank": 0.5,
+        "media_rank": 0.490079,
+        "n": 21
+      },
+      {
+        "anno": 2022,
+        "fascia": "Fine",
+        "mediana_rank": 0.979167,
+        "media_rank": 0.979167,
+        "n": 2
+      },
+      {
+        "anno": 2023,
+        "fascia": "Inizio",
+        "mediana_rank": 0.111111,
+        "media_rank": 0.148148,
+        "n": 3
+      },
+      {
+        "anno": 2023,
+        "fascia": "Centro",
+        "mediana_rank": 0.518519,
+        "media_rank": 0.539683,
+        "n": 21
+      },
+      {
+        "anno": 2023,
+        "fascia": "Fine",
+        "mediana_rank": 0.62963,
+        "media_rank": 0.62963,
+        "n": 2
+      },
+      {
+        "anno": 2024,
+        "fascia": "Inizio",
+        "mediana_rank": 0.769231,
+        "media_rank": 0.769231,
+        "n": 1
+      },
+      {
+        "anno": 2024,
+        "fascia": "Centro",
+        "mediana_rank": 0.423077,
+        "media_rank": 0.461538,
+        "n": 25
+      },
+      {
+        "anno": 2024,
+        "fascia": "Fine",
+        "mediana_rank": 0.884615,
+        "media_rank": 0.884615,
+        "n": 1
+      },
+      {
+        "anno": 2025,
+        "fascia": "Inizio",
+        "mediana_rank": 0.428571,
+        "media_rank": 0.578571,
+        "n": 5
+      },
+      {
+        "anno": 2025,
+        "fascia": "Centro",
+        "mediana_rank": 0.5,
+        "media_rank": 0.477891,
+        "n": 21
+      },
+      {
+        "anno": 2025,
+        "fascia": "Fine",
+        "mediana_rank": 0.535714,
+        "media_rank": 0.505102,
+        "n": 7
+      }
+    ],
+    "top5_per_fascia": [
+      {
+        "fascia": "Inizio",
+        "pct_top_5": 27.777778,
+        "n_top_5": 5,
+        "n_totale": 18
+      },
+      {
+        "fascia": "Centro",
+        "pct_top_5": 15.533981,
+        "n_top_5": 16,
+        "n_totale": 103
+      },
+      {
+        "fascia": "Fine",
+        "pct_top_5": 12.5,
+        "n_top_5": 2,
+        "n_totale": 16
+      }
+    ],
+    "vincitori": [
+      {
+        "anno": 2022,
+        "artista": "Mahmood e Blanco",
+        "posizione_relativa": 0.587133,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2023,
+        "artista": "Marco Mengoni",
+        "posizione_relativa": 0.4226,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2024,
+        "artista": "Angelina Mango",
+        "posizione_relativa": 0.5238,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      },
+      {
+        "anno": 2025,
+        "artista": "Olly",
+        "posizione_relativa": 0.562367,
+        "fascia_3": "Centro",
+        "fascia_5": "Terzo quinto"
+      }
+    ],
+    "scatter_per_serata": [
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Arisa",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.32,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.0833,
+        "rank_normalizzato": 0.12,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Aiello",
+        "posizione_relativa": 0.1667,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Francesca Michielin e Fedez",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 0.04,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Max Gazzè e La Trifluoperazina Monstery Band",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.76,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Noemi",
+        "posizione_relativa": 0.4167,
+        "rank_normalizzato": 0.44,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Madame",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.28,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Ghemon",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.8,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.8333,
+        "rank_normalizzato": 0.2,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Francesco Renga",
+        "posizione_relativa": 0.9167,
+        "rank_normalizzato": 0.88,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "artista": "Fasma",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.64,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Orietta Berti",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.72,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Bugo",
+        "posizione_relativa": 0.0833,
+        "rank_normalizzato": 0.92,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Gaia",
+        "posizione_relativa": 0.1667,
+        "rank_normalizzato": 0.6,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Lo Stato Sociale",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 0.36,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.52,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Malika Ayane",
+        "posizione_relativa": 0.4167,
+        "rank_normalizzato": 0.4,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Ermal Meta",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.08,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Extraliscio con Davide Toffolo",
+        "posizione_relativa": 0.5833,
+        "rank_normalizzato": 0.56,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Random",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.96,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Fulminacci",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 0.68,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.8333,
+        "rank_normalizzato": 0.24,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Gio Evan",
+        "posizione_relativa": 0.9167,
+        "rank_normalizzato": 0.84,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "artista": "Irama",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.16,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Noemi",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.44,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Fulminacci",
+        "posizione_relativa": 0.04,
+        "rank_normalizzato": 0.68,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Francesco Renga",
+        "posizione_relativa": 0.08,
+        "rank_normalizzato": 0.88,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Extraliscio con Davide Toffolo",
+        "posizione_relativa": 0.12,
+        "rank_normalizzato": 0.56,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Fasma",
+        "posizione_relativa": 0.16,
+        "rank_normalizzato": 0.64,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Bugo",
+        "posizione_relativa": 0.2,
+        "rank_normalizzato": 0.92,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Francesca Michielin e Fedez",
+        "posizione_relativa": 0.24,
+        "rank_normalizzato": 0.04,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Irama",
+        "posizione_relativa": 0.28,
+        "rank_normalizzato": 0.16,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Random",
+        "posizione_relativa": 0.36,
+        "rank_normalizzato": 0.96,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.4,
+        "rank_normalizzato": 0.24,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Orietta Berti",
+        "posizione_relativa": 0.44,
+        "rank_normalizzato": 0.72,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Gio Evan",
+        "posizione_relativa": 0.48,
+        "rank_normalizzato": 0.84,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Ghemon",
+        "posizione_relativa": 0.52,
+        "rank_normalizzato": 0.8,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.56,
+        "rank_normalizzato": 0.52,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Arisa",
+        "posizione_relativa": 0.6,
+        "rank_normalizzato": 0.32,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Madame",
+        "posizione_relativa": 0.64,
+        "rank_normalizzato": 0.28,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Lo Stato Sociale",
+        "posizione_relativa": 0.68,
+        "rank_normalizzato": 0.36,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.72,
+        "rank_normalizzato": 0.2,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Gaia",
+        "posizione_relativa": 0.76,
+        "rank_normalizzato": 0.6,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.8,
+        "rank_normalizzato": 0.12,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Malika Ayane",
+        "posizione_relativa": 0.88,
+        "rank_normalizzato": 0.4,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Max Gazzè",
+        "posizione_relativa": 0.92,
+        "rank_normalizzato": 0.76,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Ermal Meta",
+        "posizione_relativa": 0.96,
+        "rank_normalizzato": 0.08,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "artista": "Aiello",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Achille Lauro con Harlem Gospel Choir",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Yuman",
+        "posizione_relativa": 0.0909,
+        "rank_normalizzato": 0.916667,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Noemi",
+        "posizione_relativa": 0.1818,
+        "rank_normalizzato": 0.583333,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Gianni Morandi",
+        "posizione_relativa": 0.2727,
+        "rank_normalizzato": 0.083333,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.3636,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Michele Bravi",
+        "posizione_relativa": 0.4545,
+        "rank_normalizzato": 0.375,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.5455,
+        "rank_normalizzato": 0.291667,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Mahmood e Blanco",
+        "posizione_relativa": 0.6364,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Ana Mena",
+        "posizione_relativa": 0.7273,
+        "rank_normalizzato": 0.958333,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.8182,
+        "rank_normalizzato": 0.416667,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.9091,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "artista": "Giusy Ferreri",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.791667,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.166667,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Giovanni Truppi",
+        "posizione_relativa": 0.0833,
+        "rank_normalizzato": 0.875,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Le Vibrazioni",
+        "posizione_relativa": 0.1667,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Emma",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 0.208333,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Matteo Romano",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Iva Zanicchi",
+        "posizione_relativa": 0.4167,
+        "rank_normalizzato": 0.833333,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Ditonellapiaga e Rettore",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.625,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Elisa",
+        "posizione_relativa": 0.5833,
+        "rank_normalizzato": 0.041667,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Fabrizio Moro",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.458333,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Tananai",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Irama",
+        "posizione_relativa": 0.8333,
+        "rank_normalizzato": 0.125,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "AKA 7even",
+        "posizione_relativa": 0.9167,
+        "rank_normalizzato": 0.541667,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "artista": "Highsnob e Hu",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.708333,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Giusy Ferreri",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.791667,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Highsnob e Hu",
+        "posizione_relativa": 0.0417,
+        "rank_normalizzato": 0.708333,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Fabrizio Moro",
+        "posizione_relativa": 0.0833,
+        "rank_normalizzato": 0.458333,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "AKA 7even",
+        "posizione_relativa": 0.125,
+        "rank_normalizzato": 0.541667,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.1667,
+        "rank_normalizzato": 0.291667,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.2083,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Irama",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 0.125,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Ditonellapiaga e Rettore",
+        "posizione_relativa": 0.2917,
+        "rank_normalizzato": 0.625,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Michele Bravi",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.375,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.375,
+        "rank_normalizzato": 0.416667,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Mahmood e Blanco",
+        "posizione_relativa": 0.4167,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Gianni Morandi",
+        "posizione_relativa": 0.4583,
+        "rank_normalizzato": 0.083333,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Tananai",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Elisa",
+        "posizione_relativa": 0.5417,
+        "rank_normalizzato": 0.041667,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.5833,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Iva Zanicchi",
+        "posizione_relativa": 0.625,
+        "rank_normalizzato": 0.833333,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Achille Lauro con Harlem Gospel Choir",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Matteo Romano",
+        "posizione_relativa": 0.7083,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Ana Mena",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 0.958333,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.7917,
+        "rank_normalizzato": 0.166667,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Emma",
+        "posizione_relativa": 0.8333,
+        "rank_normalizzato": 0.208333,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Yuman",
+        "posizione_relativa": 0.875,
+        "rank_normalizzato": 0.916667,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Le Vibrazioni",
+        "posizione_relativa": 0.9167,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Giovanni Truppi",
+        "posizione_relativa": 0.9583,
+        "rank_normalizzato": 0.875,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "artista": "Noemi",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.583333,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Noemi",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.583333,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Giovanni Truppi",
+        "posizione_relativa": 0.0417,
+        "rank_normalizzato": 0.875,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Yuman",
+        "posizione_relativa": 0.0833,
+        "rank_normalizzato": 0.916667,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Le Vibrazioni",
+        "posizione_relativa": 0.125,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.1667,
+        "rank_normalizzato": 0.166667,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Emma",
+        "posizione_relativa": 0.2083,
+        "rank_normalizzato": 0.208333,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Gianni Morandi",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 0.083333,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Elisa",
+        "posizione_relativa": 0.2917,
+        "rank_normalizzato": 0.041667,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Achille Lauro",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Matteo Romano",
+        "posizione_relativa": 0.375,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Irama",
+        "posizione_relativa": 0.4167,
+        "rank_normalizzato": 0.125,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Ditonellapiaga e Rettore",
+        "posizione_relativa": 0.4583,
+        "rank_normalizzato": 0.625,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Iva Zanicchi",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.833333,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Ana Mena",
+        "posizione_relativa": 0.5417,
+        "rank_normalizzato": 0.958333,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "La Rappresentante di Lista",
+        "posizione_relativa": 0.5833,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.625,
+        "rank_normalizzato": 0.291667,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Michele Bravi",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.375,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Mahmood e Blanco",
+        "posizione_relativa": 0.7083,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 0.416667,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "AKA 7even",
+        "posizione_relativa": 0.7917,
+        "rank_normalizzato": 0.541667,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Highsnob e Hu",
+        "posizione_relativa": 0.8333,
+        "rank_normalizzato": 0.708333,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.875,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Giusy Ferreri",
+        "posizione_relativa": 0.9167,
+        "rank_normalizzato": 0.791667,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Fabrizio Moro",
+        "posizione_relativa": 0.9583,
+        "rank_normalizzato": 0.458333,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "artista": "Tananai",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Anna Oxa",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.851852,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Gianmaria",
+        "posizione_relativa": 0.0769,
+        "rank_normalizzato": 0.703704,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Marco Mengoni",
+        "posizione_relativa": 0.2308,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Ariete",
+        "posizione_relativa": 0.3077,
+        "rank_normalizzato": 0.555556,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Ultimo",
+        "posizione_relativa": 0.3846,
+        "rank_normalizzato": 0.111111,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Elodie",
+        "posizione_relativa": 0.5385,
+        "rank_normalizzato": 0.296296,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Leo Gassmann",
+        "posizione_relativa": 0.6154,
+        "rank_normalizzato": 0.62963,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Cugini di Campagna",
+        "posizione_relativa": 0.6923,
+        "rank_normalizzato": 0.814815,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Gianluca Grignani",
+        "posizione_relativa": 0.7692,
+        "rank_normalizzato": 0.444444,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Olly",
+        "posizione_relativa": 0.8462,
+        "rank_normalizzato": 0.777778,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Colla Zio",
+        "posizione_relativa": 0.9231,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "artista": "Mara Sattei",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.740741,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Will",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.962963,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Modà",
+        "posizione_relativa": 0.0769,
+        "rank_normalizzato": 0.407407,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Sethu",
+        "posizione_relativa": 0.1538,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 28
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Articolo 31",
+        "posizione_relativa": 0.2308,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Lazza",
+        "posizione_relativa": 0.3077,
+        "rank_normalizzato": 0.037037,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.3846,
+        "rank_normalizzato": 0.222222,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.4615,
+        "rank_normalizzato": 0.259259,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Shari",
+        "posizione_relativa": 0.5385,
+        "rank_normalizzato": 0.925926,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Madame",
+        "posizione_relativa": 0.6154,
+        "rank_normalizzato": 0.185185,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Levante",
+        "posizione_relativa": 0.6923,
+        "rank_normalizzato": 0.37037,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Tananai",
+        "posizione_relativa": 0.7692,
+        "rank_normalizzato": 0.148148,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Rosa Chemical",
+        "posizione_relativa": 0.8462,
+        "rank_normalizzato": 0.481481,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "LDA",
+        "posizione_relativa": 0.9231,
+        "rank_normalizzato": 0.592593,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "artista": "Paola & Chiara",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.518519,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Paola & Chiara",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.518519,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Mara Sattei",
+        "posizione_relativa": 0.037,
+        "rank_normalizzato": 0.740741,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Rosa Chemical",
+        "posizione_relativa": 0.0741,
+        "rank_normalizzato": 0.481481,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Gianluca Grignani",
+        "posizione_relativa": 0.1111,
+        "rank_normalizzato": 0.444444,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Levante",
+        "posizione_relativa": 0.1481,
+        "rank_normalizzato": 0.37037,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Tananai",
+        "posizione_relativa": 0.1852,
+        "rank_normalizzato": 0.148148,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Lazza",
+        "posizione_relativa": 0.2222,
+        "rank_normalizzato": 0.037037,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "LDA",
+        "posizione_relativa": 0.2593,
+        "rank_normalizzato": 0.592593,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Madame",
+        "posizione_relativa": 0.2963,
+        "rank_normalizzato": 0.185185,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Ultimo",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.111111,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Elodie",
+        "posizione_relativa": 0.3704,
+        "rank_normalizzato": 0.296296,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.4444,
+        "rank_normalizzato": 0.222222,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Colla Zio",
+        "posizione_relativa": 0.4815,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Marco Mengoni",
+        "posizione_relativa": 0.5185,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.5556,
+        "rank_normalizzato": 0.259259,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Leo Gassmann",
+        "posizione_relativa": 0.6296,
+        "rank_normalizzato": 0.62963,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Cugini di Campagna",
+        "posizione_relativa": 0.6667,
+        "rank_normalizzato": 0.814815,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Olly",
+        "posizione_relativa": 0.7037,
+        "rank_normalizzato": 0.777778,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Anna Oxa",
+        "posizione_relativa": 0.7407,
+        "rank_normalizzato": 0.851852,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Articolo 31",
+        "posizione_relativa": 0.7778,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Ariete",
+        "posizione_relativa": 0.8148,
+        "rank_normalizzato": 0.555556,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Sethu",
+        "posizione_relativa": 0.8519,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 28
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Shari",
+        "posizione_relativa": 0.8889,
+        "rank_normalizzato": 0.925926,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Gianmaria",
+        "posizione_relativa": 0.9259,
+        "rank_normalizzato": 0.703704,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Modà",
+        "posizione_relativa": 0.963,
+        "rank_normalizzato": 0.407407,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "artista": "Will",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.962963,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Ariete",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.555556,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Will",
+        "posizione_relativa": 0.037,
+        "rank_normalizzato": 0.962963,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Elodie",
+        "posizione_relativa": 0.0741,
+        "rank_normalizzato": 0.296296,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Olly",
+        "posizione_relativa": 0.1111,
+        "rank_normalizzato": 0.777778,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Ultimo",
+        "posizione_relativa": 0.1481,
+        "rank_normalizzato": 0.111111,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Lazza",
+        "posizione_relativa": 0.1852,
+        "rank_normalizzato": 0.037037,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Tananai",
+        "posizione_relativa": 0.2222,
+        "rank_normalizzato": 0.148148,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Shari",
+        "posizione_relativa": 0.2593,
+        "rank_normalizzato": 0.925926,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Gianluca Grignani",
+        "posizione_relativa": 0.2963,
+        "rank_normalizzato": 0.444444,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Leo Gassmann",
+        "posizione_relativa": 0.3333,
+        "rank_normalizzato": 0.62963,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Articolo 31",
+        "posizione_relativa": 0.3704,
+        "rank_normalizzato": 0.333333,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.4074,
+        "rank_normalizzato": 0.222222,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Colapesce Dimartino",
+        "posizione_relativa": 0.4444,
+        "rank_normalizzato": 0.259259,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Cugini di Campagna",
+        "posizione_relativa": 0.4815,
+        "rank_normalizzato": 0.814815,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Marco Mengoni",
+        "posizione_relativa": 0.5185,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Gianmaria",
+        "posizione_relativa": 0.5556,
+        "rank_normalizzato": 0.703704,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Madame",
+        "posizione_relativa": 0.6296,
+        "rank_normalizzato": 0.185185,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Rosa Chemical",
+        "posizione_relativa": 0.7037,
+        "rank_normalizzato": 0.481481,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Modà",
+        "posizione_relativa": 0.7407,
+        "rank_normalizzato": 0.407407,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Levante",
+        "posizione_relativa": 0.7778,
+        "rank_normalizzato": 0.37037,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Anna Oxa",
+        "posizione_relativa": 0.8148,
+        "rank_normalizzato": 0.851852,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Sethu",
+        "posizione_relativa": 0.8519,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 28
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "LDA",
+        "posizione_relativa": 0.8889,
+        "rank_normalizzato": 0.592593,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Mara Sattei",
+        "posizione_relativa": 0.9259,
+        "rank_normalizzato": 0.740741,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Paola & Chiara",
+        "posizione_relativa": 0.963,
+        "rank_normalizzato": 0.518519,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "artista": "Colla Zio",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.666667,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Clara",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.653846,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.0345,
+        "rank_normalizzato": 0.769231,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Fiorella Mannoia",
+        "posizione_relativa": 0.069,
+        "rank_normalizzato": 0.538462,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "La Sad",
+        "posizione_relativa": 0.1034,
+        "rank_normalizzato": 0.692308,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Irama",
+        "posizione_relativa": 0.1379,
+        "rank_normalizzato": 0.153846,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Ghali",
+        "posizione_relativa": 0.1724,
+        "rank_normalizzato": 0.115385,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Negramaro",
+        "posizione_relativa": 0.2069,
+        "rank_normalizzato": 0.192308,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.2414,
+        "rank_normalizzato": 0.076923,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Mahmood",
+        "posizione_relativa": 0.2759,
+        "rank_normalizzato": 0.269231,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Diodato",
+        "posizione_relativa": 0.3103,
+        "rank_normalizzato": 0.807692,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Loredana Bertè",
+        "posizione_relativa": 0.3448,
+        "rank_normalizzato": 0.423077,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Geolier",
+        "posizione_relativa": 0.3793,
+        "rank_normalizzato": 0.038462,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Alessandra Amoroso",
+        "posizione_relativa": 0.4138,
+        "rank_normalizzato": 0.461538,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.4483,
+        "rank_normalizzato": 0.230769,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Angelina Mango",
+        "posizione_relativa": 0.4828,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Il Volo",
+        "posizione_relativa": 0.5172,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "BigMama",
+        "posizione_relativa": 0.5517,
+        "rank_normalizzato": 0.884615,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Ricchi e Poveri",
+        "posizione_relativa": 0.5862,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Emma",
+        "posizione_relativa": 0.6207,
+        "rank_normalizzato": 0.346154,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Renga Nek",
+        "posizione_relativa": 0.6552,
+        "rank_normalizzato": 0.384615,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Bnkr44",
+        "posizione_relativa": 0.7241,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.7931,
+        "rank_normalizzato": 0.576923,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.8276,
+        "rank_normalizzato": 0.730769,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Santi Francesi",
+        "posizione_relativa": 0.8621,
+        "rank_normalizzato": 0.846154,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Fred De Palma",
+        "posizione_relativa": 0.8966,
+        "rank_normalizzato": 0.923077,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Alfa",
+        "posizione_relativa": 0.9655,
+        "rank_normalizzato": 0.961538,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "artista": "Il Tre",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Fred De Palma",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.923077,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Renga Nek",
+        "posizione_relativa": 0.0714,
+        "rank_normalizzato": 0.384615,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Alfa",
+        "posizione_relativa": 0.1429,
+        "rank_normalizzato": 0.961538,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.2143,
+        "rank_normalizzato": 0.576923,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Il Volo",
+        "posizione_relativa": 0.2857,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Emma",
+        "posizione_relativa": 0.4286,
+        "rank_normalizzato": 0.346154,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Mahmood",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.269231,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "BigMama",
+        "posizione_relativa": 0.5714,
+        "rank_normalizzato": 0.884615,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.6429,
+        "rank_normalizzato": 0.230769,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Geolier",
+        "posizione_relativa": 0.7143,
+        "rank_normalizzato": 0.038462,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Loredana Bertè",
+        "posizione_relativa": 0.7857,
+        "rank_normalizzato": 0.423077,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.8571,
+        "rank_normalizzato": 0.076923,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Irama",
+        "posizione_relativa": 0.9286,
+        "rank_normalizzato": 0.153846,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "artista": "Clara",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.653846,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Il Tre",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Bnkr44",
+        "posizione_relativa": 0.1429,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Santi Francesi",
+        "posizione_relativa": 0.2143,
+        "rank_normalizzato": 0.846154,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.3571,
+        "rank_normalizzato": 0.730769,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Alessandra Amoroso",
+        "posizione_relativa": 0.4286,
+        "rank_normalizzato": 0.461538,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Ricchi e Poveri",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Angelina Mango",
+        "posizione_relativa": 0.5714,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Diodato",
+        "posizione_relativa": 0.6429,
+        "rank_normalizzato": 0.807692,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Ghali",
+        "posizione_relativa": 0.7143,
+        "rank_normalizzato": 0.115385,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Negramaro",
+        "posizione_relativa": 0.7857,
+        "rank_normalizzato": 0.192308,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Fiorella Mannoia",
+        "posizione_relativa": 0.8571,
+        "rank_normalizzato": 0.538462,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.9286,
+        "rank_normalizzato": 0.769231,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "artista": "La Sad",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.692308,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Sangiovanni",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.769231,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Annalisa",
+        "posizione_relativa": 0.0345,
+        "rank_normalizzato": 0.076923,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.069,
+        "rank_normalizzato": 0.730769,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.1379,
+        "rank_normalizzato": 0.230769,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Alfa",
+        "posizione_relativa": 0.1724,
+        "rank_normalizzato": 0.961538,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Bnkr44",
+        "posizione_relativa": 0.2069,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Irama",
+        "posizione_relativa": 0.2414,
+        "rank_normalizzato": 0.153846,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Fiorella Mannoia",
+        "posizione_relativa": 0.2759,
+        "rank_normalizzato": 0.538462,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Santi Francesi",
+        "posizione_relativa": 0.3103,
+        "rank_normalizzato": 0.846154,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Ricchi e Poveri",
+        "posizione_relativa": 0.3448,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Ghali",
+        "posizione_relativa": 0.3793,
+        "rank_normalizzato": 0.115385,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Clara",
+        "posizione_relativa": 0.4138,
+        "rank_normalizzato": 0.653846,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Loredana Bertè",
+        "posizione_relativa": 0.4483,
+        "rank_normalizzato": 0.423077,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Geolier",
+        "posizione_relativa": 0.4828,
+        "rank_normalizzato": 0.038462,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Angelina Mango",
+        "posizione_relativa": 0.5172,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Alessandra Amoroso",
+        "posizione_relativa": 0.5517,
+        "rank_normalizzato": 0.461538,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Dargen D'Amico",
+        "posizione_relativa": 0.5862,
+        "rank_normalizzato": 0.576923,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Mahmood",
+        "posizione_relativa": 0.6207,
+        "rank_normalizzato": 0.269231,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Negramaro",
+        "posizione_relativa": 0.6897,
+        "rank_normalizzato": 0.192308,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Emma",
+        "posizione_relativa": 0.7241,
+        "rank_normalizzato": 0.346154,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Il Volo",
+        "posizione_relativa": 0.7586,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Diodato",
+        "posizione_relativa": 0.7931,
+        "rank_normalizzato": 0.807692,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "La Sad",
+        "posizione_relativa": 0.8276,
+        "rank_normalizzato": 0.692308,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Il Tre",
+        "posizione_relativa": 0.8621,
+        "rank_normalizzato": 0.307692,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "BigMama",
+        "posizione_relativa": 0.8966,
+        "rank_normalizzato": 0.884615,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Fred De Palma",
+        "posizione_relativa": 0.9655,
+        "rank_normalizzato": 0.923077,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "artista": "Renga Nek",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.384615,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Gaia",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.892857,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Francesco Gabbani",
+        "posizione_relativa": 0.0357,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.0714,
+        "rank_normalizzato": 0.964286,
+        "classifica_finale": 28
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Noemi",
+        "posizione_relativa": 0.1071,
+        "rank_normalizzato": 0.428571,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Irama",
+        "posizione_relativa": 0.1429,
+        "rank_normalizzato": 0.285714,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Coma_Cose",
+        "posizione_relativa": 0.1786,
+        "rank_normalizzato": 0.321429,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Simone Cristicchi",
+        "posizione_relativa": 0.2143,
+        "rank_normalizzato": 0.142857,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Marcella Bella",
+        "posizione_relativa": 0.25,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 29
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Achille Lauro",
+        "posizione_relativa": 0.2857,
+        "rank_normalizzato": 0.214286,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.3214,
+        "rank_normalizzato": 0.178571,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.3571,
+        "rank_normalizzato": 0.535714,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.3929,
+        "rank_normalizzato": 0.642857,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Olly",
+        "posizione_relativa": 0.4286,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Elodie",
+        "posizione_relativa": 0.4643,
+        "rank_normalizzato": 0.392857,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Shablo con Guè, Joshua e Tormento",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Shablo feat. Gue, Joshua e Tormento",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.5357,
+        "rank_normalizzato": 0.785714,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Tony Effe",
+        "posizione_relativa": 0.5714,
+        "rank_normalizzato": 0.857143,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Serena Brancale",
+        "posizione_relativa": 0.6071,
+        "rank_normalizzato": 0.821429,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Brunori Sas",
+        "posizione_relativa": 0.6429,
+        "rank_normalizzato": 0.071429,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Moda",
+        "posizione_relativa": 0.6786,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Clara",
+        "posizione_relativa": 0.7143,
+        "rank_normalizzato": 0.928571,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Fedez",
+        "posizione_relativa": 0.75,
+        "rank_normalizzato": 0.107143,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Lucio Corsi",
+        "posizione_relativa": 0.7857,
+        "rank_normalizzato": 0.035714,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Bresh",
+        "posizione_relativa": 0.8214,
+        "rank_normalizzato": 0.357143,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Sarah Toscano",
+        "posizione_relativa": 0.8571,
+        "rank_normalizzato": 0.571429,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Joan Thiele",
+        "posizione_relativa": 0.8929,
+        "rank_normalizzato": 0.678571,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Rocco Hunt",
+        "posizione_relativa": 0.9286,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "Francesca Michielin",
+        "posizione_relativa": 0.9643,
+        "rank_normalizzato": 0.714286,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "artista": "The Kolors",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.464286,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Rocco Hunt",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Elodie",
+        "posizione_relativa": 0.0714,
+        "rank_normalizzato": 0.392857,
+        "classifica_finale": 12
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Lucio Corsi",
+        "posizione_relativa": 0.1429,
+        "rank_normalizzato": 0.035714,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.2143,
+        "rank_normalizzato": 0.464286,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Serena Brancale",
+        "posizione_relativa": 0.2857,
+        "rank_normalizzato": 0.821429,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Fedez",
+        "posizione_relativa": 0.3571,
+        "rank_normalizzato": 0.107143,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Francesca Michielin",
+        "posizione_relativa": 0.4286,
+        "rank_normalizzato": 0.714286,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Simone Cristicchi",
+        "posizione_relativa": 0.5,
+        "rank_normalizzato": 0.142857,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Marcella Bella",
+        "posizione_relativa": 0.5714,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 29
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Bresh",
+        "posizione_relativa": 0.6429,
+        "rank_normalizzato": 0.357143,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Achille Lauro",
+        "posizione_relativa": 0.7143,
+        "rank_normalizzato": 0.214286,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.7857,
+        "rank_normalizzato": 0.178571,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Rkomi",
+        "posizione_relativa": 0.8571,
+        "rank_normalizzato": 0.964286,
+        "classifica_finale": 28
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.9286,
+        "rank_normalizzato": 0.642857,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.535714,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Clara",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.928571,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Brunori Sas",
+        "posizione_relativa": 0.0769,
+        "rank_normalizzato": 0.071429,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Sarah Toscano",
+        "posizione_relativa": 0.1538,
+        "rank_normalizzato": 0.571429,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.2308,
+        "rank_normalizzato": 0.785714,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Joan Thiele",
+        "posizione_relativa": 0.3077,
+        "rank_normalizzato": 0.678571,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Shablo con Guè, Joshua e Tormento",
+        "posizione_relativa": 0.3846,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Shablo feat. Gue, Joshua e Tormento",
+        "posizione_relativa": 0.3846,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Noemi",
+        "posizione_relativa": 0.4615,
+        "rank_normalizzato": 0.428571,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Olly",
+        "posizione_relativa": 0.5385,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Coma_Cose",
+        "posizione_relativa": 0.6154,
+        "rank_normalizzato": 0.321429,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Moda",
+        "posizione_relativa": 0.6923,
+        "rank_normalizzato": 0.75,
+        "classifica_finale": 22
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Tony Effe",
+        "posizione_relativa": 0.7692,
+        "rank_normalizzato": 0.857143,
+        "classifica_finale": 25
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Irama",
+        "posizione_relativa": 0.8462,
+        "rank_normalizzato": 0.285714,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Francesco Gabbani",
+        "posizione_relativa": 0.9231,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "artista": "Gaia",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.892857,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Rose Villain",
+        "posizione_relativa": 0.0,
+        "rank_normalizzato": 0.642857,
+        "classifica_finale": 19
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Clara",
+        "posizione_relativa": 0.08,
+        "rank_normalizzato": 0.928571,
+        "classifica_finale": 27
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Noemi e Tony Effe",
+        "posizione_relativa": 0.12,
+        "rank_normalizzato": 0.428571,
+        "classifica_finale": 13
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Rkomi e Francesca Michielin",
+        "posizione_relativa": 0.16,
+        "rank_normalizzato": 0.714286,
+        "classifica_finale": 21
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Lucio Corsi",
+        "posizione_relativa": 0.2,
+        "rank_normalizzato": 0.035714,
+        "classifica_finale": 2
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Serena Brancale",
+        "posizione_relativa": 0.24,
+        "rank_normalizzato": 0.821429,
+        "classifica_finale": 24
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Irama",
+        "posizione_relativa": 0.28,
+        "rank_normalizzato": 0.285714,
+        "classifica_finale": 9
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Gaia",
+        "posizione_relativa": 0.32,
+        "rank_normalizzato": 0.892857,
+        "classifica_finale": 26
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "The Kolors",
+        "posizione_relativa": 0.36,
+        "rank_normalizzato": 0.464286,
+        "classifica_finale": 14
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Marcella Bella",
+        "posizione_relativa": 0.4,
+        "rank_normalizzato": 1.0,
+        "classifica_finale": 29
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Rocco Hunt",
+        "posizione_relativa": 0.44,
+        "rank_normalizzato": 0.5,
+        "classifica_finale": 15
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Francesco Gabbani",
+        "posizione_relativa": 0.48,
+        "rank_normalizzato": 0.25,
+        "classifica_finale": 8
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Giorgia",
+        "posizione_relativa": 0.52,
+        "rank_normalizzato": 0.178571,
+        "classifica_finale": 6
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Simone Cristicchi",
+        "posizione_relativa": 0.56,
+        "rank_normalizzato": 0.142857,
+        "classifica_finale": 5
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Sarah Toscano",
+        "posizione_relativa": 0.6,
+        "rank_normalizzato": 0.571429,
+        "classifica_finale": 17
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Coma_Cose",
+        "posizione_relativa": 0.64,
+        "rank_normalizzato": 0.321429,
+        "classifica_finale": 10
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Joan Thiele",
+        "posizione_relativa": 0.68,
+        "rank_normalizzato": 0.678571,
+        "classifica_finale": 20
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Olly",
+        "posizione_relativa": 0.72,
+        "rank_normalizzato": 0.0,
+        "classifica_finale": 1
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Elodie e Achille Lauro",
+        "posizione_relativa": 0.76,
+        "rank_normalizzato": 0.214286,
+        "classifica_finale": 7
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Massimo Ranieri",
+        "posizione_relativa": 0.8,
+        "rank_normalizzato": 0.785714,
+        "classifica_finale": 23
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Willie Peyote",
+        "posizione_relativa": 0.84,
+        "rank_normalizzato": 0.535714,
+        "classifica_finale": 16
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Brunori Sas",
+        "posizione_relativa": 0.88,
+        "rank_normalizzato": 0.071429,
+        "classifica_finale": 3
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Fedez",
+        "posizione_relativa": 0.92,
+        "rank_normalizzato": 0.107143,
+        "classifica_finale": 4
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Bresh",
+        "posizione_relativa": 0.96,
+        "rank_normalizzato": 0.357143,
+        "classifica_finale": 11
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "artista": "Shablo con Guè, Joshua e Tormento",
+        "posizione_relativa": 1.0,
+        "rank_normalizzato": 0.607143,
+        "classifica_finale": 18
+      }
+    ],
+    "boxplot_per_serata": [
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.448,
+        "mediana": 0.32
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Centro",
+        "n": 2,
+        "media": 0.36,
+        "mediana": 0.36
+      },
+      {
+        "anno": 2021,
+        "serata": 1,
+        "fascia": "Fine",
+        "n": 4,
+        "media": 0.63,
+        "mediana": 0.72
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.624,
+        "mediana": 0.6
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Centro",
+        "n": 3,
+        "media": 0.346667,
+        "mediana": 0.4
+      },
+      {
+        "anno": 2021,
+        "serata": 2,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.576,
+        "mediana": 0.68
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Inizio",
+        "n": 8,
+        "media": 0.54,
+        "mediana": 0.6
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Centro",
+        "n": 8,
+        "media": 0.585,
+        "mediana": 0.62
+      },
+      {
+        "anno": 2021,
+        "serata": 3,
+        "fascia": "Fine",
+        "n": 8,
+        "media": 0.44,
+        "mediana": 0.38
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Inizio",
+        "n": 4,
+        "media": 0.520833,
+        "mediana": 0.541667
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Centro",
+        "n": 4,
+        "media": 0.229167,
+        "mediana": 0.270833
+      },
+      {
+        "anno": 2022,
+        "serata": 1,
+        "fascia": "Fine",
+        "n": 4,
+        "media": 0.625,
+        "mediana": 0.604167
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.533333,
+        "mediana": 0.666667
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Centro",
+        "n": 3,
+        "media": 0.5,
+        "mediana": 0.625
+      },
+      {
+        "anno": 2022,
+        "serata": 2,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.566667,
+        "mediana": 0.541667
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Inizio",
+        "n": 9,
+        "media": 0.472222,
+        "mediana": 0.458333
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Centro",
+        "n": 7,
+        "media": 0.375,
+        "mediana": 0.25
+      },
+      {
+        "anno": 2022,
+        "serata": 3,
+        "fascia": "Fine",
+        "n": 9,
+        "media": 0.625,
+        "mediana": 0.666667
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Inizio",
+        "n": 9,
+        "media": 0.458333,
+        "mediana": 0.5
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Centro",
+        "n": 7,
+        "media": 0.535714,
+        "mediana": 0.625
+      },
+      {
+        "anno": 2022,
+        "serata": 4,
+        "fascia": "Fine",
+        "n": 9,
+        "media": 0.513889,
+        "mediana": 0.458333
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Inizio",
+        "n": 4,
+        "media": 0.527778,
+        "mediana": 0.62963
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Centro",
+        "n": 3,
+        "media": 0.345679,
+        "mediana": 0.296296
+      },
+      {
+        "anno": 2023,
+        "serata": 1,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.688889,
+        "mediana": 0.740741
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.548148,
+        "mediana": 0.407407
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Centro",
+        "n": 4,
+        "media": 0.398148,
+        "mediana": 0.240741
+      },
+      {
+        "anno": 2023,
+        "serata": 2,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.422222,
+        "mediana": 0.481481
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Inizio",
+        "n": 10,
+        "media": 0.362963,
+        "mediana": 0.407407
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Centro",
+        "n": 6,
+        "media": 0.345679,
+        "mediana": 0.277778
+      },
+      {
+        "anno": 2023,
+        "serata": 3,
+        "fascia": "Fine",
+        "n": 10,
+        "media": 0.733333,
+        "mediana": 0.796296
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Inizio",
+        "n": 10,
+        "media": 0.488889,
+        "mediana": 0.5
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Centro",
+        "n": 7,
+        "media": 0.359788,
+        "mediana": 0.259259
+      },
+      {
+        "anno": 2023,
+        "serata": 4,
+        "fascia": "Fine",
+        "n": 9,
+        "media": 0.625514,
+        "mediana": 0.592593
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Inizio",
+        "n": 10,
+        "media": 0.426923,
+        "mediana": 0.403846
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Centro",
+        "n": 10,
+        "media": 0.357692,
+        "mediana": 0.365385
+      },
+      {
+        "anno": 2024,
+        "serata": 1,
+        "fascia": "Fine",
+        "n": 7,
+        "media": 0.763736,
+        "mediana": 0.846154
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.630769,
+        "mediana": 0.576923
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Centro",
+        "n": 4,
+        "media": 0.432692,
+        "mediana": 0.307692
+      },
+      {
+        "anno": 2024,
+        "serata": 2,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.269231,
+        "mediana": 0.153846
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Inizio",
+        "n": 3,
+        "media": 0.717949,
+        "mediana": 0.846154
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Centro",
+        "n": 5,
+        "media": 0.5,
+        "mediana": 0.5
+      },
+      {
+        "anno": 2024,
+        "serata": 3,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.461538,
+        "mediana": 0.538462
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Inizio",
+        "n": 9,
+        "media": 0.589744,
+        "mediana": 0.730769
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Centro",
+        "n": 9,
+        "media": 0.337607,
+        "mediana": 0.423077
+      },
+      {
+        "anno": 2024,
+        "serata": 4,
+        "fascia": "Fine",
+        "n": 9,
+        "media": 0.538462,
+        "mediana": 0.384615
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Inizio",
+        "n": 10,
+        "media": 0.467857,
+        "mediana": 0.303571
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Centro",
+        "n": 10,
+        "media": 0.532143,
+        "mediana": 0.607143
+      },
+      {
+        "anno": 2025,
+        "serata": 1,
+        "fascia": "Fine",
+        "n": 10,
+        "media": 0.510714,
+        "mediana": 0.535714
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.442857,
+        "mediana": 0.464286
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Centro",
+        "n": 5,
+        "media": 0.464286,
+        "mediana": 0.357143
+      },
+      {
+        "anno": 2025,
+        "serata": 2,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.507143,
+        "mediana": 0.535714
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Inizio",
+        "n": 5,
+        "media": 0.607143,
+        "mediana": 0.678571
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Centro",
+        "n": 5,
+        "media": 0.392857,
+        "mediana": 0.428571
+      },
+      {
+        "anno": 2025,
+        "serata": 3,
+        "fascia": "Fine",
+        "n": 5,
+        "media": 0.607143,
+        "mediana": 0.75
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Inizio",
+        "n": 8,
+        "media": 0.59375,
+        "mediana": 0.678571
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Centro",
+        "n": 8,
+        "media": 0.428571,
+        "mediana": 0.392857
+      },
+      {
+        "anno": 2025,
+        "serata": 4,
+        "fascia": "Fine",
+        "n": 9,
+        "media": 0.373016,
+        "mediana": 0.357143
+      }
+    ]
+  }
+}
