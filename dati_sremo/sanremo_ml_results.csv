@@ -1,0 +1,7 @@
+"target","model","mean_accuracy","std_accuracy"
+"Top 5","LogisticRegression","0.8255","0.0039"
+"Top 5","RandomForest","0.8137","0.0248"
+"Top 5","GradientBoosting","0.651","0.038"
+"Top 10","LogisticRegression","0.5817","0.0755"
+"Top 10","RandomForest","0.651","0.038"
+"Top 10","GradientBoosting","0.6294","0.078"
