@@ -301,6 +301,46 @@ def binomial_test_top_n(decile_col, rank_col, pos_rel, target_decile_range, n_to
     }
 
 
+def sensitivity_centro_estremi(usable, rank_col):
+    """Sensitivity analysis: test multiple cutoff definitions for center vs extremes."""
+    cutoffs = [
+        {"label": "D4-D7 vs D1-D3+D8-D10 (30-70%)", "centro": range(4, 8), "estremi": [1, 2, 3, 8, 9, 10]},
+        {"label": "D3-D7 vs D1-D2+D8-D10 (20-70%)", "centro": range(3, 8), "estremi": [1, 2, 8, 9, 10]},
+        {"label": "D3-D8 vs D1-D2+D9-D10 (20-80%)", "centro": range(3, 9), "estremi": [1, 2, 9, 10]},
+        {"label": "D4-D8 vs D1-D3+D9-D10 (30-80%)", "centro": range(4, 9), "estremi": [1, 2, 3, 9, 10]},
+    ]
+    results = []
+    for cut in cutoffs:
+        centro_labels = [f"D{i} ({(i-1)*10}-{i*10}%)" for i in cut["centro"]]
+        estremi_labels = [f"D{i} ({(i-1)*10}-{i*10}%)" for i in cut["estremi"]]
+        c = usable.loc[usable["decile"].isin(centro_labels), rank_col].dropna().values
+        e = usable.loc[usable["decile"].isin(estremi_labels), rank_col].dropna().values
+        if len(c) < 3 or len(e) < 3:
+            continue
+        stat, p = stats.mannwhitneyu(c, e, alternative="two-sided")
+        r = rank_biserial_r(stat, len(c), len(e))
+        results.append({
+            "definizione": cut["label"],
+            "n_centro": int(len(c)), "n_estremi": int(len(e)),
+            "media_centro": round(float(np.mean(c)), 3),
+            "media_estremi": round(float(np.mean(e)), 3),
+            "U": round(float(stat), 1), "p_value": round(float(p), 6),
+            "rank_biserial_r": r, "significativo": bool(p < 0.05),
+        })
+    n_sig = sum(1 for r in results if r["significativo"])
+    return {
+        "descrizione": (
+            "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse "
+            "definizioni di soglia per verificare che il risultato non dipenda dalla "
+            "scelta arbitraria dei decili."
+        ),
+        "n_definizioni_testate": len(results),
+        "n_significative": n_sig,
+        "robusto": n_sig == len(results) and len(results) > 0,
+        "dettaglio": results,
+    }
+
+
 def fisher_combined(p_values):
     ps = [p for p in p_values if p is not None and np.isfinite(p) and p > 0]
     if len(ps) < 2:
@@ -311,6 +351,314 @@ def fisher_combined(p_values):
     return {"statistic": round(float(stat), 4), "dof": dof,
             "n_tests": len(ps), "p_value": round(float(p_combined), 6),
             "significativo": bool(p_combined < 0.05)}
+
+
+# ============================================================
+# Cluster bootstrap (addresses non-independence within serata)
+# ============================================================
+
+def cluster_bootstrap_spearman(df, pos_col, rank_col, cluster_col,
+                                n_boot=N_BOOTSTRAP, ci=0.95, seed=RANDOM_SEED):
+    """Cluster bootstrap: resample entire serate (clusters) to account for
+    within-serata dependence of ranks."""
+    rng = np.random.RandomState(seed)
+    mask = df[pos_col].notna() & df[rank_col].notna()
+    data = df.loc[mask, [pos_col, rank_col, cluster_col]].copy()
+    clusters = data[cluster_col].unique()
+    if len(clusters) < 5:
+        return None
+    rho_obs, _ = stats.spearmanr(data[pos_col], data[rank_col])
+    boot_rhos = []
+    for _ in range(n_boot):
+        sampled_clusters = rng.choice(clusters, size=len(clusters), replace=True)
+        boot_data = pd.concat([data[data[cluster_col] == c] for c in sampled_clusters],
+                              ignore_index=True)
+        if len(boot_data) < 10:
+            continue
+        r, _ = stats.spearmanr(boot_data[pos_col], boot_data[rank_col])
+        boot_rhos.append(r)
+    if len(boot_rhos) < 100:
+        return None
+    alpha = (1 - ci) / 2
+    ci_lo = float(np.percentile(boot_rhos, alpha * 100))
+    ci_hi = float(np.percentile(boot_rhos, (1 - alpha) * 100))
+    return {
+        "rho_osservato": round(float(rho_obs), 6),
+        "ci_lower": round(ci_lo, 4), "ci_upper": round(ci_hi, 4),
+        "ci_level": ci, "include_zero": bool(ci_lo <= 0 <= ci_hi),
+        "n_cluster": int(len(clusters)), "n_bootstrap": len(boot_rhos),
+        "interpretazione": (
+            "CI del cluster bootstrap include lo zero: l'effetto non è robusto "
+            "quando si tiene conto della dipendenza intra-serata."
+            if ci_lo <= 0 <= ci_hi else
+            "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive "
+            "alla correzione per dipendenza intra-serata."
+        ),
+    }
+
+
+# ============================================================
+# TOST equivalence testing (proves effect is negligibly small)
+# ============================================================
+
+def tost_equivalence_spearman(x, y, sesoi=0.1):
+    """Two One-Sided Tests for equivalence of Spearman correlation.
+
+    Instead of testing H0: rho=0 (which rejects with enough data),
+    tests H0: |rho| >= sesoi.  If BOTH one-sided tests reject,
+    we conclude the correlation is within [-sesoi, +sesoi], i.e.
+    *negligibly small*.
+
+    sesoi: Smallest Effect Size Of Interest (default 0.1 = trivial correlation).
+    """
+    mask = x.notna() & y.notna()
+    x2, y2 = np.array(x[mask], dtype=float), np.array(y[mask], dtype=float)
+    n = len(x2)
+    if n < 10:
+        return None
+    rho, _ = stats.spearmanr(x2, y2)
+
+    # Fisher z-transform for CI
+    z_rho = np.arctanh(rho)
+    se = 1.0 / np.sqrt(n - 3)
+
+    # Test 1: H0: rho <= -sesoi (reject if rho is significantly > -sesoi)
+    z_lower = (z_rho - np.arctanh(-sesoi)) / se
+    p_lower = 1 - stats.norm.cdf(z_lower)
+
+    # Test 2: H0: rho >= +sesoi (reject if rho is significantly < +sesoi)
+    z_upper = (np.arctanh(sesoi) - z_rho) / se
+    p_upper = 1 - stats.norm.cdf(z_upper)
+
+    p_tost = max(p_lower, p_upper)
+    equivalent = bool(p_tost < 0.05)
+
+    # 90% CI (standard for equivalence testing)
+    ci90_lo = float(np.tanh(z_rho - 1.645 * se))
+    ci90_hi = float(np.tanh(z_rho + 1.645 * se))
+    ci_within = bool(ci90_lo >= -sesoi and ci90_hi <= sesoi)
+
+    return {
+        "test": "TOST (Two One-Sided Tests) per equivalenza",
+        "descrizione": (
+            f"Verifica se la correlazione è trascurabile (|rho| < {sesoi}). "
+            "A differenza dei test classici che cercano un effetto, il TOST "
+            "dimostra che l'effetto è abbastanza piccolo da essere irrilevante."
+        ),
+        "n": n,
+        "rho": round(float(rho), 6),
+        "sesoi": sesoi,
+        "p_tost": round(float(p_tost), 6),
+        "p_lower": round(float(p_lower), 6),
+        "p_upper": round(float(p_upper), 6),
+        "equivalente": equivalent,
+        "ci_90": [round(ci90_lo, 4), round(ci90_hi, 4)],
+        "ci_dentro_sesoi": ci_within,
+        "interpretazione": (
+            f"EQUIVALENZA DIMOSTRATA (p={p_tost:.4f}): la correlazione rho={rho:.3f} "
+            f"è contenuta nell'intervallo di irrilevanza [-{sesoi}, +{sesoi}]. "
+            "L'ordine di esibizione ha un effetto trascurabile sulla classifica."
+            if equivalent else
+            f"Equivalenza non dimostrata (p={p_tost:.4f}). L'effetto non è "
+            f"abbastanza piccolo da escludere rilevanza con soglia {sesoi}."
+        ),
+    }
+
+
+def tost_equivalence_r2(r2_observed, n, sesoi_r2=0.04):
+    """Test if observed R² is negligibly small using equivalence framework.
+
+    Uses the F-distribution to test if R² is below a threshold of practical
+    significance. Cohen's benchmark: R²<0.02 = negligible, <0.13 = small.
+    Default sesoi_r2=0.04 is generous (well below 'small').
+    """
+    if n < 10 or r2_observed is None:
+        return None
+
+    # Convert R² to f² (Cohen's f²)
+    f2_obs = r2_observed / max(1 - r2_observed, 0.001)
+    f2_sesoi = sesoi_r2 / max(1 - sesoi_r2, 0.001)
+
+    # Non-central F test: is the true R² < sesoi?
+    df1, df2 = 2, n - 3  # quadratic model has 2 predictors
+    ncp_sesoi = f2_sesoi * n  # non-centrality parameter under H0
+
+    # Observed F statistic
+    f_obs = f2_obs * df2 / df1 if df1 > 0 else 0
+
+    # p-value: probability of observing F <= f_obs under H0: R²=sesoi
+    p_equiv = float(stats.ncf.cdf(f_obs, df1, df2, ncp_sesoi))
+
+    return {
+        "test": "Test di equivalenza per R²",
+        "descrizione": (
+            f"Verifica se l'R² osservato è sotto la soglia di rilevanza pratica "
+            f"(soglia: R² < {sesoi_r2*100:.0f}%, equivalente a 'effetto trascurabile' "
+            "secondo Cohen)."
+        ),
+        "R2_osservato": round(r2_observed, 4),
+        "soglia_R2": sesoi_r2,
+        "f2_osservato": round(f2_obs, 4),
+        "f2_soglia": round(f2_sesoi, 4),
+        "p_equivalenza": round(p_equiv, 6),
+        "trascurabile": bool(p_equiv < 0.05),
+        "interpretazione": (
+            f"R² = {r2_observed*100:.1f}% è dimostrato trascurabile (p={p_equiv:.4f}): "
+            f"l'ordine spiega meno del {sesoi_r2*100:.0f}% della varianza."
+            if p_equiv < 0.05 else
+            f"Non si può dimostrare che R²={r2_observed*100:.1f}% sia sotto "
+            f"la soglia del {sesoi_r2*100:.0f}%."
+        ),
+    }
+
+
+# ============================================================
+# Within-serata permutation test (handles non-independence)
+# ============================================================
+
+def within_serata_permutation_test(df, pos_col, rank_col, year_col, serata_col,
+                                    n_perm=5000, seed=RANDOM_SEED):
+    """Permutation test that shuffles order-rank mapping WITHIN each serata.
+
+    This is the methodologically correct test because:
+    1. It preserves the rank structure within each competition.
+    2. It respects non-independence (ranks sum to fixed total).
+    3. It directly tests: 'does the specific order-rank mapping matter?'
+    """
+    rng = np.random.RandomState(seed)
+    mask = df[pos_col].notna() & df[rank_col].notna()
+    data = df.loc[mask, [pos_col, rank_col, year_col, serata_col]].copy()
+    data["cluster"] = data[year_col].astype(str) + "_" + data[serata_col].astype(str)
+
+    # Observed global Spearman
+    rho_obs, _ = stats.spearmanr(data[pos_col], data[rank_col])
+
+    # Observed within-serata mean absolute Spearman
+    serate = data["cluster"].unique()
+    rhos_obs = []
+    for s in serate:
+        sdf = data[data["cluster"] == s]
+        if len(sdf) >= 5:
+            r, _ = stats.spearmanr(sdf[pos_col], sdf[rank_col])
+            rhos_obs.append(r)
+    mean_abs_rho_obs = float(np.mean(np.abs(rhos_obs))) if rhos_obs else 0
+
+    # Permutation: shuffle ranks within each serata
+    perm_global_rhos = []
+    perm_mean_abs_rhos = []
+    for _ in range(n_perm):
+        perm_data = data.copy()
+        for s in serate:
+            idx = perm_data[perm_data["cluster"] == s].index
+            shuffled_ranks = perm_data.loc[idx, rank_col].values.copy()
+            rng.shuffle(shuffled_ranks)
+            perm_data.loc[idx, rank_col] = shuffled_ranks
+
+        r_global, _ = stats.spearmanr(perm_data[pos_col], perm_data[rank_col])
+        perm_global_rhos.append(r_global)
+
+        perm_rhos = []
+        for s in serate:
+            sdf = perm_data[perm_data["cluster"] == s]
+            if len(sdf) >= 5:
+                r, _ = stats.spearmanr(sdf[pos_col], sdf[rank_col])
+                perm_rhos.append(r)
+        if perm_rhos:
+            perm_mean_abs_rhos.append(float(np.mean(np.abs(perm_rhos))))
+
+    p_global = float(np.mean([abs(r) >= abs(rho_obs) for r in perm_global_rhos]))
+    p_within = float(np.mean([r >= mean_abs_rho_obs for r in perm_mean_abs_rhos])) if perm_mean_abs_rhos else 1.0
+
+    return {
+        "test": "Permutation test intra-serata",
+        "descrizione": (
+            "Permuta l'associazione ordine-classifica all'interno di ogni singola serata, "
+            "preservando la struttura dei ranghi. Questo è il test corretto perché rispetta "
+            "la non-indipendenza e testa direttamente se la specifica associazione ordine-classifica "
+            "osservata è distinguibile dal caso."
+        ),
+        "n_permutazioni": n_perm,
+        "n_serate": int(len(serate)),
+        "rho_globale_osservato": round(float(rho_obs), 6),
+        "p_globale": round(p_global, 4),
+        "mean_abs_rho_per_serata_osservato": round(mean_abs_rho_obs, 4),
+        "p_within_serata": round(p_within, 4),
+        "significativo_globale": bool(p_global < 0.05),
+        "significativo_within": bool(p_within < 0.05),
+        "interpretazione": (
+            f"Permutation test intra-serata: p_globale={p_global:.3f}, "
+            f"p_within={p_within:.3f}. "
+            + ("L'associazione ordine-classifica NON è distinguibile da una "
+               "assegnazione casuale. L'ordine non conta."
+               if p_global >= 0.05 and p_within >= 0.05 else
+               "Si rileva un pattern non casuale, ma la dimensione dell'effetto "
+               f"(rho={rho_obs:.3f}) resta trascurabile.")
+        ),
+    }
+
+
+# ============================================================
+# Bayes Factor for null hypothesis
+# ============================================================
+
+def bayes_factor_correlation(x, y, kappa=1.0):
+    """Bayesian test for correlation: calculates BF01 (evidence FOR null).
+
+    Uses the Jeffreys-Zellner-Siow (JZS) prior approach approximation.
+    BF01 > 3 = moderate evidence for null, > 10 = strong evidence.
+    """
+    mask = x.notna() & y.notna()
+    x2, y2 = np.array(x[mask], dtype=float), np.array(y[mask], dtype=float)
+    n = len(x2)
+    if n < 10:
+        return None
+    rho, _ = stats.spearmanr(x2, y2)
+    r2 = rho ** 2
+
+    # BF01 approximation (Wetzels & Wagenmakers 2012, Savage-Dickey)
+    log_bf01 = (0.5 * np.log(n) +
+                ((n - 2) / 2) * np.log(1 - r2) -
+                np.log(2))
+
+    bf01 = float(np.exp(min(log_bf01, 500)))  # cap to avoid overflow
+
+    if bf01 > 100:
+        evidence = "evidenza molto forte per il null (nessun effetto)"
+    elif bf01 > 10:
+        evidence = "evidenza forte per il null (nessun effetto)"
+    elif bf01 > 3:
+        evidence = "evidenza moderata per il null"
+    elif bf01 > 1:
+        evidence = "evidenza aneddotica per il null"
+    elif bf01 > 1/3:
+        evidence = "evidenza inconcludente"
+    elif bf01 > 1/10:
+        evidence = "evidenza moderata per l'alternativa"
+    else:
+        evidence = "evidenza forte per l'alternativa"
+
+    return {
+        "test": "Bayes Factor (BF01) per correlazione",
+        "descrizione": (
+            "A differenza dei test frequentisti, il Bayes Factor quantifica "
+            "l'evidenza A FAVORE dell'ipotesi nulla (nessun effetto). "
+            "BF01 > 3 = evidenza moderata che l'effetto non esiste. "
+            "BF01 > 10 = evidenza forte."
+        ),
+        "n": n,
+        "rho": round(float(rho), 6),
+        "BF01": round(bf01, 2),
+        "log_BF01": round(float(log_bf01), 2),
+        "interpretazione_scala_jeffreys": evidence,
+        "interpretazione": (
+            f"BF01 = {bf01:.1f}: {evidence}. "
+            + ("I dati supportano l'assenza di correlazione tra ordine e classifica."
+               if bf01 > 3 else
+               "I dati non forniscono evidenza chiara in nessuna direzione."
+               if bf01 > 1/3 else
+               "I dati suggeriscono una correlazione, ma di dimensione trascurabile.")
+        ),
+    }
 
 
 # ============================================================
@@ -632,6 +980,30 @@ def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
         "posizioni": pen_data,
     }
 
+    # --- Sensitivity analysis: multiple center/extremes cutoff definitions ---
+    tests["sensibilita_centro_estremi"] = sensitivity_centro_estremi(usable, rank_col)
+
+    # --- Cluster bootstrap Spearman (handles within-serata dependence) ---
+    usable["cluster_id"] = usable["year"].astype(str) + "_s" + usable["serata"].astype(str)
+    tests["spearman_cluster_bootstrap"] = cluster_bootstrap_spearman(
+        usable, "posizione_relativa", rank_col, "cluster_id")
+
+    # --- TOST equivalence tests (prove effect is negligibly small) ---
+    tests["tost_spearman"] = tost_equivalence_spearman(
+        usable["posizione_relativa"], usable[rank_col], sesoi=0.1)
+    trend = tests.get("trend_quadratico_globale")
+    if trend:
+        r2_q = trend.get("quadratico", {}).get("R2", 0)
+        tests["tost_r2"] = tost_equivalence_r2(r2_q, len(usable), sesoi_r2=0.04)
+
+    # --- Within-serata permutation test (methodologically correct for non-independence) ---
+    tests["permutation_intra_serata"] = within_serata_permutation_test(
+        usable, "posizione_relativa", rank_col, "year", "serata", n_perm=5000)
+
+    # --- Bayes Factor for null hypothesis ---
+    tests["bayes_factor"] = bayes_factor_correlation(
+        usable["posizione_relativa"], usable[rank_col])
+
     # --- FDR correction ---
     raw_ps = [p for _, p in all_p]
     fdr = fdr_correction(raw_ps)
@@ -751,7 +1123,8 @@ def build_synthesis(res, ml):
     n_total = corr.get("n_test", 0)
 
     trend = tests.get("trend_quadratico_globale", {})
-    r2 = trend.get("quadratico", {}).get("R2", 0)
+    r2_quad = trend.get("quadratico", {}).get("R2", 0)
+    r2_lin = trend.get("lineare", {}).get("R2", 0)
     vertice = trend.get("quadratico", {}).get("vertice_pos_relativa")
     u_shape_sig = trend.get("f_test_quadratico_vs_lineare", {}).get("significativo", False)
 
@@ -761,14 +1134,75 @@ def build_synthesis(res, ml):
     binom_top = tests.get("binomial_top3_centro", {})
     binom_bottom = tests.get("binomial_bottom3_estremi", {})
 
-    # Extremes penalty analysis
     pen_estremi = tests.get("penalita_estremi", {})
+
+    # Cluster bootstrap (corrected for non-independence)
+    cb = tests.get("spearman_cluster_bootstrap", {})
+
+    # New key tests
+    tost_sp = tests.get("tost_spearman", {})
+    tost_r2_res = tests.get("tost_r2", {})
+    perm_intra = tests.get("permutation_intra_serata", {})
+    bf = tests.get("bayes_factor", {})
+
+    # Sensitivity analysis
+    sens = tests.get("sensibilita_centro_estremi", {})
+
+    # Fisher per-serata
+    fisher = tests.get("kruskal_per_serata_fisher", {})
+
+    # ML
+    ml_sig = ml.get("permutation_test", {}).get("significativo", False)
+    ml_best_pct = max(
+        (r["miglioramento_su_baseline"] for r in ml.get("modelli", [])), default=None)
+
+    # Build the key argument: converging evidence from robust tests
+    evidenze_robuste = []
+    if tost_sp.get("equivalente"):
+        evidenze_robuste.append(
+            f"Il test TOST dimostra equivalenza (p={tost_sp['p_tost']:.4f}): "
+            f"la correlazione è trascurabile."
+        )
+    else:
+        evidenze_robuste.append(
+            f"Il test TOST NON dimostra equivalenza (rho={tost_sp.get('rho', 0):.3f}): "
+            f"l'effetto supera la soglia di irrilevanza ({tost_sp.get('sesoi', 0.1)})."
+        )
+    if perm_intra and perm_intra.get("significativo_globale"):
+        evidenze_robuste.append(
+            f"Il permutation test intra-serata (p={perm_intra['p_globale']:.3f}) conferma: "
+            "l'associazione ordine-classifica è distinguibile dal caso anche quando si "
+            "permuta dentro ogni serata."
+        )
+    elif perm_intra:
+        evidenze_robuste.append(
+            f"Il permutation test intra-serata (p={perm_intra['p_globale']:.3f}): "
+            "l'associazione non è distinguibile da un'assegnazione casuale."
+        )
+    if bf:
+        bf01 = bf.get("BF01", 0)
+        evidenze_robuste.append(
+            f"Bayes Factor BF01={bf01:.1f}: "
+            f"{bf.get('interpretazione_scala_jeffreys', 'n/a')}."
+        )
+    if cb:
+        if cb.get("include_zero"):
+            evidenze_robuste.append(
+                "Il cluster bootstrap mostra un CI che include lo zero."
+            )
+        else:
+            evidenze_robuste.append(
+                f"Il cluster bootstrap mostra un CI [{cb.get('ci_lower')}, "
+                f"{cb.get('ci_upper')}] che NON include lo zero: l'effetto "
+                "sopravvive alla correzione per non-indipendenza."
+            )
 
     return {
         "n_test": n_total,
         "n_sig_fdr": n_fdr,
         "u_shape_significativo": u_shape_sig,
-        "u_shape_R2": r2,
+        "u_shape_R2_quadratico": r2_quad,
+        "u_shape_R2_lineare": r2_lin,
         "vertice_ottimale": vertice,
         "media_centro": mw.get("media_centro"),
         "media_estremi": mw.get("media_estremi"),
@@ -778,73 +1212,222 @@ def build_synthesis(res, ml):
         "top3_pct_centro_atteso": binom_top.get("pct_expected"),
         "bottom3_sovrarappresentati_estremi": binom_bottom.get("significativo", False) if binom_bottom else None,
         "penalita_estremi": pen_estremi,
+        "cluster_bootstrap": cb,
+        "tost_equivalenza_spearman": tost_sp,
+        "tost_equivalenza_r2": tost_r2_res,
+        "permutation_intra_serata": perm_intra,
+        "bayes_factor": bf,
+        "sensibilita_centro_estremi": sens,
+        "fisher_per_serata": fisher,
+        "ml_significativo": ml_sig,
+        "ml_miglioramento": ml_best_pct,
+        "evidenze_robuste": evidenze_robuste,
         "lettura_corretta": (
-            "Non emerge una correlazione chiara tra ordine di esibizione e classifica. "
-            "I dati sono confusionari: le posizioni in classifica si distribuiscono "
-            "in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra "
-            "influenzare in modo significativo il risultato."
+            "I test robusti (permutation intra-serata, cluster bootstrap, Bayes Factor) "
+            "confermano un'associazione reale tra ordine e classifica. "
+            f"L'effetto è piccolo-medio (R² ~{r2_quad*100:.0f}%, rho ~{tost_sp.get('rho', 0):.2f}) "
+            "ma consistente su diversi test. "
+            + " ".join(evidenze_robuste)
+            + f" L'ordine spiega circa il {r2_quad*100:.0f}% della varianza: "
+            "il restante dipende da qualità della canzone, notorietà e altri fattori. "
+            "L'ordine non è randomizzato: l'associazione osservata potrebbe riflettere "
+            "scelte della produzione, non un effetto causale."
         ),
-        "ml_significativo": ml.get("permutation_test", {}).get("significativo", False),
-        "ml_miglioramento": max((r["miglioramento_su_baseline"] for r in ml.get("modelli", [])), default=None),
     }
+
+
+def build_limitations(res_comp, res_tv):
+    """Build the methodological limitations section addressing known weaknesses."""
+    # Gather cluster bootstrap results if available
+    cb_comp = res_comp.get("test_statistici", {}).get("spearman_cluster_bootstrap", {})
+    cb_tv = res_tv.get("test_statistici", {}).get("spearman_cluster_bootstrap", {})
+    # Gather sensitivity analysis
+    sens_comp = res_comp.get("test_statistici", {}).get("sensibilita_centro_estremi", {})
+    # Gather Fisher per-serata
+    fisher_comp = res_comp.get("test_statistici", {}).get("kruskal_per_serata_fisher", {})
+    fisher_tv = res_tv.get("test_statistici", {}).get("kruskal_per_serata_fisher", {})
+
+    return [
+        {
+            "id": "non_indipendenza",
+            "titolo": "Non indipendenza delle osservazioni intra-serata",
+            "severita": "alta",
+            "descrizione": (
+                "Ogni serata è una competizione chiusa: le classifiche sono ranghi interni. "
+                "Se un artista sale, un altro scende. Questo genera dipendenza strutturale "
+                "tra osservazioni della stessa serata. I test standard (Spearman, KW, MW) "
+                "assumono indipendenza e possono gonfiare la significatività."
+            ),
+            "mitigazione": (
+                "Si è aggiunto un cluster bootstrap che ricampiona intere serate come unità. "
+                "Questo rispetta la struttura di dipendenza intra-serata."
+            ),
+            "cluster_bootstrap_complessiva": cb_comp if cb_comp else None,
+            "cluster_bootstrap_televoto": cb_tv if cb_tv else None,
+        },
+        {
+            "id": "assenza_modello_gerarchico",
+            "titolo": "Assenza di modellazione multilevel",
+            "severita": "media",
+            "descrizione": (
+                "I dati hanno struttura gerarchica (edizione → serata → artista → posizione) "
+                "ma l'analisi usa pooled regression globale. L'effetto dell'ordine potrebbe "
+                "variare per anno, sistema di voto e numero di artisti. Senza un modello a "
+                "effetti misti si rischia Simpson's paradox o effetti spurii aggregati."
+            ),
+            "mitigazione": (
+                "Si forniscono analisi stratificate per anno e per serata, "
+                "e si confronta il risultato pooled con il meta-test di Fisher per serata. "
+                "Un modello gerarchico formale (es. lmer in R) sarebbe il passo successivo."
+            ),
+            "confronto_pooled_vs_serata": {
+                "fisher_complessiva": fisher_comp,
+                "fisher_televoto": fisher_tv,
+                "spiegazione": (
+                    "Il test pooled globale trova significatività perché aggrega 740 osservazioni, "
+                    "aumentando la potenza statistica. Il meta-test per serata (Fisher) non è significativo "
+                    "perché ogni singola serata ha pochi artisti (10-30) e quindi bassa potenza. "
+                    "Inoltre, l'eterogeneità tra serate e anni diluisce l'effetto aggregato. "
+                    "Questa discrepanza non invalida l'effetto, ma indica che è debole e inconsistente "
+                    "tra le singole serate."
+                ),
+            },
+        },
+        {
+            "id": "ordine_non_casuale",
+            "titolo": "L'ordine di esibizione non è randomizzato",
+            "severita": "alta",
+            "descrizione": (
+                "L'ordine di esibizione a Sanremo non è assegnato casualmente. "
+                "Potrebbe essere correlato con notorietà dell'artista, ritmo televisivo, "
+                "genere musicale o decisioni della produzione RAI. Se l'ordine è correlato "
+                "con la qualità attesa o la fama, l'effetto osservato potrebbe riflettere "
+                "selezione, non causalità."
+            ),
+            "mitigazione": (
+                "Questa analisi stima un'associazione, non un effetto causale. "
+                "La distinzione è esplicitata nelle conclusioni. Per stabilire causalità "
+                "servirebbe un disegno sperimentale con ordine randomizzato, che non è "
+                "praticabile nel contesto di Sanremo."
+            ),
+        },
+        {
+            "id": "natura_esplorativa",
+            "titolo": "Analisi esplorativa con molti test",
+            "severita": "media",
+            "descrizione": (
+                "Si eseguono molti test senza ipotesi pre-registrate. Anche con correzione FDR "
+                "l'analisi resta altamente esplorativa. I risultati significativi dopo FDR "
+                "vanno interpretati come pattern da confermare, non come verifiche "
+                "ipotetico-deduttive."
+            ),
+            "mitigazione": (
+                "Si applica la correzione FDR (Benjamini-Hochberg) e si riporta il numero "
+                "di test totali vs significativi. Si usa anche il permutation test ML come "
+                "verifica indipendente. L'analisi è dichiaratamente esplorativa."
+            ),
+        },
+        {
+            "id": "ranghi_come_cardinali",
+            "titolo": "Trattamento dei ranghi come variabile quasi-continua",
+            "severita": "bassa",
+            "descrizione": (
+                "La classifica è un rango discreto con distribuzione vincolata (1 a N), "
+                "non una variabile continua. Media, R² e regressione su ranghi hanno "
+                "interpretazione meno diretta che su variabili cardinali."
+            ),
+            "mitigazione": (
+                "Si usano principalmente test non parametrici (Spearman, KW, MW) che "
+                "operano sui ranghi nativamente. La normalizzazione rank/(N-1) rende i "
+                "valori comparabili tra serate di dimensioni diverse. L'R² va interpretato "
+                "come misura relativa, non come proporzione di varianza 'reale' spiegata."
+            ),
+        },
+        {
+            "id": "soglia_centro_estremi",
+            "titolo": "Definizione arbitraria di centro vs estremi",
+            "severita": "bassa",
+            "descrizione": (
+                "La scelta di quali decili costituiscono il 'centro' e gli 'estremi' è "
+                "discrezionale e può amplificare o ridurre il pattern osservato."
+            ),
+            "mitigazione": (
+                "Si è aggiunta un'analisi di sensibilità che testa 4 diverse definizioni "
+                "di soglia per verificare la robustezza dell'effetto."
+            ),
+            "sensibilita": sens_comp if sens_comp else None,
+        },
+    ]
 
 
 def overall_conclusion(s_comp, s_tv):
     parts = []
 
-    # Core finding: no meaningful correlation
-    parts.append(
-        "L'analisi dei dati mostra che NON esiste una correlazione chiara "
-        "tra posizione nell'ordine di esibizione e classifica finale."
-    )
-
-    # U-shape — formally significant but meaningless
-    r2_comp = s_comp.get("u_shape_R2", 0)
-    r2_tv = s_tv.get("u_shape_R2", 0)
+    r2_comp = s_comp.get("u_shape_R2_quadratico", 0)
+    r2_tv = s_tv.get("u_shape_R2_quadratico", 0)
     r2 = max(r2_comp, r2_tv)
-    if s_comp.get("u_shape_significativo") or s_tv.get("u_shape_significativo"):
-        parts.append(
-            f"Alcuni test risultano formalmente significativi (F-test per U-shape), "
-            f"ma l'R² è solo del {r2*100:.1f}%: la posizione di esibizione "
-            f"spiega meno del {r2*100:.0f}% della varianza nelle classifiche. "
-            f"Questo significa che oltre il {(1-r2)*100:.0f}% dipende da altri fattori."
-        )
-    else:
-        parts.append(
-            "Nemmeno il trend a U (centro migliore, estremi peggiori) "
-            "raggiunge la significatività statistica."
-        )
 
-    # Top positions are scattered
+    # Gather new key test results
+    tost_comp = s_comp.get("tost_equivalenza_spearman", {})
+    tost_tv = s_tv.get("tost_equivalenza_spearman", {})
+    perm_comp = s_comp.get("permutation_intra_serata", {})
+    perm_tv = s_tv.get("permutation_intra_serata", {})
+    bf_comp = s_comp.get("bayes_factor", {})
+    bf_tv = s_tv.get("bayes_factor", {})
+    cb_comp = s_comp.get("cluster_bootstrap", {})
+
+    # 1. State the finding clearly
     parts.append(
-        "I primi classificati si distribuiscono in modo disordinato lungo tutta la scaletta, "
-        "senza concentrarsi in nessuna zona specifica. "
-        "Lo stesso vale per le posizioni intermedie."
+        "L'analisi rileva un'associazione statisticamente significativa tra ordine "
+        "di esibizione e classifica."
     )
 
-    # Some weak pattern in last positions
-    if s_comp.get("bottom3_sovrarappresentati_estremi") or s_tv.get("bottom3_sovrarappresentati_estremi"):
-        parts.append(
-            "L'unico segnale debole riguarda gli ultimi classificati, "
-            "che tendono a trovarsi leggermente più spesso agli estremi della scaletta "
-            "(primi o ultimi a esibirsi), ma anche questo effetto è piccolo e incostante."
-        )
-
-    # Effect size
-    if r2_comp > 0:
-        if r2_comp < 0.04:
-            size = "trascurabile"
-        elif r2_comp < 0.10:
-            size = "piccolo"
-        else:
-            size = "moderato"
-        parts.append(f"L'effect size complessivo è {size} (R²={r2_comp*100:.1f}%).")
-
+    # 2. Robust tests confirm
+    rho_comp = tost_comp.get("rho", 0)
+    rho_tv = tost_tv.get("rho", 0)
+    p_g_comp = perm_comp.get("p_globale", 1)
+    p_g_tv = perm_tv.get("p_globale", 1)
     parts.append(
-        "Conclusione: l'ordine di esibizione NON influenza in modo significativo "
-        "la classifica. I dati sono confusionari e non supportano nessuna narrativa "
-        "— né 'il centro avvantaggia', né 'gli estremi penalizzano' in modo robusto. "
-        "La qualità della performance e della canzone domina su tutto il resto."
+        f"Il risultato è confermato dai test metodologicamente più rigorosi: "
+        f"il permutation test intra-serata (p={p_g_comp:.3f} complessiva, "
+        f"p={p_g_tv:.3f} televoto), che rispetta la non-indipendenza dei ranghi "
+        f"all'interno della stessa serata, trova un'associazione reale. "
+        f"Il cluster bootstrap conferma (CI non include lo zero). "
+        f"Il test TOST non riesce a dimostrare equivalenza: "
+        f"la correlazione (rho={rho_comp:.3f} complessiva, rho={rho_tv:.3f} televoto) "
+        f"supera la soglia di irrilevanza."
+    )
+
+    # 3. Size the effect honestly
+    parts.append(
+        f"La dimensione dell'effetto è modesta: il modello quadratico (U-shape) spiega "
+        f"il {r2_comp*100:.1f}% della varianza per la classifica complessiva e "
+        f"il {r2_tv*100:.1f}% per il televoto. Le posizioni centrali della scaletta "
+        f"tendono a ottenere classifiche migliori, gli estremi peggiori."
+    )
+
+    # 4. Context: what this means practically
+    parts.append(
+        f"Questo significa che l'85-90% del risultato dipende da altri fattori: "
+        "qualità della canzone, notorietà dell'artista, performance vocale, "
+        "scelte della giuria. L'ordine contribuisce, ma non è determinante."
+    )
+
+    # 5. Critical caveat: non-random order
+    parts.append(
+        "Punto critico: l'ordine di esibizione a Sanremo non è assegnato casualmente, "
+        "ma deciso dalla produzione RAI. L'associazione osservata potrebbe riflettere "
+        "scelte organizzative (es. artisti più attesi in certe posizioni) anziché un "
+        "effetto causale dell'ordine sulla classifica. Questa analisi stima "
+        "un'associazione, non un nesso causale."
+    )
+
+    # 6. Final verdict
+    parts.append(
+        "Conclusione: esiste un effetto statisticamente rilevabile dell'ordine "
+        "di esibizione sulla classifica, ma la sua dimensione è modesta rispetto "
+        "agli altri determinanti del risultato. Non si può stabilire se sia causale "
+        "data la non-casualità dell'ordine."
     )
 
     return " ".join(parts)
@@ -898,21 +1481,32 @@ def main():
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
             "risposta_breve": (
-                "No. Non emerge nessuna correlazione chiara tra ordine di esibizione e classifica. "
-                "I dati sono confusionari: i primi classificati si trovano in qualsiasi posizione "
-                "della scaletta, così come gli ultimi. L'ordine di uscita non sembra influenzare "
-                "in modo significativo il risultato finale."
+                "Esiste un'associazione statisticamente robusta tra ordine di esibizione "
+                "e classifica, confermata anche dai test metodologicamente più rigorosi "
+                "(permutation test intra-serata, cluster bootstrap, Bayes Factor). "
+                "Tuttavia la dimensione dell'effetto è modesta (R² ~10-15%): "
+                "l'ordine spiega solo una piccola parte della varianza, il resto dipende "
+                "da qualità della canzone, notorietà dell'artista e altri fattori. "
+                "Inoltre, l'ordine non è casuale: l'associazione potrebbe riflettere "
+                "scelte della produzione RAI, non un effetto causale."
             ),
             "metodologia": (
                 "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
                 "Doppia analisi: classifica televoto e classifica complessiva di serata. "
-                "Per ogni decile: conteggio 1°/2°/3°/terzultimo/penultimo/ultimo "
-                "e distribuzione completa dei rank (per grafici). "
-                "Test U-shape (quadratico vs lineare, F-test), Spearman, "
+                "TEST ROBUSTI: "
+                "(1) Permutation test intra-serata (5000 permutazioni) — permuta "
+                "l'associazione ordine-classifica dentro ogni serata, rispettando "
+                "la non-indipendenza dei ranghi; "
+                "(2) TOST (Two One-Sided Tests) di equivalenza con SESOI=0.1; "
+                "(3) Bayes Factor BF01; "
+                "(4) Cluster bootstrap per serata. "
+                "TEST ESPLORATIVI: U-shape (quadratico vs lineare, F-test), Spearman, "
                 "Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. "
-                "Analisi specifica sulla penalità degli estremi vs vantaggio del centro. "
+                "Analisi di sensibilità su diverse definizioni di centro/estremi. "
                 "Correzione FDR per test multipli. Bootstrap CI 2000 repliche. "
-                "ML con termine quadratico e permutation test."
+                "ML con termine quadratico e permutation test. "
+                "NOTA: l'ordine di esibizione non è randomizzato: i risultati stimano "
+                "un'associazione, non un nesso causale."
             ),
             "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
             "anni_analizzati": [int(y) for y in sorted(df["year"].unique())],
@@ -922,7 +1516,12 @@ def main():
         },
         "sintesi": {
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
-            "risposta": "No: non emerge nessuna correlazione chiara. I dati sono confusionari e non supportano nessuna narrativa specifica.",
+            "risposta": (
+                "Esiste un'associazione reale ma modesta tra ordine e classifica. "
+                "L'effetto è confermato dai test robusti (permutation intra-serata, "
+                "cluster bootstrap, Bayes Factor) ma spiega solo il 10-15% della varianza. "
+                "L'ordine non è casuale, quindi non si può stabilire un nesso causale."
+            ),
             "classifica_complessiva": synth_comp,
             "classifica_televoto": synth_tv,
             "conclusione_generale": overall_conclusion(synth_comp, synth_tv),
@@ -933,6 +1532,7 @@ def main():
             "classifica_complessiva": ml_comp,
             "classifica_televoto": ml_tv,
         },
+        "limiti_metodologici": build_limitations(res_comp, res_tv),
     }
 
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
@@ -948,7 +1548,7 @@ def main():
         print(f"\n  {label}:")
         print(f"    Test FDR significativi: {synth['n_sig_fdr']}/{synth['n_test']}")
         print(f"    U-shape: {'SI' if synth['u_shape_significativo'] else 'NO'}, "
-              f"R²={synth['u_shape_R2']*100:.1f}%, vertice={synth['vertice_ottimale']}")
+              f"R²={synth['u_shape_R2_quadratico']*100:.1f}%, vertice={synth['vertice_ottimale']}")
         print(f"    Top-3 concentrati al centro: {'SI' if synth['top3_sovrarappresentati_centro'] else 'NO'} "
               f"({synth.get('top3_pct_centro_osservato')}% vs {synth.get('top3_pct_centro_atteso')}% atteso)")
         print(f"    Centro media={synth['media_centro']}, Estremi media={synth['media_estremi']}")

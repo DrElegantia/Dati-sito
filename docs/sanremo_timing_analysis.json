@@ -2,8 +2,8 @@
   "meta": {
     "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
     "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
-    "risposta_breve": "No. Non emerge nessuna correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: i primi classificati si trovano in qualsiasi posizione della scaletta, così come gli ultimi. L'ordine di uscita non sembra influenzare in modo significativo il risultato finale.",
-    "metodologia": "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). Doppia analisi: classifica televoto e classifica complessiva di serata. Per ogni decile: conteggio 1°/2°/3°/terzultimo/penultimo/ultimo e distribuzione completa dei rank (per grafici). Test U-shape (quadratico vs lineare, F-test), Spearman, Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. Analisi specifica sulla penalità degli estremi vs vantaggio del centro. Correzione FDR per test multipli. Bootstrap CI 2000 repliche. ML con termine quadratico e permutation test.",
+    "risposta_breve": "Esiste un'associazione statisticamente robusta tra ordine di esibizione e classifica, confermata anche dai test metodologicamente più rigorosi (permutation test intra-serata, cluster bootstrap, Bayes Factor). Tuttavia la dimensione dell'effetto è modesta (R² ~10-15%): l'ordine spiega solo una piccola parte della varianza, il resto dipende da qualità della canzone, notorietà dell'artista e altri fattori. Inoltre, l'ordine non è casuale: l'associazione potrebbe riflettere scelte della produzione RAI, non un effetto causale.",
+    "metodologia": "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). Doppia analisi: classifica televoto e classifica complessiva di serata. TEST ROBUSTI: (1) Permutation test intra-serata (5000 permutazioni) — permuta l'associazione ordine-classifica dentro ogni serata, rispettando la non-indipendenza dei ranghi; (2) TOST (Two One-Sided Tests) di equivalenza con SESOI=0.1; (3) Bayes Factor BF01; (4) Cluster bootstrap per serata. TEST ESPLORATIVI: U-shape (quadratico vs lineare, F-test), Spearman, Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. Analisi di sensibilità su diverse definizioni di centro/estremi. Correzione FDR per test multipli. Bootstrap CI 2000 repliche. ML con termine quadratico e permutation test. NOTA: l'ordine di esibizione non è randomizzato: i risultati stimano un'associazione, non un nesso causale.",
     "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
     "anni_analizzati": [
       2019,
@@ -20,12 +20,13 @@
   },
   "sintesi": {
     "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
-    "risposta": "No: non emerge nessuna correlazione chiara. I dati sono confusionari e non supportano nessuna narrativa specifica.",
+    "risposta": "Esiste un'associazione reale ma modesta tra ordine e classifica. L'effetto è confermato dai test robusti (permutation intra-serata, cluster bootstrap, Bayes Factor) ma spiega solo il 10-15% della varianza. L'ordine non è casuale, quindi non si può stabilire un nesso causale.",
     "classifica_complessiva": {
       "n_test": 99,
       "n_sig_fdr": 17,
       "u_shape_significativo": true,
-      "u_shape_R2": 0.096315,
+      "u_shape_R2_quadratico": 0.096315,
+      "u_shape_R2_lineare": 0.021181,
       "vertice_ottimale": 0.4278,
       "media_centro": 10.136,
       "media_estremi": 14.32,
@@ -405,15 +406,142 @@
           }
         }
       },
-      "lettura_corretta": "Non emerge una correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: le posizioni in classifica si distribuiscono in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra influenzare in modo significativo il risultato.",
+      "cluster_bootstrap": {
+        "rho_osservato": 0.156311,
+        "ci_lower": 0.0744,
+        "ci_upper": 0.2312,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 35,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      },
+      "tost_equivalenza_spearman": {
+        "test": "TOST (Two One-Sided Tests) per equivalenza",
+        "descrizione": "Verifica se la correlazione è trascurabile (|rho| < 0.1). A differenza dei test classici che cercano un effetto, il TOST dimostra che l'effetto è abbastanza piccolo da essere irrilevante.",
+        "n": 740,
+        "rho": 0.156311,
+        "sesoi": 0.1,
+        "p_tost": 0.939989,
+        "p_lower": 0.0,
+        "p_upper": 0.939989,
+        "equivalente": false,
+        "ci_90": [
+          0.0967,
+          0.2148
+        ],
+        "ci_dentro_sesoi": false,
+        "interpretazione": "Equivalenza non dimostrata (p=0.9400). L'effetto non è abbastanza piccolo da escludere rilevanza con soglia 0.1."
+      },
+      "tost_equivalenza_r2": {
+        "test": "Test di equivalenza per R²",
+        "descrizione": "Verifica se l'R² osservato è sotto la soglia di rilevanza pratica (soglia: R² < 4%, equivalente a 'effetto trascurabile' secondo Cohen).",
+        "R2_osservato": 0.0963,
+        "soglia_R2": 0.04,
+        "f2_osservato": 0.1066,
+        "f2_soglia": 0.0417,
+        "p_equivalenza": 0.999192,
+        "trascurabile": false,
+        "interpretazione": "Non si può dimostrare che R²=9.6% sia sotto la soglia del 4%."
+      },
+      "permutation_intra_serata": {
+        "test": "Permutation test intra-serata",
+        "descrizione": "Permuta l'associazione ordine-classifica all'interno di ogni singola serata, preservando la struttura dei ranghi. Questo è il test corretto perché rispetta la non-indipendenza e testa direttamente se la specifica associazione ordine-classifica osservata è distinguibile dal caso.",
+        "n_permutazioni": 5000,
+        "n_serate": 35,
+        "rho_globale_osservato": 0.156311,
+        "p_globale": 0.0,
+        "mean_abs_rho_per_serata_osservato": 0.2586,
+        "p_within_serata": 0.003,
+        "significativo_globale": true,
+        "significativo_within": true,
+        "interpretazione": "Permutation test intra-serata: p_globale=0.000, p_within=0.003. Si rileva un pattern non casuale, ma la dimensione dell'effetto (rho=0.156) resta trascurabile."
+      },
+      "bayes_factor": {
+        "test": "Bayes Factor (BF01) per correlazione",
+        "descrizione": "A differenza dei test frequentisti, il Bayes Factor quantifica l'evidenza A FAVORE dell'ipotesi nulla (nessun effetto). BF01 > 3 = evidenza moderata che l'effetto non esiste. BF01 > 10 = evidenza forte.",
+        "n": 740,
+        "rho": 0.156311,
+        "BF01": 0.0,
+        "log_BF01": -6.52,
+        "interpretazione_scala_jeffreys": "evidenza forte per l'alternativa",
+        "interpretazione": "BF01 = 0.0: evidenza forte per l'alternativa. I dati suggeriscono una correlazione, ma di dimensione trascurabile."
+      },
+      "sensibilita_centro_estremi": {
+        "descrizione": "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse definizioni di soglia per verificare che il risultato non dipenda dalla scelta arbitraria dei decili.",
+        "n_definizioni_testate": 4,
+        "n_significative": 4,
+        "robusto": true,
+        "dettaglio": [
+          {
+            "definizione": "D4-D7 vs D1-D3+D8-D10 (30-70%)",
+            "n_centro": 283,
+            "n_estremi": 457,
+            "media_centro": 10.272,
+            "media_estremi": 13.595,
+            "U": 48691.0,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.247,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D7 vs D1-D2+D8-D10 (20-70%)",
+            "n_centro": 353,
+            "n_estremi": 387,
+            "media_centro": 10.136,
+            "media_estremi": 14.32,
+            "U": 46766.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.3153,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D8 vs D1-D2+D9-D10 (20-80%)",
+            "n_centro": 427,
+            "n_estremi": 313,
+            "media_centro": 10.756,
+            "media_estremi": 14.463,
+            "U": 48132.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.2797,
+            "significativo": true
+          },
+          {
+            "definizione": "D4-D8 vs D1-D3+D9-D10 (30-80%)",
+            "n_centro": 357,
+            "n_estremi": 383,
+            "media_centro": 10.986,
+            "media_estremi": 13.572,
+            "U": 55237.0,
+            "p_value": 6e-06,
+            "rank_biserial_r": 0.192,
+            "significativo": true
+          }
+        ]
+      },
+      "fisher_per_serata": {
+        "statistic": 88.4249,
+        "dof": 70,
+        "n_tests": 35,
+        "p_value": 0.067643,
+        "significativo": false
+      },
       "ml_significativo": true,
-      "ml_miglioramento": 5.44
+      "ml_miglioramento": 5.44,
+      "evidenze_robuste": [
+        "Il test TOST NON dimostra equivalenza (rho=0.156): l'effetto supera la soglia di irrilevanza (0.1).",
+        "Il permutation test intra-serata (p=0.000) conferma: l'associazione ordine-classifica è distinguibile dal caso anche quando si permuta dentro ogni serata.",
+        "Bayes Factor BF01=0.0: evidenza forte per l'alternativa.",
+        "Il cluster bootstrap mostra un CI [0.0744, 0.2312] che NON include lo zero: l'effetto sopravvive alla correzione per non-indipendenza."
+      ],
+      "lettura_corretta": "I test robusti (permutation intra-serata, cluster bootstrap, Bayes Factor) confermano un'associazione reale tra ordine e classifica. L'effetto è piccolo-medio (R² ~10%, rho ~0.16) ma consistente su diversi test. Il test TOST NON dimostra equivalenza (rho=0.156): l'effetto supera la soglia di irrilevanza (0.1). Il permutation test intra-serata (p=0.000) conferma: l'associazione ordine-classifica è distinguibile dal caso anche quando si permuta dentro ogni serata. Bayes Factor BF01=0.0: evidenza forte per l'alternativa. Il cluster bootstrap mostra un CI [0.0744, 0.2312] che NON include lo zero: l'effetto sopravvive alla correzione per non-indipendenza. L'ordine spiega circa il 10% della varianza: il restante dipende da qualità della canzone, notorietà e altri fattori. L'ordine non è randomizzato: l'associazione osservata potrebbe riflettere scelte della produzione, non un effetto causale."
     },
     "classifica_televoto": {
       "n_test": 71,
       "n_sig_fdr": 20,
       "u_shape_significativo": true,
-      "u_shape_R2": 0.151459,
+      "u_shape_R2_quadratico": 0.151459,
+      "u_shape_R2_lineare": 0.061547,
       "vertice_ottimale": 0.3878,
       "media_centro": 10.699,
       "media_estremi": 14.482,
@@ -793,11 +921,137 @@
           }
         }
       },
-      "lettura_corretta": "Non emerge una correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: le posizioni in classifica si distribuiscono in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra influenzare in modo significativo il risultato.",
+      "cluster_bootstrap": {
+        "rho_osservato": 0.233248,
+        "ci_lower": 0.1369,
+        "ci_upper": 0.3255,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 21,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      },
+      "tost_equivalenza_spearman": {
+        "test": "TOST (Two One-Sided Tests) per equivalenza",
+        "descrizione": "Verifica se la correlazione è trascurabile (|rho| < 0.1). A differenza dei test classici che cercano un effetto, il TOST dimostra che l'effetto è abbastanza piccolo da essere irrilevante.",
+        "n": 478,
+        "rho": 0.233248,
+        "sesoi": 0.1,
+        "p_tost": 0.998615,
+        "p_lower": 0.0,
+        "p_upper": 0.998615,
+        "equivalente": false,
+        "ci_90": [
+          0.1607,
+          0.3033
+        ],
+        "ci_dentro_sesoi": false,
+        "interpretazione": "Equivalenza non dimostrata (p=0.9986). L'effetto non è abbastanza piccolo da escludere rilevanza con soglia 0.1."
+      },
+      "tost_equivalenza_r2": {
+        "test": "Test di equivalenza per R²",
+        "descrizione": "Verifica se l'R² osservato è sotto la soglia di rilevanza pratica (soglia: R² < 4%, equivalente a 'effetto trascurabile' secondo Cohen).",
+        "R2_osservato": 0.1515,
+        "soglia_R2": 0.04,
+        "f2_osservato": 0.1785,
+        "f2_soglia": 0.0417,
+        "p_equivalenza": 0.999996,
+        "trascurabile": false,
+        "interpretazione": "Non si può dimostrare che R²=15.1% sia sotto la soglia del 4%."
+      },
+      "permutation_intra_serata": {
+        "test": "Permutation test intra-serata",
+        "descrizione": "Permuta l'associazione ordine-classifica all'interno di ogni singola serata, preservando la struttura dei ranghi. Questo è il test corretto perché rispetta la non-indipendenza e testa direttamente se la specifica associazione ordine-classifica osservata è distinguibile dal caso.",
+        "n_permutazioni": 5000,
+        "n_serate": 21,
+        "rho_globale_osservato": 0.233248,
+        "p_globale": 0.0,
+        "mean_abs_rho_per_serata_osservato": 0.2784,
+        "p_within_serata": 0.001,
+        "significativo_globale": true,
+        "significativo_within": true,
+        "interpretazione": "Permutation test intra-serata: p_globale=0.000, p_within=0.001. Si rileva un pattern non casuale, ma la dimensione dell'effetto (rho=0.233) resta trascurabile."
+      },
+      "bayes_factor": {
+        "test": "Bayes Factor (BF01) per correlazione",
+        "descrizione": "A differenza dei test frequentisti, il Bayes Factor quantifica l'evidenza A FAVORE dell'ipotesi nulla (nessun effetto). BF01 > 3 = evidenza moderata che l'effetto non esiste. BF01 > 10 = evidenza forte.",
+        "n": 478,
+        "rho": 0.233248,
+        "BF01": 0.0,
+        "log_BF01": -10.92,
+        "interpretazione_scala_jeffreys": "evidenza forte per l'alternativa",
+        "interpretazione": "BF01 = 0.0: evidenza forte per l'alternativa. I dati suggeriscono una correlazione, ma di dimensione trascurabile."
+      },
+      "sensibilita_centro_estremi": {
+        "descrizione": "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse definizioni di soglia per verificare che il risultato non dipenda dalla scelta arbitraria dei decili.",
+        "n_definizioni_testate": 4,
+        "n_significative": 4,
+        "robusto": true,
+        "dettaglio": [
+          {
+            "definizione": "D4-D7 vs D1-D3+D8-D10 (30-70%)",
+            "n_centro": 181,
+            "n_estremi": 297,
+            "media_centro": 10.939,
+            "media_estremi": 13.724,
+            "U": 21370.5,
+            "p_value": 0.000168,
+            "rank_biserial_r": 0.2049,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D7 vs D1-D2+D8-D10 (20-70%)",
+            "n_centro": 229,
+            "n_estremi": 249,
+            "media_centro": 10.699,
+            "media_estremi": 14.482,
+            "U": 20583.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.278,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D8 vs D1-D2+D9-D10 (20-80%)",
+            "n_centro": 279,
+            "n_estremi": 199,
+            "media_centro": 11.057,
+            "media_estremi": 14.93,
+            "U": 19832.0,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.2856,
+            "significativo": true
+          },
+          {
+            "definizione": "D4-D8 vs D1-D3+D9-D10 (30-80%)",
+            "n_centro": 231,
+            "n_estremi": 247,
+            "media_centro": 11.32,
+            "media_estremi": 13.931,
+            "U": 23019.0,
+            "p_value": 0.000259,
+            "rank_biserial_r": 0.1931,
+            "significativo": true
+          }
+        ]
+      },
+      "fisher_per_serata": {
+        "statistic": 58.9506,
+        "dof": 42,
+        "n_tests": 21,
+        "p_value": 0.042966,
+        "significativo": true
+      },
       "ml_significativo": true,
-      "ml_miglioramento": 8.18
+      "ml_miglioramento": 8.18,
+      "evidenze_robuste": [
+        "Il test TOST NON dimostra equivalenza (rho=0.233): l'effetto supera la soglia di irrilevanza (0.1).",
+        "Il permutation test intra-serata (p=0.000) conferma: l'associazione ordine-classifica è distinguibile dal caso anche quando si permuta dentro ogni serata.",
+        "Bayes Factor BF01=0.0: evidenza forte per l'alternativa.",
+        "Il cluster bootstrap mostra un CI [0.1369, 0.3255] che NON include lo zero: l'effetto sopravvive alla correzione per non-indipendenza."
+      ],
+      "lettura_corretta": "I test robusti (permutation intra-serata, cluster bootstrap, Bayes Factor) confermano un'associazione reale tra ordine e classifica. L'effetto è piccolo-medio (R² ~15%, rho ~0.23) ma consistente su diversi test. Il test TOST NON dimostra equivalenza (rho=0.233): l'effetto supera la soglia di irrilevanza (0.1). Il permutation test intra-serata (p=0.000) conferma: l'associazione ordine-classifica è distinguibile dal caso anche quando si permuta dentro ogni serata. Bayes Factor BF01=0.0: evidenza forte per l'alternativa. Il cluster bootstrap mostra un CI [0.1369, 0.3255] che NON include lo zero: l'effetto sopravvive alla correzione per non-indipendenza. L'ordine spiega circa il 15% della varianza: il restante dipende da qualità della canzone, notorietà e altri fattori. L'ordine non è randomizzato: l'associazione osservata potrebbe riflettere scelte della produzione, non un effetto causale."
     },
-    "conclusione_generale": "L'analisi dei dati mostra che NON esiste una correlazione chiara tra posizione nell'ordine di esibizione e classifica finale. Alcuni test risultano formalmente significativi (F-test per U-shape), ma l'R² è solo del 15.1%: la posizione di esibizione spiega meno del 15% della varianza nelle classifiche. Questo significa che oltre il 85% dipende da altri fattori. I primi classificati si distribuiscono in modo disordinato lungo tutta la scaletta, senza concentrarsi in nessuna zona specifica. Lo stesso vale per le posizioni intermedie. L'unico segnale debole riguarda gli ultimi classificati, che tendono a trovarsi leggermente più spesso agli estremi della scaletta (primi o ultimi a esibirsi), ma anche questo effetto è piccolo e incostante. L'effect size complessivo è piccolo (R²=9.6%). Conclusione: l'ordine di esibizione NON influenza in modo significativo la classifica. I dati sono confusionari e non supportano nessuna narrativa — né 'il centro avvantaggia', né 'gli estremi penalizzano' in modo robusto. La qualità della performance e della canzone domina su tutto il resto."
+    "conclusione_generale": "L'analisi rileva un'associazione statisticamente significativa tra ordine di esibizione e classifica. Il risultato è confermato dai test metodologicamente più rigorosi: il permutation test intra-serata (p=0.000 complessiva, p=0.000 televoto), che rispetta la non-indipendenza dei ranghi all'interno della stessa serata, trova un'associazione reale. Il cluster bootstrap conferma (CI non include lo zero). Il test TOST non riesce a dimostrare equivalenza: la correlazione (rho=0.156 complessiva, rho=0.233 televoto) supera la soglia di irrilevanza. La dimensione dell'effetto è modesta: il modello quadratico (U-shape) spiega il 9.6% della varianza per la classifica complessiva e il 15.1% per il televoto. Le posizioni centrali della scaletta tendono a ottenere classifiche migliori, gli estremi peggiori. Questo significa che l'85-90% del risultato dipende da altri fattori: qualità della canzone, notorietà dell'artista, performance vocale, scelte della giuria. L'ordine contribuisce, ma non è determinante. Punto critico: l'ordine di esibizione a Sanremo non è assegnato casualmente, ma deciso dalla produzione RAI. L'associazione osservata potrebbe riflettere scelte organizzative (es. artisti più attesi in certe posizioni) anziché un effetto causale dell'ordine sulla classifica. Questa analisi stima un'associazione, non un nesso causale. Conclusione: esiste un effetto statisticamente rilevabile dell'ordine di esibizione sulla classifica, ma la sua dimensione è modesta rispetto agli altri determinanti del risultato. Non si può stabilire se sia causale data la non-casualità dell'ordine."
   },
   "analisi_classifica_complessiva": {
     "tipo_classifica": "Classifica serata complessiva",
@@ -11234,6 +11488,119 @@
             }
           }
         }
+      },
+      "sensibilita_centro_estremi": {
+        "descrizione": "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse definizioni di soglia per verificare che il risultato non dipenda dalla scelta arbitraria dei decili.",
+        "n_definizioni_testate": 4,
+        "n_significative": 4,
+        "robusto": true,
+        "dettaglio": [
+          {
+            "definizione": "D4-D7 vs D1-D3+D8-D10 (30-70%)",
+            "n_centro": 283,
+            "n_estremi": 457,
+            "media_centro": 10.272,
+            "media_estremi": 13.595,
+            "U": 48691.0,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.247,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D7 vs D1-D2+D8-D10 (20-70%)",
+            "n_centro": 353,
+            "n_estremi": 387,
+            "media_centro": 10.136,
+            "media_estremi": 14.32,
+            "U": 46766.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.3153,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D8 vs D1-D2+D9-D10 (20-80%)",
+            "n_centro": 427,
+            "n_estremi": 313,
+            "media_centro": 10.756,
+            "media_estremi": 14.463,
+            "U": 48132.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.2797,
+            "significativo": true
+          },
+          {
+            "definizione": "D4-D8 vs D1-D3+D9-D10 (30-80%)",
+            "n_centro": 357,
+            "n_estremi": 383,
+            "media_centro": 10.986,
+            "media_estremi": 13.572,
+            "U": 55237.0,
+            "p_value": 6e-06,
+            "rank_biserial_r": 0.192,
+            "significativo": true
+          }
+        ]
+      },
+      "spearman_cluster_bootstrap": {
+        "rho_osservato": 0.156311,
+        "ci_lower": 0.0744,
+        "ci_upper": 0.2312,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 35,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      },
+      "tost_spearman": {
+        "test": "TOST (Two One-Sided Tests) per equivalenza",
+        "descrizione": "Verifica se la correlazione è trascurabile (|rho| < 0.1). A differenza dei test classici che cercano un effetto, il TOST dimostra che l'effetto è abbastanza piccolo da essere irrilevante.",
+        "n": 740,
+        "rho": 0.156311,
+        "sesoi": 0.1,
+        "p_tost": 0.939989,
+        "p_lower": 0.0,
+        "p_upper": 0.939989,
+        "equivalente": false,
+        "ci_90": [
+          0.0967,
+          0.2148
+        ],
+        "ci_dentro_sesoi": false,
+        "interpretazione": "Equivalenza non dimostrata (p=0.9400). L'effetto non è abbastanza piccolo da escludere rilevanza con soglia 0.1."
+      },
+      "tost_r2": {
+        "test": "Test di equivalenza per R²",
+        "descrizione": "Verifica se l'R² osservato è sotto la soglia di rilevanza pratica (soglia: R² < 4%, equivalente a 'effetto trascurabile' secondo Cohen).",
+        "R2_osservato": 0.0963,
+        "soglia_R2": 0.04,
+        "f2_osservato": 0.1066,
+        "f2_soglia": 0.0417,
+        "p_equivalenza": 0.999192,
+        "trascurabile": false,
+        "interpretazione": "Non si può dimostrare che R²=9.6% sia sotto la soglia del 4%."
+      },
+      "permutation_intra_serata": {
+        "test": "Permutation test intra-serata",
+        "descrizione": "Permuta l'associazione ordine-classifica all'interno di ogni singola serata, preservando la struttura dei ranghi. Questo è il test corretto perché rispetta la non-indipendenza e testa direttamente se la specifica associazione ordine-classifica osservata è distinguibile dal caso.",
+        "n_permutazioni": 5000,
+        "n_serate": 35,
+        "rho_globale_osservato": 0.156311,
+        "p_globale": 0.0,
+        "mean_abs_rho_per_serata_osservato": 0.2586,
+        "p_within_serata": 0.003,
+        "significativo_globale": true,
+        "significativo_within": true,
+        "interpretazione": "Permutation test intra-serata: p_globale=0.000, p_within=0.003. Si rileva un pattern non casuale, ma la dimensione dell'effetto (rho=0.156) resta trascurabile."
+      },
+      "bayes_factor": {
+        "test": "Bayes Factor (BF01) per correlazione",
+        "descrizione": "A differenza dei test frequentisti, il Bayes Factor quantifica l'evidenza A FAVORE dell'ipotesi nulla (nessun effetto). BF01 > 3 = evidenza moderata che l'effetto non esiste. BF01 > 10 = evidenza forte.",
+        "n": 740,
+        "rho": 0.156311,
+        "BF01": 0.0,
+        "log_BF01": -6.52,
+        "interpretazione_scala_jeffreys": "evidenza forte per l'alternativa",
+        "interpretazione": "BF01 = 0.0: evidenza forte per l'alternativa. I dati suggeriscono una correlazione, ma di dimensione trascurabile."
       },
       "correzione_test_multipli": {
         "n_test": 99,
@@ -24472,6 +24839,119 @@
           }
         }
       },
+      "sensibilita_centro_estremi": {
+        "descrizione": "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse definizioni di soglia per verificare che il risultato non dipenda dalla scelta arbitraria dei decili.",
+        "n_definizioni_testate": 4,
+        "n_significative": 4,
+        "robusto": true,
+        "dettaglio": [
+          {
+            "definizione": "D4-D7 vs D1-D3+D8-D10 (30-70%)",
+            "n_centro": 181,
+            "n_estremi": 297,
+            "media_centro": 10.939,
+            "media_estremi": 13.724,
+            "U": 21370.5,
+            "p_value": 0.000168,
+            "rank_biserial_r": 0.2049,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D7 vs D1-D2+D8-D10 (20-70%)",
+            "n_centro": 229,
+            "n_estremi": 249,
+            "media_centro": 10.699,
+            "media_estremi": 14.482,
+            "U": 20583.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.278,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D8 vs D1-D2+D9-D10 (20-80%)",
+            "n_centro": 279,
+            "n_estremi": 199,
+            "media_centro": 11.057,
+            "media_estremi": 14.93,
+            "U": 19832.0,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.2856,
+            "significativo": true
+          },
+          {
+            "definizione": "D4-D8 vs D1-D3+D9-D10 (30-80%)",
+            "n_centro": 231,
+            "n_estremi": 247,
+            "media_centro": 11.32,
+            "media_estremi": 13.931,
+            "U": 23019.0,
+            "p_value": 0.000259,
+            "rank_biserial_r": 0.1931,
+            "significativo": true
+          }
+        ]
+      },
+      "spearman_cluster_bootstrap": {
+        "rho_osservato": 0.233248,
+        "ci_lower": 0.1369,
+        "ci_upper": 0.3255,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 21,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      },
+      "tost_spearman": {
+        "test": "TOST (Two One-Sided Tests) per equivalenza",
+        "descrizione": "Verifica se la correlazione è trascurabile (|rho| < 0.1). A differenza dei test classici che cercano un effetto, il TOST dimostra che l'effetto è abbastanza piccolo da essere irrilevante.",
+        "n": 478,
+        "rho": 0.233248,
+        "sesoi": 0.1,
+        "p_tost": 0.998615,
+        "p_lower": 0.0,
+        "p_upper": 0.998615,
+        "equivalente": false,
+        "ci_90": [
+          0.1607,
+          0.3033
+        ],
+        "ci_dentro_sesoi": false,
+        "interpretazione": "Equivalenza non dimostrata (p=0.9986). L'effetto non è abbastanza piccolo da escludere rilevanza con soglia 0.1."
+      },
+      "tost_r2": {
+        "test": "Test di equivalenza per R²",
+        "descrizione": "Verifica se l'R² osservato è sotto la soglia di rilevanza pratica (soglia: R² < 4%, equivalente a 'effetto trascurabile' secondo Cohen).",
+        "R2_osservato": 0.1515,
+        "soglia_R2": 0.04,
+        "f2_osservato": 0.1785,
+        "f2_soglia": 0.0417,
+        "p_equivalenza": 0.999996,
+        "trascurabile": false,
+        "interpretazione": "Non si può dimostrare che R²=15.1% sia sotto la soglia del 4%."
+      },
+      "permutation_intra_serata": {
+        "test": "Permutation test intra-serata",
+        "descrizione": "Permuta l'associazione ordine-classifica all'interno di ogni singola serata, preservando la struttura dei ranghi. Questo è il test corretto perché rispetta la non-indipendenza e testa direttamente se la specifica associazione ordine-classifica osservata è distinguibile dal caso.",
+        "n_permutazioni": 5000,
+        "n_serate": 21,
+        "rho_globale_osservato": 0.233248,
+        "p_globale": 0.0,
+        "mean_abs_rho_per_serata_osservato": 0.2784,
+        "p_within_serata": 0.001,
+        "significativo_globale": true,
+        "significativo_within": true,
+        "interpretazione": "Permutation test intra-serata: p_globale=0.000, p_within=0.001. Si rileva un pattern non casuale, ma la dimensione dell'effetto (rho=0.233) resta trascurabile."
+      },
+      "bayes_factor": {
+        "test": "Bayes Factor (BF01) per correlazione",
+        "descrizione": "A differenza dei test frequentisti, il Bayes Factor quantifica l'evidenza A FAVORE dell'ipotesi nulla (nessun effetto). BF01 > 3 = evidenza moderata che l'effetto non esiste. BF01 > 10 = evidenza forte.",
+        "n": 478,
+        "rho": 0.233248,
+        "BF01": 0.0,
+        "log_BF01": -10.92,
+        "interpretazione_scala_jeffreys": "evidenza forte per l'alternativa",
+        "interpretazione": "BF01 = 0.0: evidenza forte per l'alternativa. I dati suggeriscono una correlazione, ma di dimensione trascurabile."
+      },
       "correzione_test_multipli": {
         "n_test": 71,
         "n_sig_raw": 26,
@@ -28397,5 +28877,138 @@
         "significativo": true
       }
     }
-  }
+  },
+  "limiti_metodologici": [
+    {
+      "id": "non_indipendenza",
+      "titolo": "Non indipendenza delle osservazioni intra-serata",
+      "severita": "alta",
+      "descrizione": "Ogni serata è una competizione chiusa: le classifiche sono ranghi interni. Se un artista sale, un altro scende. Questo genera dipendenza strutturale tra osservazioni della stessa serata. I test standard (Spearman, KW, MW) assumono indipendenza e possono gonfiare la significatività.",
+      "mitigazione": "Si è aggiunto un cluster bootstrap che ricampiona intere serate come unità. Questo rispetta la struttura di dipendenza intra-serata.",
+      "cluster_bootstrap_complessiva": {
+        "rho_osservato": 0.156311,
+        "ci_lower": 0.0744,
+        "ci_upper": 0.2312,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 35,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      },
+      "cluster_bootstrap_televoto": {
+        "rho_osservato": 0.233248,
+        "ci_lower": 0.1369,
+        "ci_upper": 0.3255,
+        "ci_level": 0.95,
+        "include_zero": false,
+        "n_cluster": 21,
+        "n_bootstrap": 2000,
+        "interpretazione": "CI del cluster bootstrap NON include lo zero: l'effetto sopravvive alla correzione per dipendenza intra-serata."
+      }
+    },
+    {
+      "id": "assenza_modello_gerarchico",
+      "titolo": "Assenza di modellazione multilevel",
+      "severita": "media",
+      "descrizione": "I dati hanno struttura gerarchica (edizione → serata → artista → posizione) ma l'analisi usa pooled regression globale. L'effetto dell'ordine potrebbe variare per anno, sistema di voto e numero di artisti. Senza un modello a effetti misti si rischia Simpson's paradox o effetti spurii aggregati.",
+      "mitigazione": "Si forniscono analisi stratificate per anno e per serata, e si confronta il risultato pooled con il meta-test di Fisher per serata. Un modello gerarchico formale (es. lmer in R) sarebbe il passo successivo.",
+      "confronto_pooled_vs_serata": {
+        "fisher_complessiva": {
+          "statistic": 88.4249,
+          "dof": 70,
+          "n_tests": 35,
+          "p_value": 0.067643,
+          "significativo": false
+        },
+        "fisher_televoto": {
+          "statistic": 58.9506,
+          "dof": 42,
+          "n_tests": 21,
+          "p_value": 0.042966,
+          "significativo": true
+        },
+        "spiegazione": "Il test pooled globale trova significatività perché aggrega 740 osservazioni, aumentando la potenza statistica. Il meta-test per serata (Fisher) non è significativo perché ogni singola serata ha pochi artisti (10-30) e quindi bassa potenza. Inoltre, l'eterogeneità tra serate e anni diluisce l'effetto aggregato. Questa discrepanza non invalida l'effetto, ma indica che è debole e inconsistente tra le singole serate."
+      }
+    },
+    {
+      "id": "ordine_non_casuale",
+      "titolo": "L'ordine di esibizione non è randomizzato",
+      "severita": "alta",
+      "descrizione": "L'ordine di esibizione a Sanremo non è assegnato casualmente. Potrebbe essere correlato con notorietà dell'artista, ritmo televisivo, genere musicale o decisioni della produzione RAI. Se l'ordine è correlato con la qualità attesa o la fama, l'effetto osservato potrebbe riflettere selezione, non causalità.",
+      "mitigazione": "Questa analisi stima un'associazione, non un effetto causale. La distinzione è esplicitata nelle conclusioni. Per stabilire causalità servirebbe un disegno sperimentale con ordine randomizzato, che non è praticabile nel contesto di Sanremo."
+    },
+    {
+      "id": "natura_esplorativa",
+      "titolo": "Analisi esplorativa con molti test",
+      "severita": "media",
+      "descrizione": "Si eseguono molti test senza ipotesi pre-registrate. Anche con correzione FDR l'analisi resta altamente esplorativa. I risultati significativi dopo FDR vanno interpretati come pattern da confermare, non come verifiche ipotetico-deduttive.",
+      "mitigazione": "Si applica la correzione FDR (Benjamini-Hochberg) e si riporta il numero di test totali vs significativi. Si usa anche il permutation test ML come verifica indipendente. L'analisi è dichiaratamente esplorativa."
+    },
+    {
+      "id": "ranghi_come_cardinali",
+      "titolo": "Trattamento dei ranghi come variabile quasi-continua",
+      "severita": "bassa",
+      "descrizione": "La classifica è un rango discreto con distribuzione vincolata (1 a N), non una variabile continua. Media, R² e regressione su ranghi hanno interpretazione meno diretta che su variabili cardinali.",
+      "mitigazione": "Si usano principalmente test non parametrici (Spearman, KW, MW) che operano sui ranghi nativamente. La normalizzazione rank/(N-1) rende i valori comparabili tra serate di dimensioni diverse. L'R² va interpretato come misura relativa, non come proporzione di varianza 'reale' spiegata."
+    },
+    {
+      "id": "soglia_centro_estremi",
+      "titolo": "Definizione arbitraria di centro vs estremi",
+      "severita": "bassa",
+      "descrizione": "La scelta di quali decili costituiscono il 'centro' e gli 'estremi' è discrezionale e può amplificare o ridurre il pattern osservato.",
+      "mitigazione": "Si è aggiunta un'analisi di sensibilità che testa 4 diverse definizioni di soglia per verificare la robustezza dell'effetto.",
+      "sensibilita": {
+        "descrizione": "Analisi di sensibilità: si testa l'effetto centro-vs-estremi con diverse definizioni di soglia per verificare che il risultato non dipenda dalla scelta arbitraria dei decili.",
+        "n_definizioni_testate": 4,
+        "n_significative": 4,
+        "robusto": true,
+        "dettaglio": [
+          {
+            "definizione": "D4-D7 vs D1-D3+D8-D10 (30-70%)",
+            "n_centro": 283,
+            "n_estremi": 457,
+            "media_centro": 10.272,
+            "media_estremi": 13.595,
+            "U": 48691.0,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.247,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D7 vs D1-D2+D8-D10 (20-70%)",
+            "n_centro": 353,
+            "n_estremi": 387,
+            "media_centro": 10.136,
+            "media_estremi": 14.32,
+            "U": 46766.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.3153,
+            "significativo": true
+          },
+          {
+            "definizione": "D3-D8 vs D1-D2+D9-D10 (20-80%)",
+            "n_centro": 427,
+            "n_estremi": 313,
+            "media_centro": 10.756,
+            "media_estremi": 14.463,
+            "U": 48132.5,
+            "p_value": 0.0,
+            "rank_biserial_r": 0.2797,
+            "significativo": true
+          },
+          {
+            "definizione": "D4-D8 vs D1-D3+D9-D10 (30-80%)",
+            "n_centro": 357,
+            "n_estremi": 383,
+            "media_centro": 10.986,
+            "media_estremi": 13.572,
+            "U": 55237.0,
+            "p_value": 6e-06,
+            "rank_biserial_r": 0.192,
+            "significativo": true
+          }
+        ]
+      }
+    }
+  ]
 }
