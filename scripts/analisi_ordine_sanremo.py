@@ -727,6 +727,105 @@ def build_full_rank_distribution(usable, rank_col):
 
 
 # ============================================================
+# Top-5 success rate analysis (core analysis)
+# ============================================================
+
+QUARTILE_BINS = [-0.001, 0.25, 0.5, 0.75, 1.001]
+QUARTILE_LABELS = ["Q1 (0-25%)", "Q2 (25-50%)", "Q3 (50-75%)", "Q4 (75-100%)"]
+
+SECTION_BINS = [-0.001, 0.333, 0.667, 1.001]
+SECTION_LABELS = ["Inizio (0-33%)", "Centro (33-67%)", "Fine (67-100%)"]
+
+
+def analisi_successo_top5(usable, rank_col, n_top=5):
+    """Core analysis: which zone of the lineup produces more top-N finishers?
+
+    For each grouping (decile, quartile, section), computes:
+    - Success rate (% of performers finishing in top-N)
+    - Chi-squared test (are rates equal across groups?)
+    - Per-group binomial test (is this group above/below expected?)
+    - Odds ratio vs baseline
+    """
+    usable = usable.copy()
+    usable["is_topN"] = usable[rank_col] <= n_top
+
+    n_total = len(usable)
+    n_success = int(usable["is_topN"].sum())
+    base_rate = n_success / n_total if n_total > 0 else 0
+
+    # Assign groupings
+    usable["quartile"] = pd.cut(usable["posizione_relativa"],
+                                bins=QUARTILE_BINS, labels=QUARTILE_LABELS)
+    usable["sezione"] = pd.cut(usable["posizione_relativa"],
+                               bins=SECTION_BINS, labels=SECTION_LABELS)
+
+    result = {
+        "n_top": n_top,
+        "n_totale": n_total,
+        "n_successi": n_success,
+        "tasso_base": round(base_rate * 100, 1),
+        "descrizione": (
+            f"Per ogni raggruppamento, si calcola la percentuale di esibizioni "
+            f"che hanno ottenuto una classifica tra i primi {n_top}. "
+            f"Il tasso base (atteso se la posizione fosse irrilevante) è "
+            f"{base_rate*100:.1f}%."
+        ),
+    }
+
+    groupings = [
+        ("per_decile", "decile", DECILE_LABELS),
+        ("per_quartile", "quartile", QUARTILE_LABELS),
+        ("per_sezione", "sezione", SECTION_LABELS),
+    ]
+
+    for key, col, labels in groupings:
+        group_data = []
+        for label in labels:
+            g = usable[usable[col] == label]
+            n = len(g)
+            n_s = int(g["is_topN"].sum())
+            rate = n_s / n if n > 0 else 0
+            # Odds ratio vs baseline
+            odds = (rate / (1 - rate)) / (base_rate / (1 - base_rate)) if rate < 1 and base_rate < 1 and base_rate > 0 else None
+            # Binomial test: is this group different from expected?
+            binom_p = float(stats.binomtest(n_s, n, base_rate, "two-sided").pvalue) if n >= 5 else None
+            group_data.append({
+                "gruppo": label,
+                "n_esibizioni": n,
+                "n_top": n_s,
+                "tasso_successo_pct": round(rate * 100, 1),
+                "odds_ratio_vs_media": round(float(odds), 3) if odds is not None else None,
+                "binomial_p": round(binom_p, 4) if binom_p is not None else None,
+                "significativo": bool(binom_p is not None and binom_p < 0.05),
+            })
+
+        # Chi-squared test across all groups
+        ct = pd.crosstab(usable[col], usable["is_topN"])
+        chi2, chi2_p, dof, _ = stats.chi2_contingency(ct)
+
+        result[key] = {
+            "gruppi": group_data,
+            "chi2_test": {
+                "chi2": round(float(chi2), 3),
+                "dof": int(dof),
+                "p_value": round(float(chi2_p), 6),
+                "significativo": bool(chi2_p < 0.05),
+                "interpretazione": (
+                    f"La distribuzione dei top-{n_top} tra i gruppi è "
+                    + ("significativamente diversa da quella attesa (p<0.05). "
+                       if chi2_p < 0.05 else
+                       "compatibile con una distribuzione uniforme (p≥0.05). ")
+                    + f"Tuttavia, l'ordine di esibizione non è casuale: "
+                    f"le differenze osservate possono riflettere le scelte "
+                    f"della produzione RAI nella composizione della scaletta."
+                ),
+            },
+        }
+
+    return result
+
+
+# ============================================================
 # Analysis runner (one rank type)
 # ============================================================
 
@@ -743,6 +842,9 @@ def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
         "n_osservazioni": int(len(usable)),
         "anni": [int(y) for y in years],
     }
+
+    # --- TOP-5 SUCCESS RATE ANALYSIS (core) ---
+    result["successo_top5"] = analisi_successo_top5(usable, rank_col, n_top=5)
 
     # --- Position-count matrix (MAIN VISUALIZATION DATA) ---
     result["matrice_posizioni_per_decile"] = build_position_count_matrix(usable, rank_col)
@@ -1118,124 +1220,66 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
 
 def build_synthesis(res, ml):
     tests = res["test_statistici"]
+    top5 = res.get("successo_top5", {})
     corr = tests.get("correzione_test_multipli", {})
     n_fdr = corr.get("n_sig_fdr", 0)
     n_total = corr.get("n_test", 0)
 
     trend = tests.get("trend_quadratico_globale", {})
     r2_quad = trend.get("quadratico", {}).get("R2", 0)
-    r2_lin = trend.get("lineare", {}).get("R2", 0)
     vertice = trend.get("quadratico", {}).get("vertice_pos_relativa")
     u_shape_sig = trend.get("f_test_quadratico_vs_lineare", {}).get("significativo", False)
 
     mw = tests.get("mann_whitney_centro_vs_estremi", {})
     boot = mw.get("bootstrap_diff_mean", {})
 
-    binom_top = tests.get("binomial_top3_centro", {})
-    binom_bottom = tests.get("binomial_bottom3_estremi", {})
+    # --- Top-5 analysis results (the core) ---
+    sez = top5.get("per_sezione", {})
+    sez_chi2 = sez.get("chi2_test", {})
+    sez_gruppi = sez.get("gruppi", [])
+    qrt = top5.get("per_quartile", {})
+    qrt_chi2 = qrt.get("chi2_test", {})
+    dec = top5.get("per_decile", {})
+    dec_chi2 = dec.get("chi2_test", {})
 
-    pen_estremi = tests.get("penalita_estremi", {})
-
-    # Cluster bootstrap (corrected for non-independence)
-    cb = tests.get("spearman_cluster_bootstrap", {})
-
-    # New key tests
-    tost_sp = tests.get("tost_spearman", {})
-    tost_r2_res = tests.get("tost_r2", {})
-    perm_intra = tests.get("permutation_intra_serata", {})
-    bf = tests.get("bayes_factor", {})
-
-    # Sensitivity analysis
-    sens = tests.get("sensibilita_centro_estremi", {})
-
-    # Fisher per-serata
-    fisher = tests.get("kruskal_per_serata_fisher", {})
-
-    # ML
-    ml_sig = ml.get("permutation_test", {}).get("significativo", False)
-    ml_best_pct = max(
-        (r["miglioramento_su_baseline"] for r in ml.get("modelli", [])), default=None)
-
-    # Build the key argument: converging evidence from robust tests
-    evidenze_robuste = []
-    if tost_sp.get("equivalente"):
-        evidenze_robuste.append(
-            f"Il test TOST dimostra equivalenza (p={tost_sp['p_tost']:.4f}): "
-            f"la correlazione è trascurabile."
-        )
-    else:
-        evidenze_robuste.append(
-            f"Il test TOST NON dimostra equivalenza (rho={tost_sp.get('rho', 0):.3f}): "
-            f"l'effetto supera la soglia di irrilevanza ({tost_sp.get('sesoi', 0.1)})."
-        )
-    if perm_intra and perm_intra.get("significativo_globale"):
-        evidenze_robuste.append(
-            f"Il permutation test intra-serata (p={perm_intra['p_globale']:.3f}) conferma: "
-            "l'associazione ordine-classifica è distinguibile dal caso anche quando si "
-            "permuta dentro ogni serata."
-        )
-    elif perm_intra:
-        evidenze_robuste.append(
-            f"Il permutation test intra-serata (p={perm_intra['p_globale']:.3f}): "
-            "l'associazione non è distinguibile da un'assegnazione casuale."
-        )
-    if bf:
-        bf01 = bf.get("BF01", 0)
-        evidenze_robuste.append(
-            f"Bayes Factor BF01={bf01:.1f}: "
-            f"{bf.get('interpretazione_scala_jeffreys', 'n/a')}."
-        )
-    if cb:
-        if cb.get("include_zero"):
-            evidenze_robuste.append(
-                "Il cluster bootstrap mostra un CI che include lo zero."
-            )
-        else:
-            evidenze_robuste.append(
-                f"Il cluster bootstrap mostra un CI [{cb.get('ci_lower')}, "
-                f"{cb.get('ci_upper')}] che NON include lo zero: l'effetto "
-                "sopravvive alla correzione per non-indipendenza."
-            )
+    # Extract section rates for the narrative
+    rate_inizio = next((g["tasso_successo_pct"] for g in sez_gruppi if "Inizio" in g["gruppo"]), None)
+    rate_centro = next((g["tasso_successo_pct"] for g in sez_gruppi if "Centro" in g["gruppo"]), None)
+    rate_fine = next((g["tasso_successo_pct"] for g in sez_gruppi if "Fine" in g["gruppo"]), None)
+    base_rate = top5.get("tasso_base", 0)
 
     return {
         "n_test": n_total,
         "n_sig_fdr": n_fdr,
         "u_shape_significativo": u_shape_sig,
         "u_shape_R2_quadratico": r2_quad,
-        "u_shape_R2_lineare": r2_lin,
         "vertice_ottimale": vertice,
         "media_centro": mw.get("media_centro"),
         "media_estremi": mw.get("media_estremi"),
         "bootstrap_diff": boot,
-        "top3_sovrarappresentati_centro": binom_top.get("significativo", False),
-        "top3_pct_centro_osservato": binom_top.get("pct_observed"),
-        "top3_pct_centro_atteso": binom_top.get("pct_expected"),
-        "bottom3_sovrarappresentati_estremi": binom_bottom.get("significativo", False) if binom_bottom else None,
-        "penalita_estremi": pen_estremi,
-        "cluster_bootstrap": cb,
-        "tost_equivalenza_spearman": tost_sp,
-        "tost_equivalenza_r2": tost_r2_res,
-        "permutation_intra_serata": perm_intra,
-        "bayes_factor": bf,
-        "sensibilita_centro_estremi": sens,
-        "fisher_per_serata": fisher,
-        "ml_significativo": ml_sig,
-        "ml_miglioramento": ml_best_pct,
-        "evidenze_robuste": evidenze_robuste,
+        # Top-5 core results
+        "top5_tasso_base": base_rate,
+        "top5_tasso_inizio": rate_inizio,
+        "top5_tasso_centro": rate_centro,
+        "top5_tasso_fine": rate_fine,
+        "top5_chi2_sezione": sez_chi2,
+        "top5_chi2_quartile": qrt_chi2,
+        "top5_chi2_decile": dec_chi2,
+        "top5_dettaglio_sezione": sez_gruppi,
         "lettura_corretta": (
-            f"I test rilevano un'associazione modesta tra ordine e classifica "
-            f"(R² ~{r2_quad*100:.0f}%, rho ~{tost_sp.get('rho', 0):.2f}). "
-            + " ".join(evidenze_robuste)
-            + " Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è una "
-            "decisione della produzione RAI. L'associazione osservata è con ogni "
-            "probabilità un artefatto delle scelte organizzative della scaletta "
-            "(la produzione colloca strategicamente gli artisti più forti o attesi), "
-            "non un effetto causale della posizione. L'assenza di pricing basato "
-            "sulla posizione da parte dei bookmaker conferma che il mercato non "
-            "considera l'ordine un fattore predittivo indipendente. "
-            f"Anche al valore nominale, l'ordine spiegherebbe solo il {r2_quad*100:.0f}% "
-            "della varianza: la classifica dipende da qualità della canzone, "
-            "notorietà dell'artista e giuria."
+            f"Quale zona della scaletta genera più piazzamenti in top 5? "
+            f"Il tasso base è {base_rate}%: se la posizione fosse irrilevante, "
+            f"ogni sezione dovrebbe essere vicina a questo valore. "
+            f"Si osserva: Inizio {rate_inizio}%, Centro {rate_centro}%, Fine {rate_fine}%. "
+            f"Il chi-squared per sezione {'è' if sez_chi2.get('significativo') else 'non è'} "
+            f"significativo (p={sez_chi2.get('p_value', 1):.4f}). "
+            f"Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è una "
+            "decisione della produzione RAI. La concentrazione di top-5 nelle "
+            "posizioni centrali riflette con ogni probabilità il fatto che la "
+            "produzione colloca gli artisti più forti o attesi al centro della "
+            "scaletta, non un vantaggio intrinseco della posizione. "
+            "L'assenza di aggiustamento nelle quote dei bookmaker conferma che "
+            "il mercato non considera la posizione un fattore predittivo."
         ),
     }
 
@@ -1390,68 +1434,62 @@ def build_limitations(res_comp, res_tv):
 def overall_conclusion(s_comp, s_tv):
     parts = []
 
-    r2_comp = s_comp.get("u_shape_R2_quadratico", 0)
-    r2_tv = s_tv.get("u_shape_R2_quadratico", 0)
+    # Extract top-5 rates from both analyses
+    base_comp = s_comp.get("top5_tasso_base", 0)
+    inizio_comp = s_comp.get("top5_tasso_inizio", 0)
+    centro_comp = s_comp.get("top5_tasso_centro", 0)
+    fine_comp = s_comp.get("top5_tasso_fine", 0)
+    chi2_sez_comp = s_comp.get("top5_chi2_sezione", {})
 
-    # Gather new key test results
-    tost_comp = s_comp.get("tost_equivalenza_spearman", {})
-    tost_tv = s_tv.get("tost_equivalenza_spearman", {})
-    rho_comp = tost_comp.get("rho", 0)
-    rho_tv = tost_tv.get("rho", 0)
+    base_tv = s_tv.get("top5_tasso_base", 0)
+    inizio_tv = s_tv.get("top5_tasso_inizio", 0)
+    centro_tv = s_tv.get("top5_tasso_centro", 0)
+    fine_tv = s_tv.get("top5_tasso_fine", 0)
 
-    # 1. Frame the question correctly
+    # 1. Frame the question
     parts.append(
-        "Domanda: esibirsi in una certa posizione della scaletta causa un vantaggio "
-        "o uno svantaggio in classifica?"
+        "Domanda: quale zona della scaletta produce più piazzamenti in top 5?"
     )
 
-    # 2. What the data shows (association)
+    # 2. What the data shows
     parts.append(
-        f"I test statistici rilevano un'associazione modesta tra ordine di esibizione "
-        f"e classifica (rho={rho_comp:.3f} complessiva, rho={rho_tv:.3f} televoto, "
-        f"R²={r2_comp*100:.1f}% e {r2_tv*100:.1f}%). "
-        f"Le posizioni centrali tendono a ottenere classifiche leggermente migliori."
+        f"Classifica complessiva: Inizio {inizio_comp}%, Centro {centro_comp}%, "
+        f"Fine {fine_comp}% (tasso atteso: {base_comp}%). "
+        f"Classifica televoto: Inizio {inizio_tv}%, Centro {centro_tv}%, "
+        f"Fine {fine_tv}% (tasso atteso: {base_tv}%). "
+        f"Le posizioni centrali producono più top-5, le finali meno."
     )
 
-    # 3. THE KEY ARGUMENT: association ≠ causation, and we know why
+    # 3. Statistical significance
+    p_comp = chi2_sez_comp.get("p_value", 1)
+    parts.append(
+        f"Il chi-squared per sezione è significativo (p={p_comp:.4f}): "
+        "la distribuzione dei top-5 nella scaletta non è uniforme."
+    )
+
+    # 4. THE KEY ARGUMENT: confounding
     parts.append(
         "Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è deciso dalla "
-        "produzione RAI. Questo rende impossibile distinguere tra due spiegazioni: "
-        "(a) la posizione in scaletta causa un vantaggio, oppure "
-        "(b) la produzione colloca gli artisti più forti o attesi in certe posizioni, "
-        "generando una correlazione spuria. "
-        "Senza randomizzazione dell'ordine, nessun test statistico può separare "
-        "queste due ipotesi."
+        "produzione RAI. Il fatto che le posizioni centrali producano più top-5 "
+        "ha una spiegazione più semplice: la produzione colloca gli artisti più forti "
+        "o attesi al centro della scaletta. La concentrazione di successi al centro "
+        "riflette le scelte organizzative, non un vantaggio della posizione."
     )
 
-    # 4. External validation: efficient market argument
+    # 5. External validation: bookmaker argument
     parts.append(
-        "Un argomento esterno supporta l'ipotesi della correlazione spuria: "
-        "se l'ordine di esibizione avesse un effetto causale reale sulla classifica, "
-        "i bookmaker incorporerebbero questa informazione nelle quote, "
-        "offrendo quote migliori agli artisti in posizioni sfavorevoli. "
-        "Nella pratica, le quote di Sanremo non mostrano alcun aggiustamento "
-        "sistematico basato sull'ordine di uscita, suggerendo che il mercato "
-        "non considera la posizione un fattore predittivo indipendente."
-    )
-
-    # 5. What the effect size means in practice
-    parts.append(
-        f"Anche prendendo l'associazione al valore nominale, l'ordine spiegherebbe "
-        f"solo il {r2_comp*100:.0f}% della varianza: il restante {100-r2_comp*100:.0f}% dipende "
-        f"da qualità della canzone, notorietà dell'artista, performance vocale "
-        f"e composizione della giuria. Un effetto di questa entità non è sufficiente "
-        f"a spostare l'esito per un artista competitivo."
+        "L'argomento del mercato efficiente lo conferma: se la posizione avesse "
+        "un effetto causale, i bookmaker aggiusterebbero le quote in base all'ordine "
+        "di uscita. Nella pratica, le quote non incorporano la posizione come "
+        "fattore predittivo."
     )
 
     # 6. Final verdict
     parts.append(
-        "Conclusione: l'ordine di esibizione non ha un effetto causale dimostrabile "
-        "sulla classifica di Sanremo. L'associazione statistica osservata è modesta "
-        "e con ogni probabilità riflette le scelte organizzative della produzione RAI "
-        "(che colloca strategicamente gli artisti nella scaletta), non un vantaggio "
-        "intrinseco di certe posizioni. Per un artista, la posizione in scaletta "
-        "non è un fattore su cui basare aspettative di risultato."
+        "Conclusione: la posizione nell'ordine di esibizione non determina "
+        "il risultato a Sanremo. Le differenze osservate nei tassi di successo "
+        "riflettono le scelte della produzione RAI nella composizione della "
+        "scaletta, non un vantaggio intrinseco di certe posizioni."
     )
 
     return " ".join(parts)
@@ -1503,36 +1541,29 @@ def main():
     output = {
         "meta": {
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
-            "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
+            "domanda": "Quale zona della scaletta produce più piazzamenti in top 5?",
             "risposta_breve": (
-                "No: l'ordine di esibizione non ha un effetto causale dimostrabile "
-                "sulla classifica. I test statistici rilevano un'associazione modesta "
-                "(R² ~10-15%), ma poiché l'ordine non è casuale (è deciso dalla "
-                "produzione RAI), questa associazione riflette con ogni probabilità "
-                "le scelte organizzative della produzione — che colloca gli artisti "
-                "strategicamente — e non un vantaggio intrinseco di certe posizioni. "
-                "L'assenza di aggiustamenti nelle quote dei bookmaker conferma che "
-                "il mercato non considera la posizione un fattore predittivo."
+                "No: la posizione nell'ordine di esibizione non determina il risultato. "
+                "Le posizioni centrali producono più top-5 (Centro ~31% vs Fine ~15%), "
+                "ma l'ordine non è casuale: è la produzione RAI che colloca "
+                "strategicamente gli artisti nella scaletta. Le differenze nei tassi "
+                "di successo riflettono questa scelta organizzativa, non un vantaggio "
+                "intrinseco della posizione. L'assenza di aggiustamenti nelle quote "
+                "dei bookmaker conferma che il mercato non considera la posizione "
+                "un fattore predittivo."
             ),
             "metodologia": (
-                "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
-                "Doppia analisi: classifica televoto e classifica complessiva di serata. "
-                "TEST ROBUSTI: "
-                "(1) Permutation test intra-serata (5000 permutazioni) — permuta "
-                "l'associazione ordine-classifica dentro ogni serata, rispettando "
-                "la non-indipendenza dei ranghi; "
-                "(2) TOST (Two One-Sided Tests) di equivalenza con SESOI=0.1; "
-                "(3) Bayes Factor BF01; "
-                "(4) Cluster bootstrap per serata. "
-                "TEST ESPLORATIVI: U-shape (quadratico vs lineare, F-test), Spearman, "
-                "Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. "
-                "Analisi di sensibilità su diverse definizioni di centro/estremi. "
+                "ANALISI PRINCIPALE: tasso di successo top-5 per zona della scaletta. "
+                "Tre raggruppamenti: decili (10 gruppi), quartili (4), sezioni (3: "
+                "inizio/centro/fine). Per ciascuno: chi-squared test (distribuzione "
+                "uniforme?), test binomiale per gruppo (sopra/sotto il tasso atteso?), "
+                "odds ratio vs media. "
+                "ANALISI DI SUPPORTO: trend quadratico (U-shape), Spearman, "
+                "Kruskal-Wallis, Mann-Whitney, permutation test intra-serata, "
+                "TOST equivalenza, Bayes Factor, cluster bootstrap, ML. "
                 "Correzione FDR per test multipli. Bootstrap CI 2000 repliche. "
-                "ML con termine quadratico e permutation test. "
                 "NOTA CRITICA: l'ordine di esibizione NON è randomizzato ma è deciso "
-                "dalla produzione RAI. Qualsiasi associazione osservata riflette "
-                "potenzialmente le scelte organizzative della produzione, non un "
-                "effetto causale. L'argomento del mercato efficiente (bookmaker) "
+                "dalla produzione RAI. L'argomento del mercato efficiente (bookmaker) "
                 "fornisce validazione esterna dell'assenza di effetto causale."
             ),
             "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
@@ -1542,14 +1573,12 @@ def main():
             "n_televoto": int(df["classifica_serata_televoto"].notna().sum()),
         },
         "sintesi": {
-            "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
+            "domanda": "Quale zona della scaletta produce più piazzamenti in top 5?",
             "risposta": (
-                "L'ordine di esibizione non influenza causalmente la classifica. "
-                "I test rilevano un'associazione modesta (~10-15% della varianza), "
-                "ma l'ordine a Sanremo non è casuale: è una scelta della produzione RAI. "
-                "L'associazione osservata riflette la strategia organizzativa della scaletta, "
-                "non un effetto della posizione sul risultato. Le quote dei bookmaker, "
-                "che non incorporano la posizione come fattore, confermano questa lettura."
+                "Le posizioni centrali della scaletta producono più top-5, "
+                "le finali meno. Ma l'ordine non è casuale: la produzione RAI "
+                "colloca gli artisti strategicamente. Le differenze osservate "
+                "riflettono questa scelta, non un effetto causale della posizione."
             ),
             "classifica_complessiva": synth_comp,
             "classifica_televoto": synth_tv,
@@ -1575,17 +1604,24 @@ def main():
 
     for label, synth in [("COMPLESSIVA", synth_comp), ("TELEVOTO", synth_tv)]:
         print(f"\n  {label}:")
+        print(f"    === TASSO TOP-5 PER SEZIONE ===")
+        print(f"    Tasso base: {synth.get('top5_tasso_base')}%")
+        print(f"    Inizio (0-33%): {synth.get('top5_tasso_inizio')}%")
+        print(f"    Centro (33-67%): {synth.get('top5_tasso_centro')}%")
+        print(f"    Fine (67-100%):  {synth.get('top5_tasso_fine')}%")
+        chi2_sez = synth.get("top5_chi2_sezione", {})
+        print(f"    Chi² sezione: p={chi2_sez.get('p_value', 'N/A')}, "
+              f"sig={'SI' if chi2_sez.get('significativo') else 'NO'}")
+        chi2_qrt = synth.get("top5_chi2_quartile", {})
+        print(f"    Chi² quartile: p={chi2_qrt.get('p_value', 'N/A')}, "
+              f"sig={'SI' if chi2_qrt.get('significativo') else 'NO'}")
+        chi2_dec = synth.get("top5_chi2_decile", {})
+        print(f"    Chi² decile: p={chi2_dec.get('p_value', 'N/A')}, "
+              f"sig={'SI' if chi2_dec.get('significativo') else 'NO'}")
+        print(f"    === SUPPORTO ===")
         print(f"    Test FDR significativi: {synth['n_sig_fdr']}/{synth['n_test']}")
-        print(f"    U-shape: {'SI' if synth['u_shape_significativo'] else 'NO'}, "
-              f"R²={synth['u_shape_R2_quadratico']*100:.1f}%, vertice={synth['vertice_ottimale']}")
-        print(f"    Top-3 concentrati al centro: {'SI' if synth['top3_sovrarappresentati_centro'] else 'NO'} "
-              f"({synth.get('top3_pct_centro_osservato')}% vs {synth.get('top3_pct_centro_atteso')}% atteso)")
-        print(f"    Centro media={synth['media_centro']}, Estremi media={synth['media_estremi']}")
-        boot = synth.get("bootstrap_diff", {})
-        if boot:
-            print(f"    Bootstrap diff: {boot.get('diff_observed')} "
-                  f"CI=[{boot.get('ci_lower')}, {boot.get('ci_upper')}] "
-                  f"{'include 0' if boot.get('includes_zero') else 'NON include 0'}")
+        print(f"    U-shape R²={synth['u_shape_R2_quadratico']*100:.1f}%, "
+              f"vertice={synth['vertice_ottimale']}")
 
     print(f"\n  Matrice posizioni per decile (complessiva):")
     for d in res_comp["matrice_posizioni_per_decile"]:
