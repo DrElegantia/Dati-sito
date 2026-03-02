@@ -3,7 +3,8 @@
 Sanremo Festival — Build dashboard JSON for the website.
 
 Reads:
-  - dati_sremo/sanremo_verified_data.json  (rankings, serate, performances)
+  - dati_sremo/sanremo_dati_serate.xlsx    (primary: ordine, classifiche per serata)
+  - dati_sremo/sanremo_verified_data.json  (metadata: edition, dates, host, winner)
   - dati_sremo/SanremoRai/*.json           (tweet timestamps)
 
 Writes:
@@ -19,16 +20,50 @@ import os
 import re
 from datetime import datetime
 
+import numpy as np
+import pandas as pd
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "dati_sremo")
 TWEET_DIR = os.path.join(DATA_DIR, "SanremoRai")
 VERIFIED_JSON = os.path.join(DATA_DIR, "sanremo_verified_data.json")
+XLSX_PATH = os.path.join(DATA_DIR, "sanremo_dati_serate.xlsx")
 OUTPUT_JSON = os.path.join(BASE_DIR, "docs", "sanremo_dashboard.json")
 
 
 def load_verified():
     with open(VERIFIED_JSON, "r", encoding="utf-8") as f:
         return json.load(f)
+
+
+def load_xlsx():
+    """Load the Excel dataset with performance/ranking data per serata."""
+    df = pd.read_excel(XLSX_PATH)
+    # Fix shifted rows (Shablo con Guè, Joshua e Tormento)
+    unnamed_col = next((c for c in df.columns if "Unnamed" in str(c)), None)
+    for i in df.index:
+        try:
+            int(df.at[i, "ordine"])
+        except (ValueError, TypeError):
+            suffix = str(df.at[i, "ordine"]).strip()
+            df.at[i, "artist"] = str(df.at[i, "artist"]) + ", " + suffix
+            df.at[i, "ordine"] = df.at[i, "totale_serata"]
+            df.at[i, "totale_serata"] = df.at[i, "classifica_serata_televoto"]
+            df.at[i, "classifica_serata_televoto"] = df.at[i, "classifica_serata_complessiva"]
+            df.at[i, "classifica_serata_complessiva"] = (
+                df.at[i, unnamed_col] if unnamed_col else np.nan
+            )
+    # Fix Sarah Toscano 2025 serata 5
+    for i in df.index:
+        if (df.at[i, "year"] == 2025 and df.at[i, "serata"] == 5
+                and "Sarah" in str(df.at[i, "artist"])
+                and pd.isna(df.at[i, "classifica_serata_complessiva"])):
+            df.at[i, "classifica_serata_complessiva"] = 20
+    df = df.drop(columns=[c for c in df.columns if "Unnamed" in str(c)], errors="ignore")
+    df["ordine"] = pd.to_numeric(df["ordine"], errors="coerce")
+    df["totale_serata"] = pd.to_numeric(df["totale_serata"], errors="coerce")
+    df = df.dropna(subset=["ordine", "totale_serata"])
+    return df
 
 
 def parse_tweets():
@@ -70,7 +105,7 @@ def time_to_minutes(time_str):
     return (h - 20) * 60 + m
 
 
-def build_dashboard(verified, tweets):
+def build_dashboard(verified, tweets, xlsx_df):
     """Build the complete dashboard JSON object."""
 
     # --- meta ---
@@ -141,45 +176,27 @@ def build_dashboard(verified, tweets):
                 "song": r["song"],
             })
 
-    # --- performances (all serate, flat list with computed fields) ---
+    # --- performances (from Excel: primary source for ordine and rankings) ---
     performances = []
-    for y in years:
-        ed = verified[y]
-        rank_map = {}
-        for r in ed.get("rankings", []):
-            rank_map[r["artist"].lower().strip()] = r["rank"]
-
-        for sk, sdata in ed.get("serate", {}).items():
-            n = sdata["num_performers"]
-            for perf in sdata["performances"]:
-                order = perf["order"]
-                time_str = perf.get("time")
-                minutes = time_to_minutes(time_str)
-                rel_pos = round((order - 1) / max(n - 1, 1), 4)
-
-                # Try to find rank
-                artist_lower = perf["artist"].lower().strip()
-                rank = rank_map.get(artist_lower)
-                if rank is None:
-                    for rk, rv in rank_map.items():
-                        if artist_lower in rk or rk in artist_lower:
-                            rank = rv
-                            break
-
-                performances.append({
-                    "year": int(y),
-                    "serata": int(sk),
-                    "serata_name": sdata["name"],
-                    "serata_date": sdata["date"],
-                    "artist": perf["artist"],
-                    "performance_order": order,
-                    "total_in_serata": n,
-                    "relative_position": rel_pos,
-                    "time": time_str,
-                    "minutes_since_2000": minutes,
-                    "has_exact_time": time_str is not None,
-                    "final_rank": rank,
-                })
+    for _, row in xlsx_df.iterrows():
+        y = int(row["year"])
+        s = int(row["serata"])
+        n = int(row["totale_serata"])
+        order = int(row["ordine"])
+        rel_pos = round((order - 1) / max(n - 1, 1), 4)
+        rank_tv = int(row["classifica_serata_televoto"]) if pd.notna(row.get("classifica_serata_televoto")) else None
+        rank_comp = int(row["classifica_serata_complessiva"]) if pd.notna(row.get("classifica_serata_complessiva")) else None
+        performances.append({
+            "year": y,
+            "serata": s,
+            "serata_name": row["serata_name"],
+            "artist": row["artist"],
+            "performance_order": order,
+            "total_in_serata": n,
+            "relative_position": rel_pos,
+            "classifica_serata_televoto": rank_tv,
+            "classifica_serata_complessiva": rank_comp,
+        })
 
     # --- tweet_activity (tweets per year, per type) ---
     tweet_counts = {}
@@ -252,12 +269,16 @@ def main():
     verified = load_verified()
     print(f"  Anni: {list(verified.keys())}")
 
+    print("Caricamento Excel serate...")
+    xlsx_df = load_xlsx()
+    print(f"  Righe Excel: {len(xlsx_df)}")
+
     print("Parsing tweet...")
     tweets = parse_tweets()
     print(f"  Tweet totali: {len(tweets)}")
 
     print("Costruzione dashboard JSON...")
-    dashboard = build_dashboard(verified, tweets)
+    dashboard = build_dashboard(verified, tweets, xlsx_df)
 
     print(f"Scrittura {OUTPUT_JSON}...")
     os.makedirs(os.path.dirname(OUTPUT_JSON), exist_ok=True)
