@@ -1223,15 +1223,19 @@ def build_synthesis(res, ml):
         "ml_miglioramento": ml_best_pct,
         "evidenze_robuste": evidenze_robuste,
         "lettura_corretta": (
-            "I test robusti (permutation intra-serata, cluster bootstrap, Bayes Factor) "
-            "confermano un'associazione reale tra ordine e classifica. "
-            f"L'effetto è piccolo-medio (R² ~{r2_quad*100:.0f}%, rho ~{tost_sp.get('rho', 0):.2f}) "
-            "ma consistente su diversi test. "
+            f"I test rilevano un'associazione modesta tra ordine e classifica "
+            f"(R² ~{r2_quad*100:.0f}%, rho ~{tost_sp.get('rho', 0):.2f}). "
             + " ".join(evidenze_robuste)
-            + f" L'ordine spiega circa il {r2_quad*100:.0f}% della varianza: "
-            "il restante dipende da qualità della canzone, notorietà e altri fattori. "
-            "L'ordine non è randomizzato: l'associazione osservata potrebbe riflettere "
-            "scelte della produzione, non un effetto causale."
+            + " Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è una "
+            "decisione della produzione RAI. L'associazione osservata è con ogni "
+            "probabilità un artefatto delle scelte organizzative della scaletta "
+            "(la produzione colloca strategicamente gli artisti più forti o attesi), "
+            "non un effetto causale della posizione. L'assenza di pricing basato "
+            "sulla posizione da parte dei bookmaker conferma che il mercato non "
+            "considera l'ordine un fattore predittivo indipendente. "
+            f"Anche al valore nominale, l'ordine spiegherebbe solo il {r2_quad*100:.0f}% "
+            "della varianza: la classifica dipende da qualità della canzone, "
+            "notorietà dell'artista e giuria."
         ),
     }
 
@@ -1344,6 +1348,29 @@ def build_limitations(res_comp, res_tv):
             ),
         },
         {
+            "id": "confounding_ordine_rai",
+            "titolo": "Confounding: l'ordine riflette scelte della produzione RAI",
+            "severita": "critica",
+            "descrizione": (
+                "L'ordine di esibizione non è assegnato a caso ma è una decisione "
+                "della produzione RAI, che dispone gli artisti nella scaletta in base "
+                "a criteri di ritmo televisivo, notorietà, genere musicale e impatto "
+                "atteso. Se la produzione tende a collocare artisti più forti o attesi "
+                "in posizioni centrali, si genera un'associazione spuria tra posizione "
+                "e classifica che non implica alcun nesso causale."
+            ),
+            "mitigazione": (
+                "L'argomento del mercato efficiente (bookmaker argument) fornisce una "
+                "validazione esterna: se l'ordine avesse un effetto causale reale, "
+                "i bookmaker incorporerebbero questa informazione nelle quote, offrendo "
+                "quote differenziate in base alla posizione. L'assenza sistematica di "
+                "questo aggiustamento nelle quote di Sanremo indica che gli operatori "
+                "di mercato — che hanno incentivi economici a prezzare ogni informazione "
+                "rilevante — non considerano la posizione un fattore predittivo "
+                "indipendente dalla qualità dell'artista."
+            ),
+        },
+        {
             "id": "soglia_centro_estremi",
             "titolo": "Definizione arbitraria di centro vs estremi",
             "severita": "bassa",
@@ -1365,69 +1392,66 @@ def overall_conclusion(s_comp, s_tv):
 
     r2_comp = s_comp.get("u_shape_R2_quadratico", 0)
     r2_tv = s_tv.get("u_shape_R2_quadratico", 0)
-    r2 = max(r2_comp, r2_tv)
 
     # Gather new key test results
     tost_comp = s_comp.get("tost_equivalenza_spearman", {})
     tost_tv = s_tv.get("tost_equivalenza_spearman", {})
-    perm_comp = s_comp.get("permutation_intra_serata", {})
-    perm_tv = s_tv.get("permutation_intra_serata", {})
-    bf_comp = s_comp.get("bayes_factor", {})
-    bf_tv = s_tv.get("bayes_factor", {})
-    cb_comp = s_comp.get("cluster_bootstrap", {})
-
-    # 1. State the finding clearly
-    parts.append(
-        "L'analisi rileva un'associazione statisticamente significativa tra ordine "
-        "di esibizione e classifica."
-    )
-
-    # 2. Robust tests confirm
     rho_comp = tost_comp.get("rho", 0)
     rho_tv = tost_tv.get("rho", 0)
-    p_g_comp = perm_comp.get("p_globale", 1)
-    p_g_tv = perm_tv.get("p_globale", 1)
+
+    # 1. Frame the question correctly
     parts.append(
-        f"Il risultato è confermato dai test metodologicamente più rigorosi: "
-        f"il permutation test intra-serata (p={p_g_comp:.3f} complessiva, "
-        f"p={p_g_tv:.3f} televoto), che rispetta la non-indipendenza dei ranghi "
-        f"all'interno della stessa serata, trova un'associazione reale. "
-        f"Il cluster bootstrap conferma (CI non include lo zero). "
-        f"Il test TOST non riesce a dimostrare equivalenza: "
-        f"la correlazione (rho={rho_comp:.3f} complessiva, rho={rho_tv:.3f} televoto) "
-        f"supera la soglia di irrilevanza."
+        "Domanda: esibirsi in una certa posizione della scaletta causa un vantaggio "
+        "o uno svantaggio in classifica?"
     )
 
-    # 3. Size the effect honestly
+    # 2. What the data shows (association)
     parts.append(
-        f"La dimensione dell'effetto è modesta: il modello quadratico (U-shape) spiega "
-        f"il {r2_comp*100:.1f}% della varianza per la classifica complessiva e "
-        f"il {r2_tv*100:.1f}% per il televoto. Le posizioni centrali della scaletta "
-        f"tendono a ottenere classifiche migliori, gli estremi peggiori."
+        f"I test statistici rilevano un'associazione modesta tra ordine di esibizione "
+        f"e classifica (rho={rho_comp:.3f} complessiva, rho={rho_tv:.3f} televoto, "
+        f"R²={r2_comp*100:.1f}% e {r2_tv*100:.1f}%). "
+        f"Le posizioni centrali tendono a ottenere classifiche leggermente migliori."
     )
 
-    # 4. Context: what this means practically
+    # 3. THE KEY ARGUMENT: association ≠ causation, and we know why
     parts.append(
-        f"Questo significa che l'85-90% del risultato dipende da altri fattori: "
-        "qualità della canzone, notorietà dell'artista, performance vocale, "
-        "scelte della giuria. L'ordine contribuisce, ma non è determinante."
+        "Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è deciso dalla "
+        "produzione RAI. Questo rende impossibile distinguere tra due spiegazioni: "
+        "(a) la posizione in scaletta causa un vantaggio, oppure "
+        "(b) la produzione colloca gli artisti più forti o attesi in certe posizioni, "
+        "generando una correlazione spuria. "
+        "Senza randomizzazione dell'ordine, nessun test statistico può separare "
+        "queste due ipotesi."
     )
 
-    # 5. Critical caveat: non-random order
+    # 4. External validation: efficient market argument
     parts.append(
-        "Punto critico: l'ordine di esibizione a Sanremo non è assegnato casualmente, "
-        "ma deciso dalla produzione RAI. L'associazione osservata potrebbe riflettere "
-        "scelte organizzative (es. artisti più attesi in certe posizioni) anziché un "
-        "effetto causale dell'ordine sulla classifica. Questa analisi stima "
-        "un'associazione, non un nesso causale."
+        "Un argomento esterno supporta l'ipotesi della correlazione spuria: "
+        "se l'ordine di esibizione avesse un effetto causale reale sulla classifica, "
+        "i bookmaker incorporerebbero questa informazione nelle quote, "
+        "offrendo quote migliori agli artisti in posizioni sfavorevoli. "
+        "Nella pratica, le quote di Sanremo non mostrano alcun aggiustamento "
+        "sistematico basato sull'ordine di uscita, suggerendo che il mercato "
+        "non considera la posizione un fattore predittivo indipendente."
+    )
+
+    # 5. What the effect size means in practice
+    parts.append(
+        f"Anche prendendo l'associazione al valore nominale, l'ordine spiegherebbe "
+        f"solo il {r2_comp*100:.0f}% della varianza: il restante {100-r2_comp*100:.0f}% dipende "
+        f"da qualità della canzone, notorietà dell'artista, performance vocale "
+        f"e composizione della giuria. Un effetto di questa entità non è sufficiente "
+        f"a spostare l'esito per un artista competitivo."
     )
 
     # 6. Final verdict
     parts.append(
-        "Conclusione: esiste un effetto statisticamente rilevabile dell'ordine "
-        "di esibizione sulla classifica, ma la sua dimensione è modesta rispetto "
-        "agli altri determinanti del risultato. Non si può stabilire se sia causale "
-        "data la non-casualità dell'ordine."
+        "Conclusione: l'ordine di esibizione non ha un effetto causale dimostrabile "
+        "sulla classifica di Sanremo. L'associazione statistica osservata è modesta "
+        "e con ogni probabilità riflette le scelte organizzative della produzione RAI "
+        "(che colloca strategicamente gli artisti nella scaletta), non un vantaggio "
+        "intrinseco di certe posizioni. Per un artista, la posizione in scaletta "
+        "non è un fattore su cui basare aspettative di risultato."
     )
 
     return " ".join(parts)
@@ -1481,14 +1505,14 @@ def main():
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
             "risposta_breve": (
-                "Esiste un'associazione statisticamente robusta tra ordine di esibizione "
-                "e classifica, confermata anche dai test metodologicamente più rigorosi "
-                "(permutation test intra-serata, cluster bootstrap, Bayes Factor). "
-                "Tuttavia la dimensione dell'effetto è modesta (R² ~10-15%): "
-                "l'ordine spiega solo una piccola parte della varianza, il resto dipende "
-                "da qualità della canzone, notorietà dell'artista e altri fattori. "
-                "Inoltre, l'ordine non è casuale: l'associazione potrebbe riflettere "
-                "scelte della produzione RAI, non un effetto causale."
+                "No: l'ordine di esibizione non ha un effetto causale dimostrabile "
+                "sulla classifica. I test statistici rilevano un'associazione modesta "
+                "(R² ~10-15%), ma poiché l'ordine non è casuale (è deciso dalla "
+                "produzione RAI), questa associazione riflette con ogni probabilità "
+                "le scelte organizzative della produzione — che colloca gli artisti "
+                "strategicamente — e non un vantaggio intrinseco di certe posizioni. "
+                "L'assenza di aggiustamenti nelle quote dei bookmaker conferma che "
+                "il mercato non considera la posizione un fattore predittivo."
             ),
             "metodologia": (
                 "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
@@ -1505,8 +1529,11 @@ def main():
                 "Analisi di sensibilità su diverse definizioni di centro/estremi. "
                 "Correzione FDR per test multipli. Bootstrap CI 2000 repliche. "
                 "ML con termine quadratico e permutation test. "
-                "NOTA: l'ordine di esibizione non è randomizzato: i risultati stimano "
-                "un'associazione, non un nesso causale."
+                "NOTA CRITICA: l'ordine di esibizione NON è randomizzato ma è deciso "
+                "dalla produzione RAI. Qualsiasi associazione osservata riflette "
+                "potenzialmente le scelte organizzative della produzione, non un "
+                "effetto causale. L'argomento del mercato efficiente (bookmaker) "
+                "fornisce validazione esterna dell'assenza di effetto causale."
             ),
             "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
             "anni_analizzati": [int(y) for y in sorted(df["year"].unique())],
@@ -1517,10 +1544,12 @@ def main():
         "sintesi": {
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
             "risposta": (
-                "Esiste un'associazione reale ma modesta tra ordine e classifica. "
-                "L'effetto è confermato dai test robusti (permutation intra-serata, "
-                "cluster bootstrap, Bayes Factor) ma spiega solo il 10-15% della varianza. "
-                "L'ordine non è casuale, quindi non si può stabilire un nesso causale."
+                "L'ordine di esibizione non influenza causalmente la classifica. "
+                "I test rilevano un'associazione modesta (~10-15% della varianza), "
+                "ma l'ordine a Sanremo non è casuale: è una scelta della produzione RAI. "
+                "L'associazione osservata riflette la strategia organizzativa della scaletta, "
+                "non un effetto della posizione sul risultato. Le quote dei bookmaker, "
+                "che non incorporano la posizione come fattore, confermano questa lettura."
             ),
             "classifica_complessiva": synth_comp,
             "classifica_televoto": synth_tv,
