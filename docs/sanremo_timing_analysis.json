@@ -41,7 +41,7 @@
       "top3_pct_centro_atteso": 48.2,
       "bottom3_sovrarappresentati_estremi": true,
       "penalita_estremi": {
-        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo, top5, bottom5) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici. Se il centro avvantaggiasse, i top5 dovrebbero concentrarsi nei decili centrali.",
         "posizioni": {
           "primo": {
             "totale": 34,
@@ -312,6 +312,96 @@
                 "pct": 17.6
               }
             }
+          },
+          "top5": {
+            "totale": 170,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 10,
+                "pct": 5.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 13,
+                "pct": 7.6
+              },
+              "D3 (20-30%)": {
+                "conteggio": 27,
+                "pct": 15.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 22,
+                "pct": 12.9
+              },
+              "D5 (40-50%)": {
+                "conteggio": 28,
+                "pct": 16.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 22,
+                "pct": 12.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 13,
+                "pct": 7.6
+              },
+              "D8 (70-80%)": {
+                "conteggio": 16,
+                "pct": 9.4
+              },
+              "D9 (80-90%)": {
+                "conteggio": 9,
+                "pct": 5.3
+              },
+              "D10 (90-100%)": {
+                "conteggio": 10,
+                "pct": 5.9
+              }
+            }
+          },
+          "bottom5": {
+            "totale": 182,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 30,
+                "pct": 16.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 17,
+                "pct": 9.3
+              },
+              "D3 (20-30%)": {
+                "conteggio": 9,
+                "pct": 4.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 8,
+                "pct": 4.4
+              },
+              "D5 (40-50%)": {
+                "conteggio": 10,
+                "pct": 5.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 12,
+                "pct": 6.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 10,
+                "pct": 5.5
+              },
+              "D8 (70-80%)": {
+                "conteggio": 21,
+                "pct": 11.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 29,
+                "pct": 15.9
+              },
+              "D10 (90-100%)": {
+                "conteggio": 36,
+                "pct": 19.8
+              }
+            }
           }
         }
       },
@@ -339,7 +429,7 @@
       "top3_pct_centro_atteso": 48.3,
       "bottom3_sovrarappresentati_estremi": true,
       "penalita_estremi": {
-        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo, top5, bottom5) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici. Se il centro avvantaggiasse, i top5 dovrebbero concentrarsi nei decili centrali.",
         "posizioni": {
           "primo": {
             "totale": 21,
@@ -608,6 +698,96 @@
               "D10 (90-100%)": {
                 "conteggio": 6,
                 "pct": 28.6
+              }
+            }
+          },
+          "top5": {
+            "totale": 105,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D2 (10-20%)": {
+                "conteggio": 12,
+                "pct": 11.4
+              },
+              "D3 (20-30%)": {
+                "conteggio": 15,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 11,
+                "pct": 10.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 17,
+                "pct": 16.2
+              },
+              "D6 (50-60%)": {
+                "conteggio": 16,
+                "pct": 15.2
+              },
+              "D7 (60-70%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 13,
+                "pct": 12.4
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 3.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              }
+            }
+          },
+          "bottom5": {
+            "totale": 105,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 12,
+                "pct": 11.4
+              },
+              "D2 (10-20%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 2.9
+              },
+              "D5 (40-50%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D6 (50-60%)": {
+                "conteggio": 8,
+                "pct": 7.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 11,
+                "pct": 10.5
+              },
+              "D8 (70-80%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D9 (80-90%)": {
+                "conteggio": 18,
+                "pct": 17.1
+              },
+              "D10 (90-100%)": {
+                "conteggio": 27,
+                "pct": 25.7
               }
             }
           }
@@ -10691,7 +10871,7 @@
         "significativo": true
       },
       "penalita_estremi": {
-        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo, top5, bottom5) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici. Se il centro avvantaggiasse, i top5 dovrebbero concentrarsi nei decili centrali.",
         "posizioni": {
           "primo": {
             "totale": 34,
@@ -10960,6 +11140,96 @@
               "D10 (90-100%)": {
                 "conteggio": 6,
                 "pct": 17.6
+              }
+            }
+          },
+          "top5": {
+            "totale": 170,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 10,
+                "pct": 5.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 13,
+                "pct": 7.6
+              },
+              "D3 (20-30%)": {
+                "conteggio": 27,
+                "pct": 15.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 22,
+                "pct": 12.9
+              },
+              "D5 (40-50%)": {
+                "conteggio": 28,
+                "pct": 16.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 22,
+                "pct": 12.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 13,
+                "pct": 7.6
+              },
+              "D8 (70-80%)": {
+                "conteggio": 16,
+                "pct": 9.4
+              },
+              "D9 (80-90%)": {
+                "conteggio": 9,
+                "pct": 5.3
+              },
+              "D10 (90-100%)": {
+                "conteggio": 10,
+                "pct": 5.9
+              }
+            }
+          },
+          "bottom5": {
+            "totale": 182,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 30,
+                "pct": 16.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 17,
+                "pct": 9.3
+              },
+              "D3 (20-30%)": {
+                "conteggio": 9,
+                "pct": 4.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 8,
+                "pct": 4.4
+              },
+              "D5 (40-50%)": {
+                "conteggio": 10,
+                "pct": 5.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 12,
+                "pct": 6.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 10,
+                "pct": 5.5
+              },
+              "D8 (70-80%)": {
+                "conteggio": 21,
+                "pct": 11.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 29,
+                "pct": 15.9
+              },
+              "D10 (90-100%)": {
+                "conteggio": 36,
+                "pct": 19.8
               }
             }
           }
@@ -23838,7 +24108,7 @@
         "significativo": true
       },
       "penalita_estremi": {
-        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo, top5, bottom5) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici. Se il centro avvantaggiasse, i top5 dovrebbero concentrarsi nei decili centrali.",
         "posizioni": {
           "primo": {
             "totale": 21,
@@ -24107,6 +24377,96 @@
               "D10 (90-100%)": {
                 "conteggio": 6,
                 "pct": 28.6
+              }
+            }
+          },
+          "top5": {
+            "totale": 105,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D2 (10-20%)": {
+                "conteggio": 12,
+                "pct": 11.4
+              },
+              "D3 (20-30%)": {
+                "conteggio": 15,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 11,
+                "pct": 10.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 17,
+                "pct": 16.2
+              },
+              "D6 (50-60%)": {
+                "conteggio": 16,
+                "pct": 15.2
+              },
+              "D7 (60-70%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 13,
+                "pct": 12.4
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 3.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              }
+            }
+          },
+          "bottom5": {
+            "totale": 105,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 12,
+                "pct": 11.4
+              },
+              "D2 (10-20%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 2.9
+              },
+              "D5 (40-50%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D6 (50-60%)": {
+                "conteggio": 8,
+                "pct": 7.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 11,
+                "pct": 10.5
+              },
+              "D8 (70-80%)": {
+                "conteggio": 7,
+                "pct": 6.7
+              },
+              "D9 (80-90%)": {
+                "conteggio": 18,
+                "pct": 17.1
+              },
+              "D10 (90-100%)": {
+                "conteggio": 27,
+                "pct": 25.7
               }
             }
           }

@@ -603,11 +603,31 @@ def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
                 "pct": round(count / total_in_rank * 100, 1),
             }
         pen_data[rank_label_pos] = {"totale": total_in_rank, "per_decile": dist}
+
+    # Top-5 and bottom-5 grouped analysis
+    for group_label, group_filter in [
+        ("top5", lambda r, _t: r <= 5),
+        ("bottom5", lambda r, t: r > t - 5),
+    ]:
+        subset = usable[usable.apply(lambda row: group_filter(row[rank_col], row["totale_serata"]), axis=1)]
+        total_in_group = len(subset)
+        if total_in_group == 0:
+            continue
+        dist = {}
+        for d in DECILE_LABELS:
+            count = int((subset["decile"] == d).sum())
+            dist[d] = {
+                "conteggio": count,
+                "pct": round(count / total_in_group * 100, 1),
+            }
+        pen_data[group_label] = {"totale": total_in_group, "per_decile": dist}
+
     tests["penalita_estremi"] = {
         "descrizione": (
             "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, "
-            "penultimo, ultimo) nei decili dell'ordine di esibizione. "
-            "Permette di verificare se una posizione in classifica si concentra in decili specifici."
+            "penultimo, ultimo, top5, bottom5) nei decili dell'ordine di esibizione. "
+            "Permette di verificare se una posizione in classifica si concentra in decili specifici. "
+            "Se il centro avvantaggiasse, i top5 dovrebbero concentrarsi nei decili centrali."
         ),
         "posizioni": pen_data,
     }
