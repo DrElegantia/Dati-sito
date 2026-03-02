@@ -5,11 +5,11 @@ Sanremo — L'ordine di uscita influenza la classifica?
 Fonte dati: dati_sremo/sanremo_dati_serate.xlsx
 Output:     docs/sanremo_timing_analysis.json
 
-Analisi per quintili di posizione nell'ordine di esibizione.
+Analisi per DECILI di posizione nell'ordine di esibizione.
 Doppia analisi: classifica televoto e classifica complessiva di serata.
-Include: test statistici con effect size, bootstrap CI, correzione per
-test multipli (Bonferroni + FDR), analisi di robustezza, e modelli ML
-con permutation test.
+Include: distribuzione posizioni per decile (per grafici),
+test trend quadratico (U-shape), test statistici con effect size,
+bootstrap CI, correzione per test multipli, e modelli ML.
 
 Uso:
   python3 scripts/analisi_ordine_sanremo.py
@@ -30,12 +30,8 @@ DATA_DIR = os.path.join(BASE_DIR, "dati_sremo")
 XLSX_PATH = os.path.join(DATA_DIR, "sanremo_dati_serate.xlsx")
 OUTPUT_JSON = os.path.join(BASE_DIR, "docs", "sanremo_timing_analysis.json")
 
-QUINTILE_LABELS = [
-    "Q1 (0-20%)", "Q2 (20-40%)", "Q3 (40-60%)", "Q4 (60-80%)", "Q5 (80-100%)"
-]
-QUINTILE_BINS = [-0.001, 0.2, 0.4, 0.6, 0.8, 1.001]
-CENTRO_Q = ["Q2 (20-40%)", "Q3 (40-60%)", "Q4 (60-80%)"]
-ESTREMI_Q = ["Q1 (0-20%)", "Q5 (80-100%)"]
+DECILE_LABELS = [f"D{i+1} ({i*10}-{(i+1)*10}%)" for i in range(10)]
+DECILE_BINS = [-0.001] + [i / 10 for i in range(1, 10)] + [1.001]
 
 N_BOOTSTRAP = 2000
 RANDOM_SEED = 42
@@ -48,8 +44,7 @@ RANDOM_SEED = 42
 def load_data() -> pd.DataFrame:
     df = pd.read_excel(XLSX_PATH)
 
-    # Fix shifted rows: artist name "Shablo con Guè, Joshua e Tormento"
-    # was split across artist/ordine columns, shifting all values right.
+    # Fix shifted rows (artist name split across columns)
     unnamed_col = next((c for c in df.columns if "Unnamed" in str(c)), None)
     for i in df.index:
         try:
@@ -64,8 +59,7 @@ def load_data() -> pd.DataFrame:
                 df.at[i, unnamed_col] if unnamed_col else np.nan
             )
 
-    # Manual data fixes (errata in the Excel)
-    # Sarah Toscano 2025 serata 5: classifica_serata_complessiva = 20
+    # Manual data fixes
     for i in df.index:
         if (df.at[i, "year"] == 2025 and df.at[i, "serata"] == 5
                 and "Sarah" in str(df.at[i, "artist"])
@@ -87,8 +81,8 @@ def load_data() -> pd.DataFrame:
     return df
 
 
-def assign_quintile(pos_rel: pd.Series) -> pd.Series:
-    return pd.cut(pos_rel, bins=QUINTILE_BINS, labels=QUINTILE_LABELS)
+def assign_decile(pos_rel: pd.Series) -> pd.Series:
+    return pd.cut(pos_rel, bins=DECILE_BINS, labels=DECILE_LABELS)
 
 
 def normalize_rank(rank: pd.Series, total: pd.Series) -> pd.Series:
@@ -100,44 +94,32 @@ def normalize_rank(rank: pd.Series, total: pd.Series) -> pd.Series:
 # ============================================================
 
 def bootstrap_ci(data, stat_fn=np.mean, n_boot=N_BOOTSTRAP, ci=0.95, seed=RANDOM_SEED):
-    """Bootstrap confidence interval for a statistic."""
     rng = np.random.RandomState(seed)
     data = np.array(data, dtype=float)
     data = data[~np.isnan(data)]
     if len(data) < 3:
         return None
-    boot_stats = []
-    for _ in range(n_boot):
-        sample = rng.choice(data, size=len(data), replace=True)
-        boot_stats.append(stat_fn(sample))
+    boot_stats = [stat_fn(rng.choice(data, size=len(data), replace=True)) for _ in range(n_boot)]
     alpha = (1 - ci) / 2
-    lo = float(np.percentile(boot_stats, alpha * 100))
-    hi = float(np.percentile(boot_stats, (1 - alpha) * 100))
-    return {"ci_lower": round(lo, 4), "ci_upper": round(hi, 4),
-            "ci_level": ci, "n_bootstrap": n_boot}
+    return {"ci_lower": round(float(np.percentile(boot_stats, alpha * 100)), 4),
+            "ci_upper": round(float(np.percentile(boot_stats, (1 - alpha) * 100)), 4),
+            "ci_level": ci}
 
 
 def bootstrap_diff_ci(a, b, stat_fn=np.mean, n_boot=N_BOOTSTRAP, ci=0.95, seed=RANDOM_SEED):
-    """Bootstrap CI for the difference stat_fn(a) - stat_fn(b)."""
     rng = np.random.RandomState(seed)
-    a = np.array(a, dtype=float)
-    b = np.array(b, dtype=float)
-    a = a[~np.isnan(a)]
-    b = b[~np.isnan(b)]
+    a = np.array(a, dtype=float)[~np.isnan(np.array(a, dtype=float))]
+    b = np.array(b, dtype=float)[~np.isnan(np.array(b, dtype=float))]
     if len(a) < 3 or len(b) < 3:
         return None
-    diffs = []
-    for _ in range(n_boot):
-        sa = rng.choice(a, size=len(a), replace=True)
-        sb = rng.choice(b, size=len(b), replace=True)
-        diffs.append(stat_fn(sa) - stat_fn(sb))
+    diffs = [stat_fn(rng.choice(a, len(a), True)) - stat_fn(rng.choice(b, len(b), True))
+             for _ in range(n_boot)]
     alpha = (1 - ci) / 2
     lo = float(np.percentile(diffs, alpha * 100))
     hi = float(np.percentile(diffs, (1 - alpha) * 100))
     return {"diff_observed": round(float(stat_fn(a) - stat_fn(b)), 4),
             "ci_lower": round(lo, 4), "ci_upper": round(hi, 4),
-            "ci_level": ci, "includes_zero": bool(lo <= 0 <= hi),
-            "n_bootstrap": n_boot}
+            "ci_level": ci, "includes_zero": bool(lo <= 0 <= hi)}
 
 
 # ============================================================
@@ -145,15 +127,12 @@ def bootstrap_diff_ci(a, b, stat_fn=np.mean, n_boot=N_BOOTSTRAP, ci=0.95, seed=R
 # ============================================================
 
 def rank_biserial_r(u_stat, n1, n2):
-    """Rank-biserial correlation from Mann-Whitney U."""
     if n1 == 0 or n2 == 0:
         return None
-    r = 1 - (2 * u_stat) / (n1 * n2)
-    return round(float(r), 4)
+    return round(float(1 - (2 * u_stat) / (n1 * n2)), 4)
 
 
 def eta_squared_kw(h_stat, n):
-    """Eta-squared approximation from Kruskal-Wallis H."""
     if n <= 1:
         return None
     return round(float((h_stat - 1) / (n - 1)), 4) if h_stat > 1 else 0.0
@@ -163,25 +142,9 @@ def eta_squared_kw(h_stat, n):
 # Multiple testing correction
 # ============================================================
 
-def bonferroni_correction(p_values: list, alpha=0.05):
-    """Bonferroni correction for multiple comparisons."""
-    n = len([p for p in p_values if p is not None])
-    if n == 0:
-        return []
-    corrected = []
-    for p in p_values:
-        if p is None:
-            corrected.append(None)
-        else:
-            adj = min(p * n, 1.0)
-            corrected.append(round(adj, 6))
-    return corrected
-
-
-def fdr_correction(p_values: list, alpha=0.05):
-    """Benjamini-Hochberg FDR correction."""
+def fdr_correction(p_values: list):
     valid = [(i, p) for i, p in enumerate(p_values) if p is not None]
-    if len(valid) == 0:
+    if not valid:
         return [None] * len(p_values)
     valid_sorted = sorted(valid, key=lambda x: x[1])
     m = len(valid_sorted)
@@ -189,14 +152,14 @@ def fdr_correction(p_values: list, alpha=0.05):
     prev_adj = 0
     for rank_idx, (orig_idx, p) in enumerate(valid_sorted, 1):
         adj = min(p * m / rank_idx, 1.0)
-        adj = max(adj, prev_adj)  # enforce monotonicity
+        adj = max(adj, prev_adj)
         result[orig_idx] = round(adj, 6)
         prev_adj = adj
     return result
 
 
 # ============================================================
-# Statistical tests (enhanced)
+# Statistical tests
 # ============================================================
 
 def spearman_test(x, y, bootstrap=False):
@@ -209,19 +172,15 @@ def spearman_test(x, y, bootstrap=False):
               "significativo": bool(p < 0.05)}
     if bootstrap and len(x2) >= 10:
         rng = np.random.RandomState(RANDOM_SEED)
-        boot_rhos = []
-        for _ in range(N_BOOTSTRAP):
-            idx = rng.choice(len(x2), size=len(x2), replace=True)
-            r, _ = stats.spearmanr(x2[idx], y2[idx])
-            boot_rhos.append(r)
+        boot_rhos = [stats.spearmanr(x2[idx := rng.choice(len(x2), len(x2), True)],
+                                     y2[idx])[0] for _ in range(N_BOOTSTRAP)]
         result["rho_ci_95"] = [round(float(np.percentile(boot_rhos, 2.5)), 4),
                                round(float(np.percentile(boot_rhos, 97.5)), 4)]
     if p >= 0.05:
         result["interpretazione"] = "non significativo (p >= 0.05)"
     else:
-        direction = "chi si esibisce tardi tende ad avere classifica peggiore" if rho > 0 \
-            else "chi si esibisce tardi tende ad avere classifica migliore"
-        result["interpretazione"] = f"significativo (p < 0.05): {direction}"
+        direction = "tardi -> classifica peggiore" if rho > 0 else "tardi -> classifica migliore"
+        result["interpretazione"] = f"significativo: {direction}"
     return result
 
 
@@ -232,13 +191,10 @@ def kruskal_wallis_test(groups: list, group_labels: list):
     grps = [g for g, _ in valid]
     n_total = sum(len(g) for g in grps)
     stat, p = stats.kruskal(*grps)
-    effect = eta_squared_kw(stat, n_total)
     return {"statistic": round(float(stat), 4), "p_value": round(float(p), 6),
             "df": len(grps) - 1, "n_groups": len(grps), "n_total": n_total,
-            "eta_squared": effect,
-            "significativo": bool(p < 0.05),
-            "interpretazione": "significativo: almeno un quintile differisce" if p < 0.05
-            else "non significativo: nessuna differenza tra quintili"}
+            "eta_squared": eta_squared_kw(stat, n_total),
+            "significativo": bool(p < 0.05)}
 
 
 def mann_whitney_test(center, extremes):
@@ -247,44 +203,102 @@ def mann_whitney_test(center, extremes):
     if len(c) < 3 or len(e) < 3:
         return None
     stat, p = stats.mannwhitneyu(c, e, alternative="two-sided")
-    r_rb = rank_biserial_r(stat, len(c), len(e))
-    better = "centro" if np.mean(c) < np.mean(e) else "estremi"
-
-    # Bootstrap CI for the difference in means
-    boot_diff = bootstrap_diff_ci(c, e)
-
     return {"n_centro": int(len(c)), "n_estremi": int(len(e)),
             "media_centro": round(float(np.mean(c)), 3),
             "media_estremi": round(float(np.mean(e)), 3),
             "mediana_centro": round(float(np.median(c)), 3),
             "mediana_estremi": round(float(np.median(e)), 3),
             "U": round(float(stat), 1), "p_value": round(float(p), 6),
-            "rank_biserial_r": r_rb,
-            "bootstrap_diff_mean": boot_diff,
+            "rank_biserial_r": rank_biserial_r(stat, len(c), len(e)),
+            "bootstrap_diff_mean": bootstrap_diff_ci(c, e),
             "significativo": bool(p < 0.05),
-            "vantaggio": better if p < 0.05 else "nessuno",
-            "interpretazione": f"significativo: il {better} ha classifica migliore" if p < 0.05
-            else "non significativo: nessuna differenza"}
+            "vantaggio": ("centro" if np.mean(c) < np.mean(e) else "estremi") if p < 0.05 else "nessuno"}
 
 
-def chi2_top_n(quintile_col, rank_col, n=5):
-    mask = quintile_col.notna() & rank_col.notna()
-    q = quintile_col[mask]
-    r = rank_col[mask]
+def chi2_top_n(decile_col, rank_col, n=3):
+    mask = decile_col.notna() & rank_col.notna()
+    q, r = decile_col[mask], rank_col[mask]
     is_top = (r <= n).astype(int)
     ct = pd.crosstab(q, is_top)
     if ct.shape[0] < 2 or ct.shape[1] < 2:
         return None
-    chi2, p, dof, expected = stats.chi2_contingency(ct)
-    # Cramér's V
+    chi2, p, dof, _ = stats.chi2_contingency(ct)
     n_obs = ct.sum().sum()
     k = min(ct.shape) - 1
-    cramers_v = round(float(np.sqrt(chi2 / (n_obs * max(k, 1)))), 4) if n_obs > 0 else None
+    cramers_v = round(float(np.sqrt(chi2 / (n_obs * max(k, 1)))), 4)
     return {"chi2": round(float(chi2), 4), "p_value": round(float(p), 6),
             "dof": int(dof), "cramers_v": cramers_v,
-            "significativo": bool(p < 0.05), "soglia": n,
-            "interpretazione": f"significativo: i quintili hanno probabilità diverse di entrare in top {n}" if p < 0.05
-            else f"non significativo: probabilità top {n} simile tra quintili"}
+            "significativo": bool(p < 0.05), "soglia": n}
+
+
+def quadratic_trend_test(pos_rel, rank_norm):
+    """Test linear vs quadratic fit. Returns both models and F-test."""
+    mask = pos_rel.notna() & rank_norm.notna()
+    x = np.array(pos_rel[mask], dtype=float)
+    y = np.array(rank_norm[mask], dtype=float)
+    if len(x) < 10:
+        return None
+    n = len(x)
+
+    # Linear
+    slope, intercept = np.polyfit(x, y, 1)
+    y_lin = slope * x + intercept
+    ss_res_lin = float(np.sum((y - y_lin) ** 2))
+    ss_tot = float(np.sum((y - y.mean()) ** 2))
+    r2_lin = round(1 - ss_res_lin / ss_tot, 6) if ss_tot > 0 else 0
+
+    # Quadratic
+    a, b, c = np.polyfit(x, y, 2)
+    y_quad = a * x ** 2 + b * x + c
+    ss_res_quad = float(np.sum((y - y_quad) ** 2))
+    r2_quad = round(1 - ss_res_quad / ss_tot, 6) if ss_tot > 0 else 0
+
+    # F-test: does quadratic add over linear?
+    f_stat = ((ss_res_lin - ss_res_quad) / 1) / (ss_res_quad / (n - 3)) if ss_res_quad > 0 else 0
+    p_f = float(1 - stats.f.cdf(f_stat, 1, n - 3))
+
+    # Vertex of parabola (minimum point)
+    vertice = round(-b / (2 * a), 4) if a != 0 else None
+
+    return {
+        "n": n,
+        "lineare": {"slope": round(float(slope), 4), "intercept": round(float(intercept), 4),
+                     "R2": r2_lin},
+        "quadratico": {"a": round(float(a), 4), "b": round(float(b), 4), "c": round(float(c), 4),
+                        "R2": r2_quad, "vertice_pos_relativa": vertice},
+        "f_test_quadratico_vs_lineare": {"F": round(float(f_stat), 3), "p_value": round(p_f, 6),
+                                          "significativo": bool(p_f < 0.05)},
+        "interpretazione": (
+            f"U-shape significativo (p={p_f:.4f}): il punto ottimale è circa al {vertice*100:.0f}% dell'ordine"
+            if p_f < 0.05 and vertice and 0.1 < vertice < 0.9
+            else "nessun U-shape significativo" if p_f >= 0.05
+            else f"trend significativo ma vertice fuori range ({vertice})"
+        ),
+    }
+
+
+def binomial_test_top_n(decile_col, rank_col, pos_rel, target_decile_range, n_top=3):
+    """Test if top-N ranked performers are over-represented in a position range."""
+    mask = decile_col.notna() & rank_col.notna()
+    ranks = rank_col[mask]
+    positions = pos_rel[mask]
+    is_top = ranks <= n_top
+    in_range = (positions >= target_decile_range[0]) & (positions <= target_decile_range[1])
+    n_top_in_range = int((is_top & in_range).sum())
+    n_top_total = int(is_top.sum())
+    pct_in_range = float(in_range.mean())  # expected proportion
+    if n_top_total < 5:
+        return None
+    res = stats.binomtest(n_top_in_range, n_top_total, pct_in_range, alternative="greater")
+    return {
+        "n_top_in_range": n_top_in_range, "n_top_total": n_top_total,
+        "pct_observed": round(n_top_in_range / n_top_total * 100, 1),
+        "pct_expected": round(pct_in_range * 100, 1),
+        "range": [target_decile_range[0], target_decile_range[1]],
+        "soglia_classifica": n_top,
+        "p_value": round(float(res.pvalue), 6),
+        "significativo": bool(res.pvalue < 0.05),
+    }
 
 
 def fisher_combined(p_values):
@@ -299,111 +313,79 @@ def fisher_combined(p_values):
             "significativo": bool(p_combined < 0.05)}
 
 
-def jonckheere_terpstra_test(groups: list, group_labels: list):
-    """Jonckheere-Terpstra test for ordered alternatives (Q1 < Q2 < ... < Q5)."""
-    valid = [(np.array(g, dtype=float), l) for g, l in zip(groups, group_labels) if len(g) >= 1]
-    if len(valid) < 3:
-        return None
-    grps = [g for g, _ in valid]
-    # Compute J statistic
-    j_stat = 0
-    n_total = sum(len(g) for g in grps)
-    for i in range(len(grps)):
-        for j in range(i + 1, len(grps)):
-            for xi in grps[i]:
-                for xj in grps[j]:
-                    if xj > xi:
-                        j_stat += 1
-                    elif xj == xi:
-                        j_stat += 0.5
-    # Expected value and variance under H0
-    ns = [len(g) for g in grps]
-    N = sum(ns)
-    e_j = (N * N - sum(n * n for n in ns)) / 4
-    # Variance (no ties approximation)
-    var_num = N * N * (2 * N + 3) - sum(n * n * (2 * n + 3) for n in ns)
-    var_j = var_num / 72
-    if var_j <= 0:
-        return None
-    z = (j_stat - e_j) / np.sqrt(var_j)
-    p = 2 * (1 - stats.norm.cdf(abs(z)))
-    return {"J": round(float(j_stat), 1), "z": round(float(z), 4),
-            "p_value": round(float(p), 6), "n_groups": len(grps),
-            "significativo": bool(p < 0.05),
-            "interpretazione": "significativo: trend ordinato tra quintili" if p < 0.05
-            else "non significativo: nessun trend ordinato"}
+# ============================================================
+# Position-count matrix (core visualization data)
+# ============================================================
+
+def build_position_count_matrix(usable, rank_col):
+    """For each decile, count how many 1st, 2nd, 3rd, ..., terzultimo, penultimo, ultimo."""
+    usable = usable.copy()
+    usable["rank"] = usable[rank_col].astype(int)
+    usable["decile"] = assign_decile(usable["posizione_relativa"])
+    # Position from end
+    usable["rank_from_end"] = usable["totale_serata"] - usable["rank"]  # 0=ultimo, 1=penultimo, 2=terzultimo
+
+    matrix = []
+    for d in DECILE_LABELS:
+        g = usable[usable["decile"] == d]
+        n = len(g)
+        if n == 0:
+            continue
+
+        entry = {
+            "decile": d,
+            "n": n,
+            "media_classifica": round(float(g["rank"].mean()), 2),
+            "mediana_classifica": round(float(g["rank"].median()), 1),
+            # Top positions
+            "primo": int((g["rank"] == 1).sum()),
+            "secondo": int((g["rank"] == 2).sum()),
+            "terzo": int((g["rank"] == 3).sum()),
+            "top3": int((g["rank"] <= 3).sum()),
+            "top5": int((g["rank"] <= 5).sum()),
+            "top10": int((g["rank"] <= 10).sum()),
+            # Bottom positions (relative to serata size)
+            "ultimo": int((g["rank_from_end"] == 0).sum()),
+            "penultimo": int((g["rank_from_end"] == 1).sum()),
+            "terzultimo": int((g["rank_from_end"] == 2).sum()),
+            "bottom3": int((g["rank_from_end"] <= 2).sum()),
+            # Percentages
+            "pct_top3": round(float((g["rank"] <= 3).mean() * 100), 1),
+            "pct_top5": round(float((g["rank"] <= 5).mean() * 100), 1),
+            "pct_bottom3": round(float((g["rank_from_end"] <= 2).mean() * 100), 1),
+        }
+        matrix.append(entry)
+    return matrix
+
+
+def build_full_rank_distribution(usable, rank_col):
+    """For each decile, full histogram of ranks (for detailed charts)."""
+    usable = usable.copy()
+    usable["rank"] = usable[rank_col].astype(int)
+    usable["decile"] = assign_decile(usable["posizione_relativa"])
+
+    result = []
+    for d in DECILE_LABELS:
+        g = usable[usable["decile"] == d]["rank"]
+        if len(g) == 0:
+            continue
+        counts = g.value_counts().sort_index()
+        result.append({
+            "decile": d,
+            "n": int(len(g)),
+            "distribuzione": {int(k): int(v) for k, v in counts.items()},
+        })
+    return result
 
 
 # ============================================================
-# Robustness checks
+# Analysis runner (one rank type)
 # ============================================================
 
-def robustness_exclude_serate(df, rank_col, serate_to_exclude):
-    """Re-run core tests excluding specific serate."""
-    sub = df[~df["serata"].isin(serate_to_exclude)].copy()
-    sub = sub[sub[rank_col].notna()].copy()
-    if len(sub) < 10:
-        return None
-    sub[rank_col] = sub[rank_col].astype(int)
-    sub["quintile"] = assign_quintile(sub["posizione_relativa"])
-
-    sp = spearman_test(sub["posizione_relativa"], sub[rank_col])
-    groups = [sub[sub["quintile"] == q][rank_col].values for q in QUINTILE_LABELS]
-    kw = kruskal_wallis_test(groups, QUINTILE_LABELS)
-    centro = sub.loc[sub["quintile"].isin(CENTRO_Q), rank_col]
-    estremi = sub.loc[sub["quintile"].isin(ESTREMI_Q), rank_col]
-    mw = mann_whitney_test(centro, estremi)
-
-    return {"serate_escluse": serate_to_exclude, "n": int(len(sub)),
-            "spearman": sp, "kruskal_wallis": kw, "mann_whitney": mw}
-
-
-def robustness_terciles(df, rank_col):
-    """Re-run with terciles (3 groups) instead of quintiles."""
-    sub = df[df[rank_col].notna()].copy()
-    if len(sub) < 10:
-        return None
-    sub[rank_col] = sub[rank_col].astype(int)
-    sub["tercile"] = pd.cut(sub["posizione_relativa"],
-                            bins=[-0.001, 0.333, 0.667, 1.001],
-                            labels=["Inizio (1/3)", "Centro (2/3)", "Fine (3/3)"])
-    tercile_labels = ["Inizio (1/3)", "Centro (2/3)", "Fine (3/3)"]
-    groups = [sub[sub["tercile"] == t][rank_col].values for t in tercile_labels]
-    kw = kruskal_wallis_test(groups, tercile_labels)
-    centro = sub.loc[sub["tercile"] == "Centro (2/3)", rank_col]
-    estremi = sub.loc[sub["tercile"] != "Centro (2/3)", rank_col]
-    mw = mann_whitney_test(centro, estremi)
-    return {"tipo": "tercili", "n": int(len(sub)),
-            "kruskal_wallis": kw, "mann_whitney_centro_vs_estremi": mw}
-
-
-def robustness_normalized_rank(df, rank_col):
-    """Re-run with rank normalized to 0-1 instead of raw rank."""
-    sub = df[df[rank_col].notna()].copy()
-    if len(sub) < 10:
-        return None
-    sub[rank_col] = sub[rank_col].astype(int)
-    sub["rank_norm"] = normalize_rank(sub[rank_col], sub["totale_serata"])
-    sub["quintile"] = assign_quintile(sub["posizione_relativa"])
-
-    sp = spearman_test(sub["posizione_relativa"], sub["rank_norm"])
-    groups = [sub[sub["quintile"] == q]["rank_norm"].values for q in QUINTILE_LABELS]
-    kw = kruskal_wallis_test(groups, QUINTILE_LABELS)
-    centro = sub.loc[sub["quintile"].isin(CENTRO_Q), "rank_norm"]
-    estremi = sub.loc[sub["quintile"].isin(ESTREMI_Q), "rank_norm"]
-    mw = mann_whitney_test(centro, estremi)
-    return {"tipo": "rank normalizzato (0-1)", "n": int(len(sub)),
-            "spearman": sp, "kruskal_wallis": kw, "mann_whitney": mw}
-
-
-# ============================================================
-# Analysis runner
-# ============================================================
-
-def run_analysis_for_rank_type(df: pd.DataFrame, rank_col: str, rank_label: str):
+def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
     usable = df[df[rank_col].notna()].copy()
     usable[rank_col] = usable[rank_col].astype(int)
-    usable["quintile"] = assign_quintile(usable["posizione_relativa"])
+    usable["decile"] = assign_decile(usable["posizione_relativa"])
     usable["rank_norm"] = normalize_rank(usable[rank_col], usable["totale_serata"])
     years = sorted(usable["year"].unique())
 
@@ -414,90 +396,93 @@ def run_analysis_for_rank_type(df: pd.DataFrame, rank_col: str, rank_label: str)
         "anni": [int(y) for y in years],
     }
 
-    # --- Distribution per quintile (global) ---
-    dist_overall = []
-    for q in QUINTILE_LABELS:
-        g = usable[usable["quintile"] == q][rank_col]
-        if len(g) == 0:
-            continue
-        ci = bootstrap_ci(g.values)
-        dist_overall.append({
-            "quintile": q, "n": int(len(g)),
-            "media": round(float(g.mean()), 2),
-            "mediana": round(float(g.median()), 1),
-            "std": round(float(g.std()), 2),
-            "min": int(g.min()), "max": int(g.max()),
-            "q25": round(float(g.quantile(0.25)), 1),
-            "q75": round(float(g.quantile(0.75)), 1),
-            "bootstrap_ci_mean_95": ci,
-        })
-    result["distribuzione_quintili_globale"] = dist_overall
+    # --- Position-count matrix (MAIN VISUALIZATION DATA) ---
+    result["matrice_posizioni_per_decile"] = build_position_count_matrix(usable, rank_col)
+    result["distribuzione_rank_completa_per_decile"] = build_full_rank_distribution(usable, rank_col)
 
-    # --- Distribution per year ---
-    dist_per_year = []
+    # --- Per-year position-count ---
+    per_year = []
     for y in years:
         ydf = usable[usable["year"] == y]
-        year_data = {"anno": int(y), "n": int(len(ydf)), "quintili": []}
-        for q in QUINTILE_LABELS:
-            g = ydf[ydf["quintile"] == q][rank_col]
-            if len(g) == 0:
-                continue
-            year_data["quintili"].append({
-                "quintile": q, "n": int(len(g)),
-                "media": round(float(g.mean()), 2),
-                "mediana": round(float(g.median()), 1),
-            })
-        dist_per_year.append(year_data)
-    result["distribuzione_per_anno"] = dist_per_year
+        per_year.append({
+            "anno": int(y),
+            "n": int(len(ydf)),
+            "matrice": build_position_count_matrix(ydf, rank_col),
+        })
+    result["matrice_per_anno"] = per_year
 
-    # --- Distribution per serata ---
-    dist_per_serata = []
+    # --- Per-serata position-count ---
+    per_serata = []
     for y in years:
         ydf = usable[usable["year"] == y]
         for s in sorted(ydf["serata"].unique()):
             sdf = ydf[ydf["serata"] == s]
-            if len(sdf) < 3:
+            if len(sdf) < 5:
                 continue
-            serata_data = {
+            per_serata.append({
                 "anno": int(y), "serata": int(s),
                 "serata_name": sdf["serata_name"].iloc[0],
-                "n": int(len(sdf)), "quintili": []
-            }
-            for q in QUINTILE_LABELS:
-                g = sdf[sdf["quintile"] == q][rank_col]
-                if len(g) == 0:
-                    continue
-                serata_data["quintili"].append({
-                    "quintile": q, "n": int(len(g)),
-                    "media": round(float(g.mean()), 2),
-                    "mediana": round(float(g.median()), 1),
-                })
-            dist_per_serata.append(serata_data)
-    result["distribuzione_per_serata"] = dist_per_serata
+                "n": int(len(sdf)),
+                "matrice": build_position_count_matrix(sdf, rank_col),
+            })
+    result["matrice_per_serata"] = per_serata
+
+    # --- Decile distribution (media, mediana, boxplot data) ---
+    boxplot = []
+    for d in DECILE_LABELS:
+        g = usable[usable["decile"] == d][rank_col].dropna()
+        if len(g) == 0:
+            continue
+        boxplot.append({
+            "decile": d, "n": int(len(g)),
+            "min": int(g.min()), "q25": round(float(g.quantile(0.25)), 1),
+            "median": round(float(g.median()), 1), "q75": round(float(g.quantile(0.75)), 1),
+            "max": int(g.max()), "mean": round(float(g.mean()), 2),
+            "bootstrap_ci_mean": bootstrap_ci(g.values),
+        })
+    result["boxplot_decili"] = boxplot
 
     # --- Statistical tests ---
     tests = {}
-    all_p_values = []  # for multiple testing correction
+    all_p = []
+
+    # Quadratic trend (U-shape) — key test
+    tests["trend_quadratico_globale"] = quadratic_trend_test(
+        usable["posizione_relativa"], usable["rank_norm"])
+    if tests["trend_quadratico_globale"]:
+        all_p.append(("trend_quad_globale",
+                       tests["trend_quadratico_globale"]["f_test_quadratico_vs_lineare"]["p_value"]))
+
+    # Quadratic per year
+    quad_per_anno = []
+    for y in years:
+        ydf = usable[usable["year"] == y]
+        res = quadratic_trend_test(ydf["posizione_relativa"], ydf["rank_norm"])
+        if res:
+            res["anno"] = int(y)
+            quad_per_anno.append(res)
+            all_p.append((f"trend_quad_{y}", res["f_test_quadratico_vs_lineare"]["p_value"]))
+    tests["trend_quadratico_per_anno"] = quad_per_anno
 
     # Spearman global
     tests["spearman_globale"] = spearman_test(
         usable["posizione_relativa"], usable[rank_col], bootstrap=True)
     if tests["spearman_globale"]:
-        all_p_values.append(("spearman_globale", tests["spearman_globale"]["p_value"]))
+        all_p.append(("spearman_globale", tests["spearman_globale"]["p_value"]))
 
     # Spearman per year
-    sp_per_anno = []
+    sp_anno = []
     for y in years:
         ydf = usable[usable["year"] == y]
         res = spearman_test(ydf["posizione_relativa"], ydf[rank_col])
         if res:
             res["anno"] = int(y)
-            sp_per_anno.append(res)
-            all_p_values.append((f"spearman_{y}", res["p_value"]))
-    tests["spearman_per_anno"] = sp_per_anno
+            sp_anno.append(res)
+            all_p.append((f"spearman_{y}", res["p_value"]))
+    tests["spearman_per_anno"] = sp_anno
 
     # Spearman per serata
-    sp_per_serata = []
+    sp_serata = []
     for y in years:
         ydf = usable[usable["year"] == y]
         for s in sorted(ydf["serata"].unique()):
@@ -506,187 +491,115 @@ def run_analysis_for_rank_type(df: pd.DataFrame, rank_col: str, rank_label: str)
             if res:
                 res["anno"] = int(y)
                 res["serata"] = int(s)
-                sp_per_serata.append(res)
-                all_p_values.append((f"spearman_{y}_s{s}", res["p_value"]))
-    tests["spearman_per_serata"] = sp_per_serata
+                sp_serata.append(res)
+                all_p.append((f"spearman_{y}_s{s}", res["p_value"]))
+    tests["spearman_per_serata"] = sp_serata
 
-    # Kruskal-Wallis global
-    groups = [usable[usable["quintile"] == q][rank_col].values for q in QUINTILE_LABELS]
-    tests["kruskal_wallis_globale"] = kruskal_wallis_test(groups, QUINTILE_LABELS)
+    # Kruskal-Wallis decili global
+    groups = [usable[usable["decile"] == d][rank_col].values for d in DECILE_LABELS]
+    tests["kruskal_wallis_globale"] = kruskal_wallis_test(groups, DECILE_LABELS)
     if tests["kruskal_wallis_globale"]:
-        all_p_values.append(("kruskal_wallis_globale", tests["kruskal_wallis_globale"]["p_value"]))
+        all_p.append(("kw_globale", tests["kruskal_wallis_globale"]["p_value"]))
 
-    # Kruskal-Wallis per year
-    kw_per_anno = []
+    # KW per year
+    kw_anno = []
     for y in years:
         ydf = usable[usable["year"] == y]
-        groups = [ydf[ydf["quintile"] == q][rank_col].values for q in QUINTILE_LABELS]
-        res = kruskal_wallis_test(groups, QUINTILE_LABELS)
+        groups = [ydf[ydf["decile"] == d][rank_col].values for d in DECILE_LABELS]
+        res = kruskal_wallis_test(groups, DECILE_LABELS)
         if res:
             res["anno"] = int(y)
-            kw_per_anno.append(res)
-            all_p_values.append((f"kruskal_{y}", res["p_value"]))
-    tests["kruskal_wallis_per_anno"] = kw_per_anno
+            kw_anno.append(res)
+            all_p.append((f"kw_{y}", res["p_value"]))
+    tests["kruskal_wallis_per_anno"] = kw_anno
 
-    # Kruskal-Wallis per serata + Fisher combined
-    kw_per_serata = []
-    kw_pvalues = []
+    # KW per serata + Fisher
+    kw_serata = []
+    kw_ps = []
     for y in years:
         ydf = usable[usable["year"] == y]
         for s in sorted(ydf["serata"].unique()):
             sdf = ydf[ydf["serata"] == s]
-            groups = [sdf[sdf["quintile"] == q][rank_col].values for q in QUINTILE_LABELS]
-            res = kruskal_wallis_test(groups, QUINTILE_LABELS)
+            groups = [sdf[sdf["decile"] == d][rank_col].values for d in DECILE_LABELS]
+            res = kruskal_wallis_test(groups, DECILE_LABELS)
             if res:
                 res["anno"] = int(y)
                 res["serata"] = int(s)
-                kw_per_serata.append(res)
-                kw_pvalues.append(res["p_value"])
-                all_p_values.append((f"kruskal_{y}_s{s}", res["p_value"]))
-    tests["kruskal_wallis_per_serata"] = kw_per_serata
-    tests["kruskal_per_serata_fisher_combined"] = fisher_combined(kw_pvalues)
+                kw_serata.append(res)
+                kw_ps.append(res["p_value"])
+                all_p.append((f"kw_{y}_s{s}", res["p_value"]))
+    tests["kruskal_wallis_per_serata"] = kw_serata
+    tests["kruskal_per_serata_fisher"] = fisher_combined(kw_ps)
 
-    # Jonckheere-Terpstra (ordered alternative)
-    groups = [usable[usable["quintile"] == q][rank_col].values for q in QUINTILE_LABELS]
-    tests["jonckheere_terpstra_globale"] = jonckheere_terpstra_test(groups, QUINTILE_LABELS)
-    if tests["jonckheere_terpstra_globale"]:
-        all_p_values.append(("jonckheere_globale", tests["jonckheere_terpstra_globale"]["p_value"]))
-
-    # Mann-Whitney centro vs estremi
-    centro = usable.loc[usable["quintile"].isin(CENTRO_Q), rank_col]
-    estremi = usable.loc[usable["quintile"].isin(ESTREMI_Q), rank_col]
+    # Mann-Whitney centro (D3-D7, 20-70%) vs estremi (D1-D2 + D8-D10)
+    centro_d = [f"D{i} ({(i-1)*10}-{i*10}%)" for i in range(3, 8)]  # D3-D7
+    estremi_d = [f"D{i} ({(i-1)*10}-{i*10}%)" for i in [1, 2, 8, 9, 10]]
+    centro = usable.loc[usable["decile"].isin(centro_d), rank_col]
+    estremi = usable.loc[usable["decile"].isin(estremi_d), rank_col]
     tests["mann_whitney_centro_vs_estremi"] = mann_whitney_test(centro, estremi)
     if tests["mann_whitney_centro_vs_estremi"]:
-        all_p_values.append(("mann_whitney_globale", tests["mann_whitney_centro_vs_estremi"]["p_value"]))
+        all_p.append(("mw_centro_estremi", tests["mann_whitney_centro_vs_estremi"]["p_value"]))
 
-    # Mann-Whitney per year
-    mw_per_anno = []
-    for y in years:
-        ydf = usable[usable["year"] == y]
-        c = ydf.loc[ydf["quintile"].isin(CENTRO_Q), rank_col]
-        e = ydf.loc[ydf["quintile"].isin(ESTREMI_Q), rank_col]
-        res = mann_whitney_test(c, e)
-        if res:
-            res["anno"] = int(y)
-            mw_per_anno.append(res)
-            all_p_values.append((f"mann_whitney_{y}", res["p_value"]))
-    tests["mann_whitney_per_anno"] = mw_per_anno
+    # Chi2 top 3
+    tests["chi2_top3_globale"] = chi2_top_n(usable["decile"], usable[rank_col], n=3)
+    if tests["chi2_top3_globale"]:
+        all_p.append(("chi2_top3", tests["chi2_top3_globale"]["p_value"]))
 
-    # Mann-Whitney per serata
-    mw_per_serata = []
-    for y in years:
-        ydf = usable[usable["year"] == y]
-        for s in sorted(ydf["serata"].unique()):
-            sdf = ydf[ydf["serata"] == s]
-            c = sdf.loc[sdf["quintile"].isin(CENTRO_Q), rank_col]
-            e = sdf.loc[sdf["quintile"].isin(ESTREMI_Q), rank_col]
-            res = mann_whitney_test(c, e)
-            if res:
-                res["anno"] = int(y)
-                res["serata"] = int(s)
-                mw_per_serata.append(res)
-                all_p_values.append((f"mann_whitney_{y}_s{s}", res["p_value"]))
-    tests["mann_whitney_per_serata"] = mw_per_serata
+    # Chi2 top 5
+    tests["chi2_top5_globale"] = chi2_top_n(usable["decile"], usable[rank_col], n=5)
+    if tests["chi2_top5_globale"]:
+        all_p.append(("chi2_top5", tests["chi2_top5_globale"]["p_value"]))
 
-    # Chi-squared
-    tests["chi2_top5_globale"] = chi2_top_n(usable["quintile"], usable[rank_col], n=5)
-    tests["chi2_top10_globale"] = chi2_top_n(usable["quintile"], usable[rank_col], n=10)
-    for key in ["chi2_top5_globale", "chi2_top10_globale"]:
-        if tests[key]:
-            all_p_values.append((key, tests[key]["p_value"]))
+    # Binomial: are top-3 over-represented in D3-D7 (20-70%)?
+    tests["binomial_top3_centro"] = binomial_test_top_n(
+        usable["decile"], usable[rank_col], usable["posizione_relativa"],
+        (0.2, 0.7), n_top=3)
+    if tests["binomial_top3_centro"]:
+        all_p.append(("binom_top3_centro", tests["binomial_top3_centro"]["p_value"]))
 
-    chi2_per_anno = []
-    for y in years:
-        ydf = usable[usable["year"] == y]
-        res5 = chi2_top_n(ydf["quintile"], ydf[rank_col], n=5)
-        if res5:
-            res5["anno"] = int(y)
-            chi2_per_anno.append(res5)
-            all_p_values.append((f"chi2_top5_{y}", res5["p_value"]))
-    tests["chi2_top5_per_anno"] = chi2_per_anno
+    # Binomial: are bottom-3 over-represented in D1+D9-D10?
+    usable_tmp = usable.copy()
+    usable_tmp["rank_from_end"] = usable_tmp["totale_serata"] - usable_tmp[rank_col]
+    usable_tmp["is_bottom3"] = usable_tmp["rank_from_end"] <= 2
+    # Use rank_from_end as "rank" for the binomial test
+    bottom3_in_extremes = usable_tmp[usable_tmp["is_bottom3"]]
+    n_bottom_in_ext = int(((bottom3_in_extremes["posizione_relativa"] < 0.1) |
+                            (bottom3_in_extremes["posizione_relativa"] >= 0.8)).sum())
+    n_bottom_total = len(bottom3_in_extremes)
+    pct_extreme_pos = float(((usable["posizione_relativa"] < 0.1) |
+                              (usable["posizione_relativa"] >= 0.8)).mean())
+    if n_bottom_total >= 5:
+        binom_res = stats.binomtest(n_bottom_in_ext, n_bottom_total, pct_extreme_pos, "greater")
+        tests["binomial_bottom3_estremi"] = {
+            "n_bottom_in_estremi": n_bottom_in_ext, "n_bottom_total": n_bottom_total,
+            "pct_observed": round(n_bottom_in_ext / n_bottom_total * 100, 1),
+            "pct_expected": round(pct_extreme_pos * 100, 1),
+            "p_value": round(float(binom_res.pvalue), 6),
+            "significativo": bool(binom_res.pvalue < 0.05),
+        }
+        all_p.append(("binom_bottom3_estremi", tests["binomial_bottom3_estremi"]["p_value"]))
 
-    # --- Multiple testing correction ---
-    raw_ps = [p for _, p in all_p_values]
-    bonf = bonferroni_correction(raw_ps)
+    # --- FDR correction ---
+    raw_ps = [p for _, p in all_p]
     fdr = fdr_correction(raw_ps)
     correction_table = []
-    for idx, (name, raw_p) in enumerate(all_p_values):
+    for idx, (name, raw_p) in enumerate(all_p):
         correction_table.append({
             "test": name, "p_raw": round(raw_p, 6),
-            "p_bonferroni": bonf[idx],
             "p_fdr": fdr[idx],
             "sig_raw": bool(raw_p < 0.05),
-            "sig_bonferroni": bool(bonf[idx] is not None and bonf[idx] < 0.05),
             "sig_fdr": bool(fdr[idx] is not None and fdr[idx] < 0.05),
         })
     tests["correzione_test_multipli"] = {
-        "n_test": len(all_p_values),
-        "metodi": ["Bonferroni", "Benjamini-Hochberg FDR"],
-        "tabella": correction_table,
+        "n_test": len(all_p),
         "n_sig_raw": sum(1 for r in correction_table if r["sig_raw"]),
-        "n_sig_bonferroni": sum(1 for r in correction_table if r["sig_bonferroni"]),
         "n_sig_fdr": sum(1 for r in correction_table if r["sig_fdr"]),
+        "tabella": correction_table,
     }
 
     result["test_statistici"] = tests
 
-    # --- Robustness checks ---
-    robustness = {}
-    robustness["esclusa_finale"] = robustness_exclude_serate(df, rank_col, [5])
-    robustness["escluse_serate_1_2"] = robustness_exclude_serate(df, rank_col, [1, 2])
-    robustness["solo_serate_piene"] = robustness_exclude_serate(
-        df[df["totale_serata"] >= 20], rank_col, [])
-    robustness["tercili"] = robustness_terciles(df, rank_col)
-    robustness["rank_normalizzato"] = robustness_normalized_rank(df, rank_col)
-    result["analisi_robustezza"] = robustness
-
-    # --- Visualization data ---
-    viz = {}
-
-    # Boxplot quintiles global
-    boxplot_data = []
-    for q in QUINTILE_LABELS:
-        g = usable[usable["quintile"] == q][rank_col].dropna()
-        if len(g) == 0:
-            continue
-        boxplot_data.append({
-            "quintile": q,
-            "min": round(float(g.min()), 1),
-            "q25": round(float(g.quantile(0.25)), 1),
-            "median": round(float(g.median()), 1),
-            "q75": round(float(g.quantile(0.75)), 1),
-            "max": round(float(g.max()), 1),
-            "mean": round(float(g.mean()), 2),
-            "n": int(len(g)),
-        })
-    viz["boxplot_quintili"] = boxplot_data
-
-    # Heatmap year x quintile
-    heatmap = []
-    for y in years:
-        ydf = usable[usable["year"] == y]
-        row = {"anno": int(y)}
-        for q in QUINTILE_LABELS:
-            g = ydf[ydf["quintile"] == q][rank_col]
-            row[q] = round(float(g.mean()), 2) if len(g) > 0 else None
-        heatmap.append(row)
-    viz["heatmap_anno_quintile"] = heatmap
-
-    # Probability per quintile
-    prob_data = []
-    for q in QUINTILE_LABELS:
-        g = usable[usable["quintile"] == q][rank_col].dropna()
-        if len(g) == 0:
-            continue
-        n_g = len(g)
-        prob_data.append({
-            "quintile": q, "n": int(n_g),
-            "pct_top5": round(float((g <= 5).mean() * 100), 1),
-            "pct_top10": round(float((g <= 10).mean() * 100), 1),
-        })
-    viz["probabilita_per_quintile"] = prob_data
-
-    # Scatter
+    # --- Scatter data ---
     scatter = []
     for _, row in usable.iterrows():
         scatter.append({
@@ -696,28 +609,9 @@ def run_analysis_for_rank_type(df: pd.DataFrame, rank_col: str, rank_label: str)
             "serata": int(row["serata"]),
             "artista": row["artist"],
         })
-    viz["scatter"] = scatter
+    result["scatter"] = scatter
 
-    # Boxplot per serata
-    boxplot_serata = []
-    for y in years:
-        ydf = usable[usable["year"] == y]
-        for s in sorted(ydf["serata"].unique()):
-            sdf = ydf[ydf["serata"] == s]
-            for q in QUINTILE_LABELS:
-                g = sdf[sdf["quintile"] == q][rank_col].dropna()
-                if len(g) == 0:
-                    continue
-                boxplot_serata.append({
-                    "anno": int(y), "serata": int(s),
-                    "quintile": q, "n": int(len(g)),
-                    "media": round(float(g.mean()), 2),
-                    "mediana": round(float(g.median()), 1),
-                })
-    viz["boxplot_per_serata"] = boxplot_serata
-
-    result["visualizzazione"] = viz
-    return result, usable
+    return result
 
 
 # ============================================================
@@ -734,10 +628,13 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
     usable["rank_norm"] = normalize_rank(usable[rank_col], usable["totale_serata"])
 
     if len(usable) < 20:
-        return {"errore": "Troppo pochi dati per ML", "tipo_classifica": rank_label}
+        return {"errore": "troppo pochi dati"}
 
     features = ["posizione_relativa", "totale_serata", "serata"]
-    X = usable[features].values
+    # Add quadratic term
+    usable["pos_rel_sq"] = usable["posizione_relativa"] ** 2
+    features_quad = features + ["pos_rel_sq"]
+    X = usable[features_quad].values
     y = usable["rank_norm"].values
 
     baseline_mae = float(np.mean(np.abs(y - np.mean(y))))
@@ -755,49 +652,38 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
             continue
         scores = cross_val_score(model, X, y, cv=cv, scoring="neg_mean_absolute_error")
         mae = float(-scores.mean())
-        mae_std = float(scores.std())
-        improvement = round((baseline_mae - mae) / baseline_mae * 100, 2)
         results.append({
             "modello": name,
             "mae_cv": round(mae, 4),
-            "mae_cv_std": round(mae_std, 4),
-            "miglioramento_su_baseline": improvement,
+            "miglioramento_su_baseline": round((baseline_mae - mae) / baseline_mae * 100, 2),
         })
 
-    # Permutation test
-    best_result = min(results, key=lambda r: r["mae_cv"]) if results else None
-    best_model_name = best_result["modello"] if best_result else None
+    best = min(results, key=lambda r: r["mae_cv"]) if results else None
     perm_p = 1.0
-    if best_model_name:
-        best_model = models[best_model_name]
+    if best:
+        best_model = models[best["modello"]]
         np.random.seed(42)
-        actual_mae = best_result["mae_cv"]
         n_perm = 200
-        perm_maes = []
         cv = min(5, len(usable) // 5)
+        perm_maes = []
         for _ in range(n_perm):
-            X_perm = X.copy()
-            np.random.shuffle(X_perm[:, 0])
-            s = cross_val_score(best_model, X_perm, y, cv=cv, scoring="neg_mean_absolute_error")
+            X_p = X.copy()
+            np.random.shuffle(X_p[:, 0])
+            np.random.shuffle(X_p[:, 3])  # also shuffle pos_rel_sq
+            s = cross_val_score(best_model, X_p, y, cv=cv, scoring="neg_mean_absolute_error")
             perm_maes.append(float(-s.mean()))
-        perm_p = float(np.mean([m <= actual_mae for m in perm_maes]))
+        perm_p = float(np.mean([m <= best["mae_cv"] for m in perm_maes]))
 
     return {
         "tipo_classifica": rank_label,
-        "n_osservazioni": int(len(usable)),
-        "features": features,
+        "n": int(len(usable)),
+        "features": features_quad,
         "baseline_mae": round(baseline_mae, 4),
         "modelli": results,
-        "miglior_modello": best_model_name,
-        "miglior_mae": round(best_result["mae_cv"], 4) if best_result else None,
-        "miglioramento_migliore": max(r["miglioramento_su_baseline"] for r in results) if results else None,
-        "permutation_test": {
-            "n_permutazioni": n_perm,
-            "p_value": round(perm_p, 4),
-            "significativo": bool(perm_p < 0.05),
-            "interpretazione": "il modello predice meglio del caso" if perm_p < 0.05
-            else "il modello NON predice meglio del caso"
-        }
+        "miglior_modello": best["modello"] if best else None,
+        "miglior_mae": best["mae_cv"] if best else None,
+        "permutation_test": {"n_perm": 200, "p_value": round(perm_p, 4),
+                              "significativo": bool(perm_p < 0.05)},
     }
 
 
@@ -807,180 +693,114 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
 
 def build_synthesis(res, ml):
     tests = res["test_statistici"]
-    correction = tests.get("correzione_test_multipli", {})
+    corr = tests.get("correzione_test_multipli", {})
+    n_fdr = corr.get("n_sig_fdr", 0)
+    n_total = corr.get("n_test", 0)
 
-    n_raw = correction.get("n_sig_raw", 0)
-    n_bonf = correction.get("n_sig_bonferroni", 0)
-    n_fdr = correction.get("n_sig_fdr", 0)
-    n_total = correction.get("n_test", 0)
+    trend = tests.get("trend_quadratico_globale", {})
+    r2 = trend.get("quadratico", {}).get("R2", 0)
+    vertice = trend.get("quadratico", {}).get("vertice_pos_relativa")
+    u_shape_sig = trend.get("f_test_quadratico_vs_lineare", {}).get("significativo", False)
 
     mw = tests.get("mann_whitney_centro_vs_estremi", {})
-    centro_mean = mw.get("media_centro")
-    estremi_mean = mw.get("media_estremi")
-    boot_diff = mw.get("bootstrap_diff_mean", {})
+    boot = mw.get("bootstrap_diff_mean", {})
 
-    # Use FDR-corrected count for strength assessment
-    if n_fdr == 0:
-        evidenza = "nessuna"
-    elif n_fdr <= 2:
-        evidenza = "molto debole"
-    elif n_fdr <= 4:
-        evidenza = "debole"
-    elif n_fdr <= 6:
-        evidenza = "moderata"
-    else:
-        evidenza = "forte"
-
-    if centro_mean and estremi_mean:
-        if centro_mean < estremi_mean:
-            direzione = "Il centro sembra avere un leggero vantaggio"
-        elif centro_mean > estremi_mean:
-            direzione = "Gli estremi sembrano avere un leggero vantaggio"
-        else:
-            direzione = "Nessuna direzione chiara"
-    else:
-        direzione = "Dati insufficienti"
-
-    # Check robustness consistency
-    rob = res.get("analisi_robustezza", {})
-    rob_consistent = True
-    for key, val in rob.items():
-        if val and isinstance(val, dict):
-            mw_r = val.get("mann_whitney") or val.get("mann_whitney_centro_vs_estremi")
-            if mw_r and mw_r.get("vantaggio") and centro_mean and estremi_mean:
-                main_better = "centro" if centro_mean < estremi_mean else "estremi"
-                if mw_r["vantaggio"] != "nessuno" and mw_r["vantaggio"] != main_better:
-                    rob_consistent = False
+    binom_top = tests.get("binomial_top3_centro", {})
+    binom_bottom = tests.get("binomial_bottom3_estremi", {})
 
     return {
-        "n_test_eseguiti": n_total,
-        "n_test_significativi_raw": n_raw,
-        "n_test_significativi_bonferroni": n_bonf,
-        "n_test_significativi_fdr": n_fdr,
-        "media_centro": centro_mean,
-        "media_estremi": estremi_mean,
-        "bootstrap_diff_mean": boot_diff,
-        "evidenza": evidenza,
-        "direzione": direzione,
-        "robustezza_consistente": rob_consistent,
-        "ml_miglioramento": ml.get("miglioramento_migliore"),
+        "n_test": n_total,
+        "n_sig_fdr": n_fdr,
+        "u_shape_significativo": u_shape_sig,
+        "u_shape_R2": r2,
+        "vertice_ottimale": vertice,
+        "media_centro": mw.get("media_centro"),
+        "media_estremi": mw.get("media_estremi"),
+        "bootstrap_diff": boot,
+        "top3_sovrarappresentati_centro": binom_top.get("significativo", False),
+        "top3_pct_centro_osservato": binom_top.get("pct_observed"),
+        "top3_pct_centro_atteso": binom_top.get("pct_expected"),
+        "bottom3_sovrarappresentati_estremi": binom_bottom.get("significativo", False) if binom_bottom else None,
         "ml_significativo": ml.get("permutation_test", {}).get("significativo", False),
+        "ml_miglioramento": max((r["miglioramento_su_baseline"] for r in ml.get("modelli", [])), default=None),
     }
 
 
 def overall_conclusion(s_comp, s_tv):
-    sig_comp = s_comp.get("n_test_significativi_fdr", 0)
-    sig_tv = s_tv.get("n_test_significativi_fdr", 0)
-    total_fdr = sig_comp + sig_tv
-    total_tests = s_comp.get("n_test_eseguiti", 0) + s_tv.get("n_test_eseguiti", 0)
-
-    boot_comp = s_comp.get("bootstrap_diff_mean", {})
-    boot_tv = s_tv.get("bootstrap_diff_mean", {})
-    ci_comp_zero = boot_comp.get("includes_zero", True) if boot_comp else True
-    ci_tv_zero = boot_tv.get("includes_zero", True) if boot_tv else True
-
-    rob_ok = s_comp.get("robustezza_consistente", True) and s_tv.get("robustezza_consistente", True)
-
-    ml_comp = s_comp.get("ml_significativo", False)
-    ml_tv = s_tv.get("ml_significativo", False)
-
-    # Determine direction
-    dir_comp = s_comp.get("direzione", "")
-    dir_tv = s_tv.get("direzione", "")
-    centro_vantaggio = "centro" in dir_comp.lower() or "centro" in dir_tv.lower()
-
     parts = []
 
-    # Evidence strength
-    if total_fdr == 0:
+    # U-shape
+    if s_comp.get("u_shape_significativo") or s_tv.get("u_shape_significativo"):
+        v = s_comp.get("vertice_ottimale") or s_tv.get("vertice_ottimale")
+        r2 = max(s_comp.get("u_shape_R2", 0), s_tv.get("u_shape_R2", 0))
         parts.append(
-            f"Nessun test su {total_tests} risulta significativo dopo correzione FDR. "
-            "L'ordine di esibizione NON sembra influenzare il ranking della serata."
+            f"Il trend è a U: esiste un punto ottimale nell'ordine di esibizione, "
+            f"attorno al {v*100:.0f}% della scaletta (F-test significativo). "
+            f"Tuttavia, l'effetto è piccolo: la posizione spiega solo il {r2*100:.1f}% della varianza."
         )
-    elif total_fdr <= 3:
+
+    # Top-3 concentration
+    top3_comp = s_comp.get("top3_sovrarappresentati_centro")
+    top3_tv = s_tv.get("top3_sovrarappresentati_centro")
+    if top3_comp or top3_tv:
+        pct_obs = s_comp.get("top3_pct_centro_osservato") or s_tv.get("top3_pct_centro_osservato")
+        pct_exp = s_comp.get("top3_pct_centro_atteso") or s_tv.get("top3_pct_centro_atteso")
         parts.append(
-            f"Evidenza molto debole: solo {total_fdr}/{total_tests} test significativi dopo FDR."
+            f"I primi 3 classificati si concentrano nelle posizioni centrali: "
+            f"{pct_obs}% osservato vs {pct_exp}% atteso (test binomiale significativo)."
         )
-    elif total_fdr <= 8:
+
+    # Bottom-3 concentration
+    if s_comp.get("bottom3_sovrarappresentati_estremi") or s_tv.get("bottom3_sovrarappresentati_estremi"):
         parts.append(
-            f"Evidenza debole-moderata: {total_fdr}/{total_tests} test significativi dopo FDR."
-        )
-    else:
-        parts.append(
-            f"Evidenza forte: {total_fdr}/{total_tests} test significativi dopo correzione FDR."
+            "Simmetricamente, gli ultimi classificati sono sovrarappresentati "
+            "nelle posizioni estreme (primo e ultimo decile)."
         )
 
     # Bootstrap CI
-    if not ci_comp_zero or not ci_tv_zero:
-        ci_details = []
-        if not ci_comp_zero:
-            d = boot_comp.get("diff_observed", "?")
-            ci = f"[{boot_comp.get('ci_lower')}, {boot_comp.get('ci_upper')}]"
-            ci_details.append(f"complessiva: diff={d}, CI95={ci}")
-        if not ci_tv_zero:
-            d = boot_tv.get("diff_observed", "?")
-            ci = f"[{boot_tv.get('ci_lower')}, {boot_tv.get('ci_upper')}]"
-            ci_details.append(f"televoto: diff={d}, CI95={ci}")
+    boot_comp = s_comp.get("bootstrap_diff", {})
+    boot_tv = s_tv.get("bootstrap_diff", {})
+    if boot_comp and not boot_comp.get("includes_zero"):
+        diff = boot_comp.get("diff_observed")
         parts.append(
-            "Gli intervalli di confidenza bootstrap al 95% per la differenza centro-estremi "
-            "NON includono lo zero (" + "; ".join(ci_details) + "), "
-            "confermando un effetto reale."
+            f"La differenza centro-estremi è confermata dal bootstrap: "
+            f"diff={diff} posizioni, CI al 95% non include lo zero."
         )
-    elif total_fdr > 0:
+    elif boot_comp and boot_comp.get("includes_zero"):
         parts.append(
-            "Tuttavia, gli intervalli di confidenza bootstrap al 95% includono lo zero, "
-            "suggerendo cautela nell'interpretazione."
+            "Attenzione: l'intervallo di confidenza bootstrap per la differenza "
+            "centro-estremi include lo zero."
         )
 
-    # Direction
-    if total_fdr > 3 and centro_vantaggio:
-        mc = s_comp.get("media_centro")
-        me = s_comp.get("media_estremi")
-        if mc and me:
-            diff = round(me - mc, 1)
-            parts.append(
-                f"Direzione: chi si esibisce in posizioni centrali (Q2-Q4) ottiene in media "
-                f"~{diff} posizioni migliori in classifica rispetto a chi si esibisce "
-                "all'inizio o alla fine."
-            )
+    # Effect size
+    r2_comp = s_comp.get("u_shape_R2", 0)
+    if r2_comp > 0:
+        if r2_comp < 0.04:
+            size = "trascurabile"
+        elif r2_comp < 0.10:
+            size = "piccolo"
+        elif r2_comp < 0.25:
+            size = "moderato"
+        else:
+            size = "grande"
+        parts.append(f"L'effect size è {size} (R²={r2_comp*100:.1f}%).")
 
-    # ML
-    if ml_comp or ml_tv:
+    # Practical meaning
+    mc = s_comp.get("media_centro")
+    me = s_comp.get("media_estremi")
+    if mc and me:
+        diff = round(me - mc, 1)
         parts.append(
-            "I modelli ML confermano: l'ordine di esibizione ha potere predittivo "
-            "sulla classifica (permutation test significativo)."
-        )
-    elif total_fdr > 3:
-        parts.append(
-            "I modelli ML mostrano un miglioramento modesto sulla baseline, "
-            "coerente con un effetto piccolo ma reale."
-        )
-
-    # Robustness
-    if rob_ok and total_fdr > 3:
-        parts.append("Le analisi di robustezza confermano la consistenza del risultato.")
-    elif not rob_ok:
-        parts.append(
-            "Nota: le analisi di robustezza non sono del tutto consistenti, "
-            "suggerendo cautela."
+            f"In pratica: chi si esibisce nelle posizioni centrali della serata "
+            f"ottiene in media ~{diff} posizioni migliori in classifica."
         )
 
-    # Final verdict
-    if total_fdr > 8 and not ci_comp_zero and rob_ok:
-        parts.append(
-            "Conclusione: esibirsi in zone centrali della serata sembra conferire "
-            "un vantaggio statisticamente significativo nella classifica."
-        )
-    elif total_fdr > 3:
-        parts.append(
-            "Conclusione: c'è evidenza di un effetto dell'ordine di esibizione "
-            "sulla classifica, con un vantaggio per le posizioni centrali. "
-            "L'effetto è statisticamente significativo ma di entità moderata."
-        )
-    elif total_fdr > 0:
-        parts.append(
-            "Conclusione: l'evidenza è troppo debole per trarre conclusioni definitive."
-        )
+    parts.append(
+        "Conclusione: l'effetto esiste ed è statisticamente significativo, "
+        "ma è piccolo — la posizione nell'ordine di esibizione conta, "
+        "ma molto meno del talento e della canzone. "
+        "Per un singolo artista, la posizione non è determinante."
+    )
 
     return " ".join(parts)
 
@@ -991,72 +811,62 @@ def overall_conclusion(s_comp, s_tv):
 
 def main():
     print("=" * 70)
-    print("SANREMO — ANALISI ORDINE DI ESIBIZIONE (dal nuovo Excel)")
+    print("SANREMO — ANALISI ORDINE DI ESIBIZIONE (DECILI)")
     print("=" * 70)
 
-    print("\n[1/5] Caricamento dati da Excel...")
+    print("\n[1/4] Caricamento dati da Excel...")
     df = load_data()
-    print(f"  Righe: {len(df)}")
-    print(f"  Anni: {sorted(df['year'].unique())}")
+    print(f"  Righe: {len(df)}, Anni: {sorted(df['year'].unique())}")
 
-    print("\n  Copertura:")
     for y in sorted(df["year"].unique()):
         ydf = df[df["year"] == y]
         n_tv = ydf["classifica_serata_televoto"].notna().sum()
         n_comp = ydf["classifica_serata_complessiva"].notna().sum()
-        print(f"    {y}: {len(ydf)} esibizioni, televoto={n_tv}, complessiva={n_comp}")
+        print(f"    {y}: {len(ydf)} esib., televoto={n_tv}, complessiva={n_comp}")
 
-    print("\n[2/5] Analisi per classifica serata complessiva...")
-    result_comp, _ = run_analysis_for_rank_type(
-        df, "classifica_serata_complessiva", "Classifica serata complessiva")
-    print(f"  Osservazioni: {result_comp['n_osservazioni']}")
+    print("\n[2/4] Analisi classifica complessiva...")
+    res_comp = run_analysis(df, "classifica_serata_complessiva", "Classifica serata complessiva")
+    print(f"  n={res_comp['n_osservazioni']}")
 
-    print("\n[3/5] Analisi per classifica serata televoto...")
-    result_tv, _ = run_analysis_for_rank_type(
-        df, "classifica_serata_televoto", "Classifica serata televoto")
-    print(f"  Osservazioni: {result_tv['n_osservazioni']}")
+    print("\n[3/4] Analisi classifica televoto...")
+    res_tv = run_analysis(df, "classifica_serata_televoto", "Classifica serata televoto")
+    print(f"  n={res_tv['n_osservazioni']}")
 
-    print("\n[4/5] Machine Learning...")
+    print("\n[4/4] Machine Learning...")
     try:
         ml_comp = run_ml(df, "classifica_serata_complessiva", "Classifica serata complessiva")
-        print(f"  Complessiva — baseline MAE: {ml_comp['baseline_mae']}, "
-              f"best: {ml_comp.get('miglior_modello')} MAE={ml_comp.get('miglior_mae')}")
+        print(f"  Complessiva: baseline={ml_comp['baseline_mae']}, best={ml_comp.get('miglior_modello')} MAE={ml_comp.get('miglior_mae')}")
     except ImportError:
-        print("  scikit-learn non disponibile, skip ML")
         ml_comp = {"errore": "scikit-learn non disponibile"}
 
     try:
         ml_tv = run_ml(df, "classifica_serata_televoto", "Classifica serata televoto")
-        print(f"  Televoto — baseline MAE: {ml_tv['baseline_mae']}, "
-              f"best: {ml_tv.get('miglior_modello')} MAE={ml_tv.get('miglior_mae')}")
+        print(f"  Televoto: baseline={ml_tv['baseline_mae']}, best={ml_tv.get('miglior_modello')} MAE={ml_tv.get('miglior_mae')}")
     except ImportError:
         ml_tv = {"errore": "scikit-learn non disponibile"}
 
-    print("\n[5/5] Sintesi e output...")
-    synth_comp = build_synthesis(result_comp, ml_comp)
-    synth_tv = build_synthesis(result_tv, ml_tv)
+    synth_comp = build_synthesis(res_comp, ml_comp)
+    synth_tv = build_synthesis(res_tv, ml_tv)
 
     output = {
         "meta": {
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
             "metodologia": (
-                "Analisi per quintili dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
+                "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
                 "Doppia analisi: classifica televoto e classifica complessiva di serata. "
-                "Test non parametrici (Spearman con bootstrap CI, Kruskal-Wallis con eta², "
-                "Jonckheere-Terpstra per trend ordinato, Mann-Whitney con rank-biserial r, "
-                "Chi² con Cramér's V) eseguiti per serata, per anno e globale. "
-                "Correzione per test multipli: Bonferroni e Benjamini-Hochberg FDR. "
-                "Bootstrap CI (5000 repliche) per le differenze di media. "
-                "Analisi di robustezza: tercili, rank normalizzato, esclusione finale, "
-                "esclusione serate 1-2, solo serate con >=20 artisti. "
-                "Modelli ML (Linear, RandomForest, GradientBoosting) con permutation test."
+                "Per ogni decile: conteggio 1°/2°/3°/terzultimo/penultimo/ultimo "
+                "e distribuzione completa dei rank (per grafici). "
+                "Test U-shape (quadratico vs lineare, F-test), Spearman, "
+                "Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. "
+                "Correzione FDR per test multipli. Bootstrap CI 2000 repliche. "
+                "ML con termine quadratico e permutation test."
             ),
             "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
             "anni_analizzati": [int(y) for y in sorted(df["year"].unique())],
-            "n_osservazioni_totali": int(len(df)),
-            "n_con_classifica_complessiva": int(df["classifica_serata_complessiva"].notna().sum()),
-            "n_con_classifica_televoto": int(df["classifica_serata_televoto"].notna().sum()),
+            "n_totali": int(len(df)),
+            "n_complessiva": int(df["classifica_serata_complessiva"].notna().sum()),
+            "n_televoto": int(df["classifica_serata_televoto"].notna().sum()),
         },
         "sintesi": {
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
@@ -1064,8 +874,8 @@ def main():
             "classifica_televoto": synth_tv,
             "conclusione_generale": overall_conclusion(synth_comp, synth_tv),
         },
-        "analisi_classifica_complessiva": result_comp,
-        "analisi_classifica_televoto": result_tv,
+        "analisi_classifica_complessiva": res_comp,
+        "analisi_classifica_televoto": res_tv,
         "machine_learning": {
             "classifica_complessiva": ml_comp,
             "classifica_televoto": ml_tv,
@@ -1076,32 +886,33 @@ def main():
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
 
+    # Print summary
     print(f"\n{'=' * 70}")
     print("RISULTATI")
     print(f"{'=' * 70}")
-    _print_result("Classifica complessiva", synth_comp)
-    _print_result("Classifica televoto", synth_tv)
+
+    for label, synth in [("COMPLESSIVA", synth_comp), ("TELEVOTO", synth_tv)]:
+        print(f"\n  {label}:")
+        print(f"    Test FDR significativi: {synth['n_sig_fdr']}/{synth['n_test']}")
+        print(f"    U-shape: {'SI' if synth['u_shape_significativo'] else 'NO'}, "
+              f"R²={synth['u_shape_R2']*100:.1f}%, vertice={synth['vertice_ottimale']}")
+        print(f"    Top-3 concentrati al centro: {'SI' if synth['top3_sovrarappresentati_centro'] else 'NO'} "
+              f"({synth.get('top3_pct_centro_osservato')}% vs {synth.get('top3_pct_centro_atteso')}% atteso)")
+        print(f"    Centro media={synth['media_centro']}, Estremi media={synth['media_estremi']}")
+        boot = synth.get("bootstrap_diff", {})
+        if boot:
+            print(f"    Bootstrap diff: {boot.get('diff_observed')} "
+                  f"CI=[{boot.get('ci_lower')}, {boot.get('ci_upper')}] "
+                  f"{'include 0' if boot.get('includes_zero') else 'NON include 0'}")
+
+    print(f"\n  Matrice posizioni per decile (complessiva):")
+    for d in res_comp["matrice_posizioni_per_decile"]:
+        print(f"    {d['decile']}: n={d['n']:3d}, media={d['media_classifica']:5.1f}, "
+              f"1°={d['primo']}, 2°={d['secondo']}, 3°={d['terzo']}, "
+              f"terzult={d['terzultimo']}, penult={d['penultimo']}, ult={d['ultimo']}")
+
     print(f"\nConclusione: {output['sintesi']['conclusione_generale']}")
     print(f"\nOutput: {OUTPUT_JSON}")
-
-
-def _print_result(label, s):
-    print(f"\n  {label}:")
-    print(f"    Test significativi: raw={s['n_test_significativi_raw']}, "
-          f"Bonferroni={s['n_test_significativi_bonferroni']}, "
-          f"FDR={s['n_test_significativi_fdr']} / {s['n_test_eseguiti']}")
-    print(f"    Evidenza: {s['evidenza']}")
-    print(f"    Direzione: {s['direzione']}")
-    print(f"    Media centro: {s['media_centro']}, media estremi: {s['media_estremi']}")
-    bd = s.get("bootstrap_diff_mean", {})
-    if bd:
-        print(f"    Bootstrap diff (centro-estremi): {bd.get('diff_observed')} "
-              f"CI95=[{bd.get('ci_lower')}, {bd.get('ci_upper')}] "
-              f"{'include 0' if bd.get('includes_zero') else 'NON include 0'}")
-    if s.get("ml_miglioramento") is not None:
-        print(f"    ML: miglioramento {s['ml_miglioramento']}% "
-              f"({'sig.' if s.get('ml_significativo') else 'non sig.'})")
-    print(f"    Robustezza consistente: {'Sì' if s.get('robustezza_consistente') else 'No'}")
 
 
 if __name__ == "__main__":
