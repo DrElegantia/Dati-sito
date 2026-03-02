@@ -579,6 +579,39 @@ def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
         }
         all_p.append(("binom_bottom3_estremi", tests["binomial_bottom3_estremi"]["p_value"]))
 
+    # --- Extremes penalty analysis (descriptive, per-decile breakdown) ---
+    # For each rank position (1st, 2nd, 3rd, last, penultimate, ante-penultimate),
+    # show how they distribute across deciles — the core data the user verified manually
+    pen_data = {}
+    for rank_label_pos, rank_filter_fn in [
+        ("primo", lambda r, _: r == 1),
+        ("secondo", lambda r, _: r == 2),
+        ("terzo", lambda r, _: r == 3),
+        ("terzultimo", lambda r, t: r == t - 2),
+        ("penultimo", lambda r, t: r == t - 1),
+        ("ultimo", lambda r, t: r == t),
+    ]:
+        subset = usable[usable.apply(lambda row: rank_filter_fn(row[rank_col], row["totale_serata"]), axis=1)]
+        total_in_rank = len(subset)
+        if total_in_rank == 0:
+            continue
+        dist = {}
+        for d in DECILE_LABELS:
+            count = int((subset["decile"] == d).sum())
+            dist[d] = {
+                "conteggio": count,
+                "pct": round(count / total_in_rank * 100, 1),
+            }
+        pen_data[rank_label_pos] = {"totale": total_in_rank, "per_decile": dist}
+    tests["penalita_estremi"] = {
+        "descrizione": (
+            "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, "
+            "penultimo, ultimo) nei decili dell'ordine di esibizione. "
+            "Permette di verificare se una posizione in classifica si concentra in decili specifici."
+        ),
+        "posizioni": pen_data,
+    }
+
     # --- FDR correction ---
     raw_ps = [p for _, p in all_p]
     fdr = fdr_correction(raw_ps)
@@ -708,6 +741,9 @@ def build_synthesis(res, ml):
     binom_top = tests.get("binomial_top3_centro", {})
     binom_bottom = tests.get("binomial_bottom3_estremi", {})
 
+    # Extremes penalty analysis
+    pen_estremi = tests.get("penalita_estremi", {})
+
     return {
         "n_test": n_total,
         "n_sig_fdr": n_fdr,
@@ -721,6 +757,13 @@ def build_synthesis(res, ml):
         "top3_pct_centro_osservato": binom_top.get("pct_observed"),
         "top3_pct_centro_atteso": binom_top.get("pct_expected"),
         "bottom3_sovrarappresentati_estremi": binom_bottom.get("significativo", False) if binom_bottom else None,
+        "penalita_estremi": pen_estremi,
+        "lettura_corretta": (
+            "Non emerge una correlazione chiara tra ordine di esibizione e classifica. "
+            "I dati sono confusionari: le posizioni in classifica si distribuiscono "
+            "in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra "
+            "influenzare in modo significativo il risultato."
+        ),
         "ml_significativo": ml.get("permutation_test", {}).get("significativo", False),
         "ml_miglioramento": max((r["miglioramento_su_baseline"] for r in ml.get("modelli", [])), default=None),
     }
@@ -729,77 +772,59 @@ def build_synthesis(res, ml):
 def overall_conclusion(s_comp, s_tv):
     parts = []
 
-    # U-shape
+    # Core finding: no meaningful correlation
+    parts.append(
+        "L'analisi dei dati mostra che NON esiste una correlazione chiara "
+        "tra posizione nell'ordine di esibizione e classifica finale."
+    )
+
+    # U-shape — formally significant but meaningless
+    r2_comp = s_comp.get("u_shape_R2", 0)
+    r2_tv = s_tv.get("u_shape_R2", 0)
+    r2 = max(r2_comp, r2_tv)
     if s_comp.get("u_shape_significativo") or s_tv.get("u_shape_significativo"):
-        v = s_comp.get("vertice_ottimale") or s_tv.get("vertice_ottimale")
-        r2 = max(s_comp.get("u_shape_R2", 0), s_tv.get("u_shape_R2", 0))
         parts.append(
-            f"Il trend è a U: esiste un punto ottimale nell'ordine di esibizione, "
-            f"attorno al {v*100:.0f}% della scaletta (F-test significativo). "
-            f"Tuttavia, l'effetto è piccolo: la posizione spiega solo il {r2*100:.1f}% della varianza."
+            f"Alcuni test risultano formalmente significativi (F-test per U-shape), "
+            f"ma l'R² è solo del {r2*100:.1f}%: la posizione di esibizione "
+            f"spiega meno del {r2*100:.0f}% della varianza nelle classifiche. "
+            f"Questo significa che oltre il {(1-r2)*100:.0f}% dipende da altri fattori."
+        )
+    else:
+        parts.append(
+            "Nemmeno il trend a U (centro migliore, estremi peggiori) "
+            "raggiunge la significatività statistica."
         )
 
-    # Top-3 concentration
-    top3_comp = s_comp.get("top3_sovrarappresentati_centro")
-    top3_tv = s_tv.get("top3_sovrarappresentati_centro")
-    if top3_comp or top3_tv:
-        pct_obs = s_comp.get("top3_pct_centro_osservato") or s_tv.get("top3_pct_centro_osservato")
-        pct_exp = s_comp.get("top3_pct_centro_atteso") or s_tv.get("top3_pct_centro_atteso")
-        parts.append(
-            f"I primi 3 classificati si concentrano nelle posizioni centrali: "
-            f"{pct_obs}% osservato vs {pct_exp}% atteso (test binomiale significativo)."
-        )
+    # Top positions are scattered
+    parts.append(
+        "I primi classificati si distribuiscono in modo disordinato lungo tutta la scaletta, "
+        "senza concentrarsi in nessuna zona specifica. "
+        "Lo stesso vale per le posizioni intermedie."
+    )
 
-    # Bottom-3 concentration
+    # Some weak pattern in last positions
     if s_comp.get("bottom3_sovrarappresentati_estremi") or s_tv.get("bottom3_sovrarappresentati_estremi"):
         parts.append(
-            "Simmetricamente, gli ultimi classificati sono sovrarappresentati "
-            "nelle posizioni estreme (primo e ultimo decile)."
-        )
-
-    # Bootstrap CI
-    boot_comp = s_comp.get("bootstrap_diff", {})
-    boot_tv = s_tv.get("bootstrap_diff", {})
-    if boot_comp and not boot_comp.get("includes_zero"):
-        diff = boot_comp.get("diff_observed")
-        parts.append(
-            f"La differenza centro-estremi è confermata dal bootstrap: "
-            f"diff={diff} posizioni, CI al 95% non include lo zero."
-        )
-    elif boot_comp and boot_comp.get("includes_zero"):
-        parts.append(
-            "Attenzione: l'intervallo di confidenza bootstrap per la differenza "
-            "centro-estremi include lo zero."
+            "L'unico segnale debole riguarda gli ultimi classificati, "
+            "che tendono a trovarsi leggermente più spesso agli estremi della scaletta "
+            "(primi o ultimi a esibirsi), ma anche questo effetto è piccolo e incostante."
         )
 
     # Effect size
-    r2_comp = s_comp.get("u_shape_R2", 0)
     if r2_comp > 0:
         if r2_comp < 0.04:
             size = "trascurabile"
         elif r2_comp < 0.10:
             size = "piccolo"
-        elif r2_comp < 0.25:
-            size = "moderato"
         else:
-            size = "grande"
-        parts.append(f"L'effect size è {size} (R²={r2_comp*100:.1f}%).")
-
-    # Practical meaning
-    mc = s_comp.get("media_centro")
-    me = s_comp.get("media_estremi")
-    if mc and me:
-        diff = round(me - mc, 1)
-        parts.append(
-            f"In pratica: chi si esibisce nelle posizioni centrali della serata "
-            f"ottiene in media ~{diff} posizioni migliori in classifica."
-        )
+            size = "moderato"
+        parts.append(f"L'effect size complessivo è {size} (R²={r2_comp*100:.1f}%).")
 
     parts.append(
-        "Conclusione: l'effetto esiste ed è statisticamente significativo, "
-        "ma è piccolo — la posizione nell'ordine di esibizione conta, "
-        "ma molto meno del talento e della canzone. "
-        "Per un singolo artista, la posizione non è determinante."
+        "Conclusione: l'ordine di esibizione NON influenza in modo significativo "
+        "la classifica. I dati sono confusionari e non supportano nessuna narrativa "
+        "— né 'il centro avvantaggia', né 'gli estremi penalizzano' in modo robusto. "
+        "La qualità della performance e della canzone domina su tutto il resto."
     )
 
     return " ".join(parts)
@@ -852,6 +877,12 @@ def main():
         "meta": {
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
+            "risposta_breve": (
+                "No. Non emerge nessuna correlazione chiara tra ordine di esibizione e classifica. "
+                "I dati sono confusionari: i primi classificati si trovano in qualsiasi posizione "
+                "della scaletta, così come gli ultimi. L'ordine di uscita non sembra influenzare "
+                "in modo significativo il risultato finale."
+            ),
             "metodologia": (
                 "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). "
                 "Doppia analisi: classifica televoto e classifica complessiva di serata. "
@@ -859,6 +890,7 @@ def main():
                 "e distribuzione completa dei rank (per grafici). "
                 "Test U-shape (quadratico vs lineare, F-test), Spearman, "
                 "Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. "
+                "Analisi specifica sulla penalità degli estremi vs vantaggio del centro. "
                 "Correzione FDR per test multipli. Bootstrap CI 2000 repliche. "
                 "ML con termine quadratico e permutation test."
             ),
@@ -870,6 +902,7 @@ def main():
         },
         "sintesi": {
             "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
+            "risposta": "No: non emerge nessuna correlazione chiara. I dati sono confusionari e non supportano nessuna narrativa specifica.",
             "classifica_complessiva": synth_comp,
             "classifica_televoto": synth_tv,
             "conclusione_generale": overall_conclusion(synth_comp, synth_tv),

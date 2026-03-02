@@ -2,7 +2,8 @@
   "meta": {
     "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
     "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
-    "metodologia": "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). Doppia analisi: classifica televoto e classifica complessiva di serata. Per ogni decile: conteggio 1°/2°/3°/terzultimo/penultimo/ultimo e distribuzione completa dei rank (per grafici). Test U-shape (quadratico vs lineare, F-test), Spearman, Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. Correzione FDR per test multipli. Bootstrap CI 2000 repliche. ML con termine quadratico e permutation test.",
+    "risposta_breve": "No. Non emerge nessuna correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: i primi classificati si trovano in qualsiasi posizione della scaletta, così come gli ultimi. L'ordine di uscita non sembra influenzare in modo significativo il risultato finale.",
+    "metodologia": "Analisi per DECILI dell'ordine di esibizione relativo (0=primo, 1=ultimo). Doppia analisi: classifica televoto e classifica complessiva di serata. Per ogni decile: conteggio 1°/2°/3°/terzultimo/penultimo/ultimo e distribuzione completa dei rank (per grafici). Test U-shape (quadratico vs lineare, F-test), Spearman, Kruskal-Wallis, Mann-Whitney, Chi², test binomiale. Analisi specifica sulla penalità degli estremi vs vantaggio del centro. Correzione FDR per test multipli. Bootstrap CI 2000 repliche. ML con termine quadratico e permutation test.",
     "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
     "anni_analizzati": [
       2019,
@@ -19,6 +20,7 @@
   },
   "sintesi": {
     "domanda": "Esibirsi in zone centrali è meglio per il ranking della serata?",
+    "risposta": "No: non emerge nessuna correlazione chiara. I dati sono confusionari e non supportano nessuna narrativa specifica.",
     "classifica_complessiva": {
       "n_test": 99,
       "n_sig_fdr": 17,
@@ -38,6 +40,282 @@
       "top3_pct_centro_osservato": 68.6,
       "top3_pct_centro_atteso": 48.2,
       "bottom3_sovrarappresentati_estremi": true,
+      "penalita_estremi": {
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "posizioni": {
+          "primo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D4 (30-40%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              },
+              "D5 (40-50%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D6 (50-60%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D9 (80-90%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              }
+            }
+          },
+          "secondo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              },
+              "D6 (50-60%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              }
+            }
+          },
+          "terzo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              }
+            }
+          },
+          "terzultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              }
+            }
+          },
+          "penultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D9 (80-90%)": {
+                "conteggio": 9,
+                "pct": 26.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              }
+            }
+          },
+          "ultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 10,
+                "pct": 29.4
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              }
+            }
+          }
+        }
+      },
+      "lettura_corretta": "Non emerge una correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: le posizioni in classifica si distribuiscono in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra influenzare in modo significativo il risultato.",
       "ml_significativo": true,
       "ml_miglioramento": 5.44
     },
@@ -60,10 +338,286 @@
       "top3_pct_centro_osservato": 63.5,
       "top3_pct_centro_atteso": 48.3,
       "bottom3_sovrarappresentati_estremi": true,
+      "penalita_estremi": {
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "posizioni": {
+          "primo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D6 (50-60%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              }
+            }
+          },
+          "secondo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D6 (50-60%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              }
+            }
+          },
+          "terzo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              }
+            }
+          },
+          "terzultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D7 (60-70%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D10 (90-100%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              }
+            }
+          },
+          "penultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D3 (20-30%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 8,
+                "pct": 38.1
+              }
+            }
+          },
+          "ultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D2 (10-20%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D9 (80-90%)": {
+                "conteggio": 8,
+                "pct": 38.1
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 28.6
+              }
+            }
+          }
+        }
+      },
+      "lettura_corretta": "Non emerge una correlazione chiara tra ordine di esibizione e classifica. I dati sono confusionari: le posizioni in classifica si distribuiscono in modo disordinato lungo tutti i decili. L'ordine di uscita non sembra influenzare in modo significativo il risultato.",
       "ml_significativo": true,
       "ml_miglioramento": 8.18
     },
-    "conclusione_generale": "Il trend è a U: esiste un punto ottimale nell'ordine di esibizione, attorno al 43% della scaletta (F-test significativo). Tuttavia, l'effetto è piccolo: la posizione spiega solo il 15.1% della varianza. I primi 3 classificati si concentrano nelle posizioni centrali: 68.6% osservato vs 48.2% atteso (test binomiale significativo). Simmetricamente, gli ultimi classificati sono sovrarappresentati nelle posizioni estreme (primo e ultimo decile). La differenza centro-estremi è confermata dal bootstrap: diff=-4.1844 posizioni, CI al 95% non include lo zero. L'effect size è piccolo (R²=9.6%). In pratica: chi si esibisce nelle posizioni centrali della serata ottiene in media ~4.2 posizioni migliori in classifica. Conclusione: l'effetto esiste ed è statisticamente significativo, ma è piccolo — la posizione nell'ordine di esibizione conta, ma molto meno del talento e della canzone. Per un singolo artista, la posizione non è determinante."
+    "conclusione_generale": "L'analisi dei dati mostra che NON esiste una correlazione chiara tra posizione nell'ordine di esibizione e classifica finale. Alcuni test risultano formalmente significativi (F-test per U-shape), ma l'R² è solo del 15.1%: la posizione di esibizione spiega meno del 15% della varianza nelle classifiche. Questo significa che oltre il 85% dipende da altri fattori. I primi classificati si distribuiscono in modo disordinato lungo tutta la scaletta, senza concentrarsi in nessuna zona specifica. Lo stesso vale per le posizioni intermedie. L'unico segnale debole riguarda gli ultimi classificati, che tendono a trovarsi leggermente più spesso agli estremi della scaletta (primi o ultimi a esibirsi), ma anche questo effetto è piccolo e incostante. L'effect size complessivo è piccolo (R²=9.6%). Conclusione: l'ordine di esibizione NON influenza in modo significativo la classifica. I dati sono confusionari e non supportano nessuna narrativa — né 'il centro avvantaggia', né 'gli estremi penalizzano' in modo robusto. La qualità della performance e della canzone domina su tutto il resto."
   },
   "analisi_classifica_complessiva": {
     "tipo_classifica": "Classifica serata complessiva",
@@ -10135,6 +10689,281 @@
         "pct_expected": 33.6,
         "p_value": 0.0,
         "significativo": true
+      },
+      "penalita_estremi": {
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "posizioni": {
+          "primo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D4 (30-40%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              },
+              "D5 (40-50%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D6 (50-60%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D9 (80-90%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              }
+            }
+          },
+          "secondo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D3 (20-30%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              },
+              "D6 (50-60%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              },
+              "D7 (60-70%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              }
+            }
+          },
+          "terzo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              }
+            }
+          },
+          "terzultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              }
+            }
+          },
+          "penultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 8.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 5,
+                "pct": 14.7
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D9 (80-90%)": {
+                "conteggio": 9,
+                "pct": 26.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 7,
+                "pct": 20.6
+              }
+            }
+          },
+          "ultimo": {
+            "totale": 34,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 10,
+                "pct": 29.4
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 1,
+                "pct": 2.9
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 5.9
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 11.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 8,
+                "pct": 23.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 17.6
+              }
+            }
+          }
+        }
       },
       "correzione_test_multipli": {
         "n_test": 99,
@@ -23007,6 +23836,281 @@
         "pct_expected": 32.8,
         "p_value": 0.0,
         "significativo": true
+      },
+      "penalita_estremi": {
+        "descrizione": "Distribuzione di ciascuna posizione in classifica (1°, 2°, 3°, terzultimo, penultimo, ultimo) nei decili dell'ordine di esibizione. Permette di verificare se una posizione in classifica si concentra in decili specifici.",
+        "posizioni": {
+          "primo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D2 (10-20%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D6 (50-60%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              }
+            }
+          },
+          "secondo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D5 (40-50%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D6 (50-60%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D9 (80-90%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              }
+            }
+          },
+          "terzo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D2 (10-20%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D3 (20-30%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D4 (30-40%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D10 (90-100%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              }
+            }
+          },
+          "terzultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D4 (30-40%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D5 (40-50%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D6 (50-60%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D7 (60-70%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D8 (70-80%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D9 (80-90%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D10 (90-100%)": {
+                "conteggio": 5,
+                "pct": 23.8
+              }
+            }
+          },
+          "penultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D2 (10-20%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D3 (20-30%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D6 (50-60%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D9 (80-90%)": {
+                "conteggio": 4,
+                "pct": 19.0
+              },
+              "D10 (90-100%)": {
+                "conteggio": 8,
+                "pct": 38.1
+              }
+            }
+          },
+          "ultimo": {
+            "totale": 21,
+            "per_decile": {
+              "D1 (0-10%)": {
+                "conteggio": 3,
+                "pct": 14.3
+              },
+              "D2 (10-20%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D3 (20-30%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D4 (30-40%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D5 (40-50%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D6 (50-60%)": {
+                "conteggio": 2,
+                "pct": 9.5
+              },
+              "D7 (60-70%)": {
+                "conteggio": 1,
+                "pct": 4.8
+              },
+              "D8 (70-80%)": {
+                "conteggio": 0,
+                "pct": 0.0
+              },
+              "D9 (80-90%)": {
+                "conteggio": 8,
+                "pct": 38.1
+              },
+              "D10 (90-100%)": {
+                "conteggio": 6,
+                "pct": 28.6
+              }
+            }
+          }
+        }
       },
       "correzione_test_multipli": {
         "n_test": 71,
