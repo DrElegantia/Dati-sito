@@ -820,13 +820,13 @@ def analisi_successo_top5(usable, rank_col, soglia_pct=20):
                 "p_value": round(float(chi2_p), 6),
                 "significativo": bool(chi2_p < 0.05),
                 "interpretazione": (
-                    f"La distribuzione dei top-{n_top} tra i gruppi è "
+                    f"La distribuzione dei top {soglia_pct}% tra i gruppi è "
                     + ("significativamente diversa da quella attesa (p<0.05). "
                        if chi2_p < 0.05 else
                        "compatibile con una distribuzione uniforme (p≥0.05). ")
-                    + f"Tuttavia, l'ordine di esibizione non è casuale: "
-                    f"le differenze osservate possono riflettere le scelte "
-                    f"della produzione RAI nella composizione della scaletta."
+                    + "Tuttavia, l'ordine di esibizione non è casuale: "
+                    "le differenze osservate possono riflettere le scelte "
+                    "della produzione RAI nella composizione della scaletta."
                 ),
             },
         }
