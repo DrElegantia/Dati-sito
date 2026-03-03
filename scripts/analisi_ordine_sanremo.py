@@ -737,17 +737,24 @@ SECTION_BINS = [-0.001, 0.333, 0.667, 1.001]
 SECTION_LABELS = ["Inizio (0-33%)", "Centro (33-67%)", "Fine (67-100%)"]
 
 
-def analisi_successo_top5(usable, rank_col, n_top=5):
-    """Core analysis: which zone of the lineup produces more top-N finishers?
+def analisi_successo_top5(usable, rank_col, soglia_pct=20):
+    """Core analysis: which zone of the lineup produces more top finishers?
+
+    Uses a RELATIVE threshold (top 20% of each serata) instead of absolute
+    top-N, so that comparisons are fair across serate of different sizes
+    (e.g. 12 vs 24 performers in split vs full serate).
 
     For each grouping (decile, quartile, section), computes:
-    - Success rate (% of performers finishing in top-N)
+    - Success rate (% of performers finishing in top 20%)
     - Chi-squared test (are rates equal across groups?)
     - Per-group binomial test (is this group above/below expected?)
     - Odds ratio vs baseline
     """
     usable = usable.copy()
-    usable["is_topN"] = usable[rank_col] <= n_top
+    # Criterio relativo: top 20% di ogni serata
+    # rank_norm = (rank - 1) / (totale_serata - 1), dove 0 = primo, 1 = ultimo
+    usable["rank_norm_serata"] = (usable[rank_col] - 1) / np.maximum(usable["totale_serata"] - 1, 1)
+    usable["is_topN"] = usable["rank_norm_serata"] <= (soglia_pct / 100)
 
     n_total = len(usable)
     n_success = int(usable["is_topN"].sum())
@@ -760,13 +767,15 @@ def analisi_successo_top5(usable, rank_col, n_top=5):
                                bins=SECTION_BINS, labels=SECTION_LABELS)
 
     result = {
-        "n_top": n_top,
+        "criterio": f"top {soglia_pct}% di ogni serata (criterio relativo)",
         "n_totale": n_total,
         "n_successi": n_success,
         "tasso_base": round(base_rate * 100, 1),
         "descrizione": (
             f"Per ogni raggruppamento, si calcola la percentuale di esibizioni "
-            f"che hanno ottenuto una classifica tra i primi {n_top}. "
+            f"che si sono classificate nel top {soglia_pct}% della propria serata. "
+            f"Il criterio è relativo (non assoluto) per garantire equità tra "
+            f"serate di dimensioni diverse (split vs complete). "
             f"Il tasso base (atteso se la posizione fosse irrilevante) è "
             f"{base_rate*100:.1f}%."
         ),
@@ -831,6 +840,8 @@ def analisi_successo_top5(usable, rank_col, n_top=5):
 
 def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
     usable = df[df[rank_col].notna()].copy()
+    # Escludi serata 4 (cover): dinamica diversa, non comparabile
+    usable = usable[usable["serata"] != 4].copy()
     usable[rank_col] = usable[rank_col].astype(int)
     usable["decile"] = assign_decile(usable["posizione_relativa"])
     usable["rank_norm"] = normalize_rank(usable[rank_col], usable["totale_serata"])
@@ -844,7 +855,7 @@ def run_analysis(df: pd.DataFrame, rank_col: str, rank_label: str):
     }
 
     # --- TOP-5 SUCCESS RATE ANALYSIS (core) ---
-    result["successo_top5"] = analisi_successo_top5(usable, rank_col, n_top=5)
+    result["successo_top"] = analisi_successo_top5(usable, rank_col, soglia_pct=20)
 
     # --- Position-count matrix (MAIN VISUALIZATION DATA) ---
     result["matrice_posizioni_per_decile"] = build_position_count_matrix(usable, rank_col)
@@ -1151,6 +1162,7 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
     from sklearn.model_selection import cross_val_score
 
     usable = df[df[rank_col].notna()].copy()
+    usable = usable[usable["serata"] != 4].copy()  # Escludi cover
     usable[rank_col] = usable[rank_col].astype(int)
     usable["rank_norm"] = normalize_rank(usable[rank_col], usable["totale_serata"])
 
@@ -1220,7 +1232,7 @@ def run_ml(df: pd.DataFrame, rank_col: str, rank_label: str):
 
 def build_synthesis(res, ml):
     tests = res["test_statistici"]
-    top5 = res.get("successo_top5", {})
+    top5 = res.get("successo_top", {})
     corr = tests.get("correzione_test_multipli", {})
     n_fdr = corr.get("n_sig_fdr", 0)
     n_total = corr.get("n_test", 0)
@@ -1448,29 +1460,30 @@ def overall_conclusion(s_comp, s_tv):
 
     # 1. Frame the question
     parts.append(
-        "Domanda: quale zona della scaletta produce più piazzamenti in top 5?"
+        "Domanda: quale zona della scaletta produce più piazzamenti nei primi posti?"
     )
 
     # 2. What the data shows
     parts.append(
+        f"Tasso di successo (top 20% della serata) per sezione della scaletta. "
         f"Classifica complessiva: Inizio {inizio_comp}%, Centro {centro_comp}%, "
         f"Fine {fine_comp}% (tasso atteso: {base_comp}%). "
         f"Classifica televoto: Inizio {inizio_tv}%, Centro {centro_tv}%, "
         f"Fine {fine_tv}% (tasso atteso: {base_tv}%). "
-        f"Le posizioni centrali producono più top-5, le finali meno."
+        f"Le posizioni centrali hanno un tasso di successo più alto."
     )
 
     # 3. Statistical significance
     p_comp = chi2_sez_comp.get("p_value", 1)
     parts.append(
         f"Il chi-squared per sezione è significativo (p={p_comp:.4f}): "
-        "la distribuzione dei top-5 nella scaletta non è uniforme."
+        "la distribuzione dei successi nella scaletta non è uniforme."
     )
 
     # 4. THE KEY ARGUMENT: confounding
     parts.append(
         "Tuttavia, l'ordine di esibizione a Sanremo NON è casuale: è deciso dalla "
-        "produzione RAI. Il fatto che le posizioni centrali producano più top-5 "
+        "produzione RAI. Il maggior tasso di successo delle posizioni centrali "
         "ha una spiegazione più semplice: la produzione colloca gli artisti più forti "
         "o attesi al centro della scaletta. La concentrazione di successi al centro "
         "riflette le scelte organizzative, non un vantaggio della posizione."
@@ -1541,16 +1554,17 @@ def main():
     output = {
         "meta": {
             "titolo": "Sanremo — L'ordine di esibizione influenza la classifica?",
-            "domanda": "Quale zona della scaletta produce più piazzamenti in top 5?",
+            "domanda": "Quale zona della scaletta produce più piazzamenti nei primi posti?",
             "risposta_breve": (
                 "No: la posizione nell'ordine di esibizione non determina il risultato. "
-                "Le posizioni centrali producono più top-5 (Centro ~31% vs Fine ~15%), "
-                "ma l'ordine non è casuale: è la produzione RAI che colloca "
-                "strategicamente gli artisti nella scaletta. Le differenze nei tassi "
-                "di successo riflettono questa scelta organizzativa, non un vantaggio "
-                "intrinseco della posizione. L'assenza di aggiustamenti nelle quote "
-                "dei bookmaker conferma che il mercato non considera la posizione "
-                "un fattore predittivo."
+                "I dati mostrano che le posizioni centrali della scaletta hanno un "
+                "tasso di successo più alto (top 20% della serata), ma l'ordine non "
+                "è casuale: è la produzione RAI che colloca strategicamente gli artisti. "
+                "Le differenze nei tassi di successo riflettono questa scelta "
+                "organizzativa, non un vantaggio intrinseco della posizione. "
+                "L'assenza di aggiustamenti nelle quote dei bookmaker conferma che "
+                "il mercato non considera la posizione un fattore predittivo. "
+                "La serata 4 (cover) è esclusa perché ha una dinamica diversa."
             ),
             "metodologia": (
                 "ANALISI PRINCIPALE: tasso di successo top-5 per zona della scaletta. "
@@ -1569,16 +1583,19 @@ def main():
             "fonte_dati": "dati_sremo/sanremo_dati_serate.xlsx",
             "anni_analizzati": [int(y) for y in sorted(df["year"].unique())],
             "n_totali": int(len(df)),
-            "n_complessiva": int(df["classifica_serata_complessiva"].notna().sum()),
-            "n_televoto": int(df["classifica_serata_televoto"].notna().sum()),
+            "esclusione": "Serata 4 (cover) esclusa: dinamica diversa (brano altrui, duetti), classifica non comparabile",
+            "n_complessiva_pre_esclusione": int(df["classifica_serata_complessiva"].notna().sum()),
+            "n_televoto_pre_esclusione": int(df["classifica_serata_televoto"].notna().sum()),
+            "n_serata4_escluse": int(df[df["serata"] == 4].shape[0]),
         },
         "sintesi": {
-            "domanda": "Quale zona della scaletta produce più piazzamenti in top 5?",
+            "domanda": "Quale zona della scaletta produce più piazzamenti nei primi posti?",
             "risposta": (
-                "Le posizioni centrali della scaletta producono più top-5, "
-                "le finali meno. Ma l'ordine non è casuale: la produzione RAI "
-                "colloca gli artisti strategicamente. Le differenze osservate "
-                "riflettono questa scelta, non un effetto causale della posizione."
+                "Le posizioni centrali della scaletta hanno un tasso di successo "
+                "più alto (criterio: top 20% relativo per serata), le finali più basso. "
+                "Ma l'ordine non è casuale: la produzione RAI colloca gli artisti "
+                "strategicamente. Le differenze osservate riflettono questa scelta, "
+                "non un effetto causale della posizione."
             ),
             "classifica_complessiva": synth_comp,
             "classifica_televoto": synth_tv,
@@ -1604,7 +1621,7 @@ def main():
 
     for label, synth in [("COMPLESSIVA", synth_comp), ("TELEVOTO", synth_tv)]:
         print(f"\n  {label}:")
-        print(f"    === TASSO TOP-5 PER SEZIONE ===")
+        print(f"    === TASSO TOP-20% PER SEZIONE ===")
         print(f"    Tasso base: {synth.get('top5_tasso_base')}%")
         print(f"    Inizio (0-33%): {synth.get('top5_tasso_inizio')}%")
         print(f"    Centro (33-67%): {synth.get('top5_tasso_centro')}%")
