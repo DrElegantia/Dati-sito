@@ -173,6 +173,20 @@ def load_sub_history():
     return []
 
 
+def load_fixed_fields():
+    """Carica campi fissi (non derivabili da API) dal JSON esistente."""
+    fixed = {}
+    if OUTPUT.exists():
+        try:
+            data = json.loads(OUTPUT.read_text("utf-8"))
+            for key in ("audience_age_distribution",):
+                if key in data:
+                    fixed[key] = data[key]
+        except Exception:
+            pass
+    return fixed
+
+
 def update_sub_history(hist, current):
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     if hist and hist[-1]["date"] == today:
@@ -214,6 +228,7 @@ def main():
 
     sub_hist = update_sub_history(load_sub_history(), ch["subscribers"])
     sub_gains = monthly_sub_gains(sub_hist)
+    fixed = load_fixed_fields()
 
     pwd = os.environ.get("YT_DASHBOARD_PWD", "economiaitalia")
     pwd_hash = hashlib.sha256(pwd.encode()).hexdigest()
@@ -233,6 +248,7 @@ def main():
         "monthly_videos_published": m_count,
         "monthly_avg_views": m_avg,
         "boxplot_data": bp,
+        **fixed,
     }
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
