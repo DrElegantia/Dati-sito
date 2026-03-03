@@ -78,6 +78,30 @@ def load_data() -> pd.DataFrame:
 
     df["posizione_relativa"] = (df["ordine"] - 1) / np.maximum(df["totale_serata"] - 1, 1)
     df["posizione_relativa"] = df["posizione_relativa"].round(4)
+
+    # --- Correzione NP: nelle serate split degli anni con Nuove Proposte,
+    # circa 5 NP si esibivano prima dei Big, spostando la posizione broadcast.
+    # Aggiungiamo 5 al totale e all'ordine per riflettere la posizione reale
+    # nello show (non solo tra i Big).
+    ANNI_CON_NP = {2018, 2020, 2021, 2025}
+    NP_PER_SERATA_SPLIT = 5
+
+    for year in df["year"].unique():
+        if int(year) not in ANNI_CON_NP:
+            continue
+        mask_year = df["year"] == year
+        max_tot = df.loc[mask_year, "totale_serata"].max()
+        # Serate split: circa metà degli artisti (threshold 70% del max)
+        # Esclude serate quasi-complete (es. Bugo squalificato, 23 vs 24)
+        split_threshold = int(max_tot * 0.7)
+        mask_split = mask_year & (df["totale_serata"] <= split_threshold)
+        df.loc[mask_split, "ordine"] += NP_PER_SERATA_SPLIT
+        df.loc[mask_split, "totale_serata"] += NP_PER_SERATA_SPLIT
+
+    # Ricalcola posizione_relativa dopo correzione NP
+    df["posizione_relativa"] = (df["ordine"] - 1) / np.maximum(df["totale_serata"] - 1, 1)
+    df["posizione_relativa"] = df["posizione_relativa"].round(4)
+
     return df
 
 
