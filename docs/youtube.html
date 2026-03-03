@@ -145,7 +145,7 @@ footer{text-align:center;padding:2rem 1rem;color:#999;font-size:.8rem}
   <section class="card">
     <h2>6. Distribuzione Pubblico per Età</h2>
     <div class="chart-wrap"><canvas id="chart6"></canvas></div>
-    <p class="legend-note">Dati fissi (non disponibili via API pipeline)</p>
+    <p class="legend-note">Distribuzione percentuale del pubblico per fascia di età</p>
   </section>
 
   <footer>Dati aggiornati quotidianamente via YouTube Data API v3</footer>
@@ -232,12 +232,12 @@ function render() {
   document.getElementById('kpi-shorts').textContent = fmtN(shortsCount);
   document.getElementById('kpi-longs').textContent = fmtN(longsCount);
 
-  renderChart1(24);
-  renderChart2();
-  renderChart3(24);
-  renderChart4(24);
-  renderChart5();
-  renderChart6();
+  try { renderChart1(24); } catch(e) { console.error('Chart1:', e); }
+  try { renderChart2(); } catch(e) { console.error('Chart2:', e); }
+  try { renderChart3(24); } catch(e) { console.error('Chart3:', e); }
+  try { renderChart4(24); } catch(e) { console.error('Chart4:', e); }
+  try { renderChart5(); } catch(e) { console.error('Chart5:', e); }
+  try { renderChart6(); } catch(e) { console.error('Chart6:', e); }
   bindRangeButtons();
 }
 
