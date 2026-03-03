@@ -1971,5 +1971,14 @@
         "n": 2
       }
     ]
-  }
+  },
+  "audience_age_distribution": [
+    { "range": "13-17", "percent": 0.3 },
+    { "range": "18-24", "percent": 20.3 },
+    { "range": "25-34", "percent": 41.9 },
+    { "range": "35-44", "percent": 16.1 },
+    { "range": "45-54", "percent": 8.9 },
+    { "range": "55-64", "percent": 6.8 },
+    { "range": "65+", "percent": 5.6 }
+  ]
 }
