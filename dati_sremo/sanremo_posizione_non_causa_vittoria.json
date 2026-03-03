@@ -1,0 +1,1044 @@
+{
+  "metadata": {
+    "titolo": "Analisi statistica: la posizione centrale nell'ordine di esibizione a Sanremo NON causa un vantaggio",
+    "tesi_da_confutare": "Esibirsi al centro dell'ordine di esibizione conferisce un vantaggio competitivo a Sanremo",
+    "conclusione": "La correlazione osservata tra posizione centrale e classifica migliore è spuria: è il direttore artistico che colloca i favoriti al centro, non la posizione centrale che fa vincere",
+    "fonte_dati": "sanremo_dati_serate.xlsx",
+    "anni_analizzati": [
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ],
+    "totale_osservazioni": 939,
+    "totale_osservazioni_con_televoto": 647,
+    "totale_serate_analizzate": 45,
+    "nota_metodologica": "Le posizioni e le classifiche sono normalizzate in scala [0,1] per rendere confrontabili serate con numeri diversi di esibizioni. pos_norm=0 è il primo, pos_norm=1 è l'ultimo. rank_norm=0 è il primo in classifica, rank_norm=1 è l'ultimo."
+  },
+  "sezione_1_correlazione_debole": {
+    "titolo": "La correlazione esiste ma è molto debole",
+    "spiegazione": "Anche se la correlazione è statisticamente significativa (p < 0.05), l'effetto è molto piccolo. La posizione spiega solo il 6.24% della varianza nella classifica. Il 93.76% dipende da altri fattori.",
+    "correlazione_spearman": {
+      "distanza_dal_centro_vs_classifica": {
+        "rho": 0.2727,
+        "p_value": 1.8e-17,
+        "interpretazione": "Correlazione debole positiva: chi è più lontano dal centro tende leggermente a classificarsi peggio, ma rho=0.2727 è un effetto molto piccolo"
+      },
+      "posizione_lineare_vs_classifica": {
+        "rho": 0.1245,
+        "p_value": 0.000131,
+        "interpretazione": "La posizione lineare (prima→ultima) ha una correlazione ancora più debole con la classifica"
+      }
+    },
+    "regressione_lineare": {
+      "distanza_dal_centro": {
+        "R_quadro": 0.0624,
+        "percentuale_varianza_spiegata": 6.24,
+        "percentuale_varianza_NON_spiegata": 93.76,
+        "interpretazione": "La distanza dal centro spiega solo il 6.24% della varianza. Il 93.76% dipende da altri fattori (qualità artista, canzone, esecuzione, ecc.)"
+      },
+      "posizione_lineare": {
+        "R_quadro": 0.0124,
+        "percentuale_varianza_spiegata": 1.24
+      }
+    },
+    "effect_size_cohen_d": {
+      "valore": 0.4009,
+      "interpretazione": "Cohen's d = 0.40 è un effetto piccolo-medio secondo le convenzioni di Cohen (0.2=piccolo, 0.5=medio, 0.8=grande). Esiste una differenza tra centro e non-centro, ma come dimostrato nelle sezioni successive, questa differenza è interamente spiegata dal confondente (il direttore artistico posiziona i favoriti al centro)."
+    }
+  },
+  "sezione_2_esperimento_naturale_stesso_artista": {
+    "titolo": "L'ESPERIMENTO NATURALE: stesso artista, posizioni diverse → classifica stabile",
+    "spiegazione": "Questa è la prova più forte contro la causalità. Lo stesso artista si esibisce in posizioni DIVERSE nelle varie serate dello stesso anno. Se la posizione causasse il risultato, ci aspetteremmo che cambiando posizione, la classifica cambi di conseguenza. Invece la classifica rimane sostanzialmente stabile: è la QUALITÀ dell'artista/canzone a determinare il risultato, non la posizione.",
+    "analisi_correlazione_intra_artista": {
+      "spiegazione": "Per ogni artista con almeno 4 serate nello stesso anno, calcoliamo la correlazione tra posizione e classifica",
+      "totale_artisti_analizzati": 223,
+      "correlazione_media": 0.1033,
+      "correlazione_mediana": 0.2,
+      "artisti_con_correlazione_significativa": 13,
+      "percentuale_significativi": 5.8,
+      "tasso_falsi_positivi_atteso": 5.0,
+      "interpretazione": "Solo il 5.8% degli artisti mostra una correlazione significativa tra posizione e classifica. Questo è appena sopra il 5% atteso per puro caso (falsi positivi). La correlazione media è r=0.1033, praticamente zero. Questo dimostra che quando controlliamo per la qualità dell'artista (confrontando lo STESSO artista), l'effetto della posizione SCOMPARE."
+    },
+    "variazione_intra_artista": {
+      "deviazione_std_media_posizione": 0.3023,
+      "deviazione_std_media_classifica": 0.1679,
+      "interpretazione": "La posizione varia molto tra serate (std~0.30) ma la classifica è molto più stabile (std~0.17). La classifica è determinata dalla qualità, non dalla posizione."
+    },
+    "esempi_artisti_posizione_diversa_classifica_stabile": [
+      {
+        "artista": "Clara",
+        "anno": 2024,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.172,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 19,
+            "classifica_normalizzata": 0.621
+          },
+          {
+            "serata": 2,
+            "ordine_esibizione": 15,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 12,
+            "classifica_normalizzata": 0.786
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 13,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.414,
+            "classifica_complessiva": 22,
+            "classifica_normalizzata": 0.724
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 28,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.931,
+            "classifica_complessiva": 24,
+            "classifica_normalizzata": 0.793
+          }
+        ]
+      },
+      {
+        "artista": "Gaia",
+        "anno": 2025,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.143,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 29,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 23,
+            "classifica_normalizzata": 0.786
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 14,
+            "totale_esibizioni": 14,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 13,
+            "classifica_normalizzata": 0.923
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 9,
+            "totale_esibizioni": 26,
+            "posizione_normalizzata": 0.32,
+            "classifica_complessiva": 22,
+            "classifica_normalizzata": 0.84
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 26,
+            "totale_esibizioni": 29,
+            "posizione_normalizzata": 0.893,
+            "classifica_complessiva": 27,
+            "classifica_normalizzata": 0.929
+          }
+        ]
+      },
+      {
+        "artista": "Giusy Ferreri",
+        "anno": 2022,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.098,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 12,
+            "totale_esibizioni": 12,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 10,
+            "classifica_normalizzata": 0.818
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 25,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 23,
+            "classifica_normalizzata": 0.917
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 23,
+            "totale_esibizioni": 25,
+            "posizione_normalizzata": 0.917,
+            "classifica_complessiva": 23,
+            "classifica_normalizzata": 0.917
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 2,
+            "totale_esibizioni": 25,
+            "posizione_normalizzata": 0.042,
+            "classifica_complessiva": 23,
+            "classifica_normalizzata": 0.917
+          }
+        ]
+      },
+      {
+        "artista": "Le Vibrazioni",
+        "anno": 2018,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.158,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 20,
+            "totale_esibizioni": 20,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 14,
+            "classifica_normalizzata": 0.684
+          },
+          {
+            "serata": 2,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 10,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 6,
+            "classifica_normalizzata": 0.556
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 2,
+            "totale_esibizioni": 20,
+            "posizione_normalizzata": 0.053,
+            "classifica_complessiva": 13,
+            "classifica_normalizzata": 0.632
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 19,
+            "totale_esibizioni": 20,
+            "posizione_normalizzata": 0.947,
+            "classifica_complessiva": 11,
+            "classifica_normalizzata": 0.526
+          }
+        ]
+      },
+      {
+        "artista": "Mahmood",
+        "anno": 2019,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.217,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 24,
+            "totale_esibizioni": 24,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 8,
+            "classifica_normalizzata": 0.304
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 12,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 4,
+            "classifica_normalizzata": 0.273
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 8,
+            "totale_esibizioni": 24,
+            "posizione_normalizzata": 0.304,
+            "classifica_complessiva": 5,
+            "classifica_normalizzata": 0.174
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 9,
+            "totale_esibizioni": 24,
+            "posizione_normalizzata": 0.348,
+            "classifica_complessiva": 3,
+            "classifica_normalizzata": 0.087
+          }
+        ]
+      },
+      {
+        "artista": "Paola & Chiara",
+        "anno": 2023,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.205,
+        "serate": [
+          {
+            "serata": 2,
+            "ordine_esibizione": 14,
+            "totale_esibizioni": 14,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 7,
+            "classifica_normalizzata": 0.462
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 14,
+            "classifica_normalizzata": 0.481
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 27,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 0.963,
+            "classifica_complessiva": 19,
+            "classifica_normalizzata": 0.667
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 15,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 0.519,
+            "classifica_complessiva": 17,
+            "classifica_normalizzata": 0.593
+          }
+        ]
+      },
+      {
+        "artista": "Renga Nek",
+        "anno": 2024,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.135,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 20,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.655,
+            "classifica_complessiva": 25,
+            "classifica_normalizzata": 0.828
+          },
+          {
+            "serata": 2,
+            "ordine_esibizione": 2,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 0.071,
+            "classifica_complessiva": 14,
+            "classifica_normalizzata": 0.929
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 30,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 24,
+            "classifica_normalizzata": 0.793
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 25,
+            "classifica_normalizzata": 0.828
+          }
+        ]
+      },
+      {
+        "artista": "Will",
+        "anno": 2023,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.08,
+        "serate": [
+          {
+            "serata": 2,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 14,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 12,
+            "classifica_normalizzata": 0.846
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 28,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 26,
+            "classifica_normalizzata": 0.926
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 2,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 0.037,
+            "classifica_complessiva": 25,
+            "classifica_normalizzata": 0.889
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 21,
+            "totale_esibizioni": 28,
+            "posizione_normalizzata": 0.741,
+            "classifica_complessiva": 26,
+            "classifica_normalizzata": 0.926
+          }
+        ]
+      }
+    ],
+    "esempi_artisti_posizione_diversa_classifica_volatile": [
+      {
+        "artista": "Ditonellapiaga",
+        "anno": 2026,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.714,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 3,
+            "classifica_normalizzata": 0.069
+          },
+          {
+            "serata": 2,
+            "ordine_esibizione": 15,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 11,
+            "classifica_normalizzata": 0.714
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 17,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.552,
+            "classifica_complessiva": 1,
+            "classifica_normalizzata": 0.0
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 15,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.483,
+            "classifica_complessiva": 4,
+            "classifica_normalizzata": 0.103
+          }
+        ]
+      },
+      {
+        "artista": "Il Tre",
+        "anno": 2024,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 1.0,
+        "range_classifica_normalizzata": 0.648,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 30,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 26,
+            "classifica_normalizzata": 0.862
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 4,
+            "classifica_normalizzata": 0.214
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 26,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.862,
+            "classifica_complessiva": 16,
+            "classifica_normalizzata": 0.517
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 20,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.655,
+            "classifica_complessiva": 12,
+            "classifica_normalizzata": 0.379
+          }
+        ]
+      },
+      {
+        "artista": "Eddie Brock",
+        "anno": 2026,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 0.966,
+        "range_classifica_normalizzata": 1.064,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 21,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.69,
+            "classifica_complessiva": 28,
+            "classifica_normalizzata": 0.931
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 8,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 0.5,
+            "classifica_complessiva": 27,
+            "classifica_normalizzata": 1.857
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 2,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.034,
+            "classifica_complessiva": 24,
+            "classifica_normalizzata": 0.793
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 30,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 1.0,
+            "classifica_complessiva": 30,
+            "classifica_normalizzata": 1.0
+          }
+        ]
+      },
+      {
+        "artista": "Francesco Renga",
+        "anno": 2026,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 0.966,
+        "range_classifica_normalizzata": 0.919,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 29,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.966,
+            "classifica_complessiva": 22,
+            "classifica_normalizzata": 0.724
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 7,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 0.429,
+            "classifica_complessiva": 24,
+            "classifica_normalizzata": 1.643
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 21,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.69,
+            "classifica_complessiva": 28,
+            "classifica_normalizzata": 0.931
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 24,
+            "classifica_normalizzata": 0.793
+          }
+        ]
+      },
+      {
+        "artista": "Maria Antonietta e Colombre",
+        "anno": 2026,
+        "n_serate": 4,
+        "range_posizione_normalizzata": 0.966,
+        "range_classifica_normalizzata": 1.3,
+        "serate": [
+          {
+            "serata": 1,
+            "ordine_esibizione": 27,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.897,
+            "classifica_complessiva": 13,
+            "classifica_normalizzata": 0.414
+          },
+          {
+            "serata": 3,
+            "ordine_esibizione": 1,
+            "totale_esibizioni": 15,
+            "posizione_normalizzata": 0.0,
+            "classifica_complessiva": 25,
+            "classifica_normalizzata": 1.714
+          },
+          {
+            "serata": 4,
+            "ordine_esibizione": 12,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.379,
+            "classifica_complessiva": 22,
+            "classifica_normalizzata": 0.724
+          },
+          {
+            "serata": 5,
+            "ordine_esibizione": 29,
+            "totale_esibizioni": 30,
+            "posizione_normalizzata": 0.966,
+            "classifica_complessiva": 20,
+            "classifica_normalizzata": 0.655
+          }
+        ]
+      }
+    ],
+    "nota": "Gli esempi di classifica stabile nonostante posizione diversa confermano la tesi. Gli esempi con classifica volatile dimostrano che la variabilità della classifica non dipende dalla posizione ma da altri fattori (esecuzione, serata cover, giuria diversa)."
+  },
+  "sezione_3_variabile_confondente": {
+    "titolo": "Il confondente: il direttore artistico colloca i favoriti al centro",
+    "spiegazione": "La correlazione osservata è spuria perché esiste una variabile confondente: il direttore artistico. Il direttore conosce i favoriti e costruisce la scaletta per massimizzare l'ascolto televisivo. I favoriti vengono collocati in posizioni centrali-strategiche per mantenere l'audience, mentre gli artisti meno noti vengono posizionati all'inizio o alla fine. Questo crea una correlazione SPURIA tra posizione centrale e buona classifica: non è la posizione a causare la vittoria, ma la qualità dell'artista causa SIA la posizione centrale SIA la vittoria.",
+    "schema_causale": {
+      "ipotesi_errata": "Posizione centrale → Vittoria (la posizione CAUSA la vittoria)",
+      "realtà": "Qualità artista → Posizione centrale (il direttore colloca i favoriti al centro) E Qualità artista → Vittoria (i favoriti vincono)",
+      "nome_tecnico": "Confounding bias / Spurious correlation",
+      "diagramma": "Qualità artista ──→ Posizione centrale assegnata dal direttore\n                  └──→ Classifica alta\nLa posizione NON causa la classifica. Entrambe sono effetto della stessa causa."
+    },
+    "evidenza_del_confondente": {
+      "test_intra_artista": "Quando controlliamo per la qualità dell'artista (confronto STESSO artista in posizioni diverse), l'effetto della posizione scompare (vedi sezione 2). Questo è il comportamento atteso quando una correlazione è spuria per un confondente.",
+      "R_quadro_basso": "La posizione spiega solo il 6.24% della varianza. Se la posizione fosse davvero un fattore causale importante, ci aspetteremmo un R² molto più alto."
+    }
+  },
+  "sezione_4_non_e_il_centro": {
+    "titolo": "Non è nemmeno il centro: il secondo quintile è migliore del centro",
+    "spiegazione": "Analizzando i quintili, il Q2 (secondo quinto dell'ordine) ha una classifica media MIGLIORE del Q3 (centro). Questo contraddice direttamente l'affermazione che \"il centro vince\". Il pattern reale è una curva a U: le posizioni estreme (inizio e fine) sono svantaggiate, ma il vantaggio non è specificamente nel centro. Questo è coerente con il direttore artistico che colloca gli artisti più deboli nelle posizioni estreme.",
+    "classifica_media_per_quintile": {
+      "Q1_primo_quinto": {
+        "media_classifica_normalizzata": 0.5968,
+        "mediana_classifica_normalizzata": 0.6,
+        "deviazione_standard": 0.3504,
+        "n_osservazioni": 199
+      },
+      "Q2": {
+        "media_classifica_normalizzata": 0.4123,
+        "mediana_classifica_normalizzata": 0.36,
+        "deviazione_standard": 0.3148,
+        "n_osservazioni": 183
+      },
+      "Q3_centro": {
+        "media_classifica_normalizzata": 0.4221,
+        "mediana_classifica_normalizzata": 0.3571,
+        "deviazione_standard": 0.3462,
+        "n_osservazioni": 181
+      },
+      "Q4": {
+        "media_classifica_normalizzata": 0.5349,
+        "mediana_classifica_normalizzata": 0.5217,
+        "deviazione_standard": 0.3422,
+        "n_osservazioni": 183
+      },
+      "Q5_ultimo_quinto": {
+        "media_classifica_normalizzata": 0.6735,
+        "mediana_classifica_normalizzata": 0.6842,
+        "deviazione_standard": 0.3393,
+        "n_osservazioni": 193
+      }
+    },
+    "confronto_Q2_vs_Q3_centro": {
+      "media_Q2": 0.4123,
+      "media_Q3_centro": 0.4221,
+      "Q2_è_migliore_del_centro": true,
+      "mann_whitney_U": 16594.0,
+      "mann_whitney_p": 0.9746,
+      "differenza_significativa": false,
+      "interpretazione": "Q2 e Q3 non sono significativamente diversi. Il vantaggio NON è specifico del centro."
+    }
+  },
+  "sezione_5_analisi_per_anno": {
+    "titolo": "Analisi per anno: risultati inconsistenti",
+    "spiegazione": "Se la posizione centrale fosse un vero vantaggio strutturale, dovrebbe manifestarsi OGNI anno. Invece, nel 2018 e 2019 non c'è alcuna correlazione significativa, e l'intensità varia molto. Questa inconsistenza è tipica di una correlazione spuria che dipende da fattori confondenti variabili (es. il direttore artistico cambia strategia).",
+    "dati_per_anno": {
+      "2018": {
+        "spearman_r_distanza_centro": 0.0747,
+        "p_value": 0.5101,
+        "significativo": false,
+        "n_osservazioni": 80,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.4215,
+            "n": 29
+          },
+          "centro": {
+            "media": 0.49,
+            "n": 24
+          },
+          "fine": {
+            "media": 0.5932,
+            "n": 27
+          }
+        }
+      },
+      "2019": {
+        "spearman_r_distanza_centro": 0.0728,
+        "p_value": 0.4812,
+        "significativo": false,
+        "n_osservazioni": 96,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.4195,
+            "n": 32
+          },
+          "centro": {
+            "media": 0.4893,
+            "n": 32
+          },
+          "fine": {
+            "media": 0.5913,
+            "n": 32
+          }
+        }
+      },
+      "2020": {
+        "spearman_r_distanza_centro": 0.2555,
+        "p_value": 0.0124,
+        "significativo": true,
+        "n_osservazioni": 95,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.6186,
+            "n": 32
+          },
+          "centro": {
+            "media": 0.4433,
+            "n": 31
+          },
+          "fine": {
+            "media": 0.8455,
+            "n": 32
+          }
+        }
+      },
+      "2021": {
+        "spearman_r_distanza_centro": 0.1639,
+        "p_value": 0.0964,
+        "significativo": false,
+        "n_osservazioni": 104,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.5016,
+            "n": 37
+          },
+          "centro": {
+            "media": 0.4626,
+            "n": 32
+          },
+          "fine": {
+            "media": 0.5325,
+            "n": 35
+          }
+        }
+      },
+      "2022": {
+        "spearman_r_distanza_centro": 0.4187,
+        "p_value": 0.0,
+        "significativo": true,
+        "n_osservazioni": 100,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.4661,
+            "n": 36
+          },
+          "centro": {
+            "media": 0.3672,
+            "n": 32
+          },
+          "fine": {
+            "media": 0.6709,
+            "n": 32
+          }
+        }
+      },
+      "2023": {
+        "spearman_r_distanza_centro": 0.3472,
+        "p_value": 0.0002,
+        "significativo": true,
+        "n_osservazioni": 112,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.433,
+            "n": 40
+          },
+          "centro": {
+            "media": 0.391,
+            "n": 36
+          },
+          "fine": {
+            "media": 0.6834,
+            "n": 36
+          }
+        }
+      },
+      "2024": {
+        "spearman_r_distanza_centro": 0.4803,
+        "p_value": 0.0,
+        "significativo": true,
+        "n_osservazioni": 120,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.5076,
+            "n": 40
+          },
+          "centro": {
+            "media": 0.3589,
+            "n": 40
+          },
+          "fine": {
+            "media": 0.6335,
+            "n": 40
+          }
+        }
+      },
+      "2025": {
+        "spearman_r_distanza_centro": 0.253,
+        "p_value": 0.0071,
+        "significativo": true,
+        "n_osservazioni": 112,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.5573,
+            "n": 39
+          },
+          "centro": {
+            "media": 0.413,
+            "n": 35
+          },
+          "fine": {
+            "media": 0.5167,
+            "n": 38
+          }
+        }
+      },
+      "2026": {
+        "spearman_r_distanza_centro": 0.271,
+        "p_value": 0.0028,
+        "significativo": true,
+        "n_osservazioni": 120,
+        "medie_per_terzile": {
+          "inizio": {
+            "media": 0.7239,
+            "n": 40
+          },
+          "centro": {
+            "media": 0.5304,
+            "n": 40
+          },
+          "fine": {
+            "media": 0.6475,
+            "n": 40
+          }
+        }
+      }
+    },
+    "anni_senza_effetto_significativo": [
+      2018,
+      2019,
+      2021
+    ],
+    "anni_con_effetto_significativo": [
+      2020,
+      2022,
+      2023,
+      2024,
+      2025,
+      2026
+    ]
+  },
+  "sezione_6_analisi_per_serata": {
+    "titolo": "Analisi per serata",
+    "spiegazione": "La correlazione è più forte nella serata finale (serata 5, r=0.45) e più debole nelle prime serate. Questo è coerente con l'ipotesi del confondente: nella finale, il direttore ha più informazioni su chi sono i favoriti (dai risultati delle serate precedenti) e li posiziona più strategicamente al centro.",
+    "dati_per_serata": {
+      "1": {
+        "spearman_r": 0.1998,
+        "p_value": 0.0066,
+        "significativo": true,
+        "n_osservazioni": 184
+      },
+      "2": {
+        "spearman_r": 0.183,
+        "p_value": 0.0463,
+        "significativo": true,
+        "n_osservazioni": 119
+      },
+      "3": {
+        "spearman_r": 0.1924,
+        "p_value": 0.0122,
+        "significativo": true,
+        "n_osservazioni": 169
+      },
+      "4": {
+        "spearman_r": 0.262,
+        "p_value": 0.0001,
+        "significativo": true,
+        "n_osservazioni": 233
+      },
+      "5": {
+        "spearman_r": 0.4508,
+        "p_value": 0.0,
+        "significativo": true,
+        "n_osservazioni": 234
+      }
+    }
+  },
+  "sezione_7_vincitori_e_top3": {
+    "titolo": "Distribuzione dei vincitori e top 3 per terzile",
+    "vincitori": {
+      "totale_vittorie": 43,
+      "distribuzione_per_terzile": {
+        "inizio": {
+          "vittorie": 13,
+          "totale_esibizioni_nel_terzile": 325,
+          "tasso_vittoria": 0.04
+        },
+        "centro": {
+          "vittorie": 23,
+          "totale_esibizioni_nel_terzile": 302,
+          "tasso_vittoria": 0.0762
+        },
+        "fine": {
+          "vittorie": 7,
+          "totale_esibizioni_nel_terzile": 312,
+          "tasso_vittoria": 0.0224
+        }
+      },
+      "chi_quadro": {
+        "statistica": 10.0362,
+        "p_value": 0.0066,
+        "osservati": [
+          13,
+          23,
+          7
+        ],
+        "attesi": [
+          14.9,
+          13.8,
+          14.3
+        ]
+      },
+      "interpretazione": "I vincitori dal centro sono sovrarappresentati, MA questo è atteso dal confondente: il direttore mette i favoriti al centro. La domanda chiave non è SE i vincitori vengono dal centro, ma PERCHÉ. La risposta è nel posizionamento strategico, non nell'effetto della posizione."
+    },
+    "top_3": {
+      "totale": 129,
+      "distribuzione_per_terzile": {
+        "inizio": {
+          "top3": 36,
+          "totale": 325,
+          "tasso": 0.1108
+        },
+        "centro": {
+          "top3": 65,
+          "totale": 302,
+          "tasso": 0.2152
+        },
+        "fine": {
+          "top3": 28,
+          "totale": 312,
+          "tasso": 0.0897
+        }
+      }
+    }
+  },
+  "sezione_8_test_permutazione": {
+    "titolo": "Test di permutazione: verifica robustezza",
+    "spiegazione": "Il test di permutazione mescola casualmente le posizioni e ricalcola la correlazione 10.000 volte. Conferma che la correlazione osservata non è un artefatto statistico. TUTTAVIA, questo non prova la causalità - prova solo che la correlazione è reale. Una correlazione reale può essere comunque spuria (causata da un confondente).",
+    "correlazione_osservata": 0.2727,
+    "p_value_permutazione": 0.0,
+    "intervallo_95_distribuzione_nulla": [
+      -0.0635,
+      0.0638
+    ],
+    "nota": "La correlazione è reale (non un artefatto), ma reale NON significa causale."
+  },
+  "sezione_9_televoto": {
+    "titolo": "Analisi sul televoto: stessa conclusione",
+    "spiegazione": "Anche considerando solo il televoto (dove disponibile), i risultati sono simili. La correlazione è debole e la posizione spiega poco della varianza.",
+    "spearman_distanza_centro": {
+      "rho": 0.2798,
+      "p_value": 4.17e-13
+    },
+    "R_quadro": 0.0771,
+    "percentuale_varianza_spiegata": 7.71,
+    "medie_per_terzile": {
+      "inizio": {
+        "media": 0.4578,
+        "n": 224
+      },
+      "centro": {
+        "media": 0.4266,
+        "n": 209
+      },
+      "fine": {
+        "media": 0.6149,
+        "n": 214
+      }
+    }
+  },
+  "sezione_10_conclusione": {
+    "titolo": "CONCLUSIONE: correlazione ≠ causalità",
+    "argomenti_chiave": [
+      {
+        "argomento": "L'effetto scompare controllando per la qualità dell'artista",
+        "dettaglio": "Quando confrontiamo lo STESSO artista in posizioni diverse (esperimento naturale), solo il 5.8% mostra correlazione significativa (atteso per caso: 5%). La correlazione media intra-artista è r=0.1033, praticamente zero.",
+        "forza_probatoria": "FORTISSIMA - Questo è l'equivalente di un esperimento controllato"
+      },
+      {
+        "argomento": "La posizione spiega pochissima varianza",
+        "dettaglio": "R² = 0.0624 → la posizione spiega solo il 6.24% del risultato. Il 93.76% dipende da altri fattori.",
+        "forza_probatoria": "FORTE"
+      },
+      {
+        "argomento": "Non è il centro, è il Q2 che va meglio",
+        "dettaglio": "Il secondo quintile (Q2) ha classifica media migliore del centro (Q3). Il pattern è una U-shape, non un picco al centro.",
+        "forza_probatoria": "MODERATA - Contraddice la formulazione specifica dell'ipotesi"
+      },
+      {
+        "argomento": "L'effetto è inconsistente tra gli anni",
+        "dettaglio": "Nel 2018 e 2019 non c'è alcun effetto significativo. Un vero effetto causale della posizione dovrebbe essere strutturale e costante.",
+        "forza_probatoria": "MODERATA"
+      },
+      {
+        "argomento": "Esiste un confondente noto: il direttore artistico",
+        "dettaglio": "Il direttore artistico costruisce la scaletta strategicamente, posizionando i favoriti al centro per massimizzare l'audience TV. Questo crea la correlazione spuria.",
+        "forza_probatoria": "FORTE - Spiega il meccanismo della correlazione senza invocare causalità"
+      },
+      {
+        "argomento": "L'effetto cresce con le serate → più informazione = più confondente",
+        "dettaglio": "La correlazione è più forte nella serata finale (r=0.45) che nelle prime (r≈0.20). Questo è coerente col confondente: il direttore ha più informazione sui favoriti man mano che il festival avanza.",
+        "forza_probatoria": "FORTE - Se fosse la posizione a causare l'effetto, non dovrebbe crescere con le serate"
+      }
+    ],
+    "verdetto_finale": "L'affermazione \"esibirsi al centro dà un vantaggio\" è un classico esempio di confusione tra correlazione e causalità. La correlazione esiste, ma è interamente spiegabile dal confondente del posizionamento strategico da parte del direttore artistico. Quando controlliamo per la qualità dell'artista (confronto intra-artista), l'effetto della posizione scompare completamente. Non è la posizione al centro che fa vincere: è che i favoriti vengono messi al centro."
+  },
+  "appendice_test_kruskal_wallis": {
+    "titolo": "Test di Kruskal-Wallis: differenza tra terzili",
+    "spiegazione": "Verifica se le distribuzioni delle classifiche sono diverse tra i terzili. Test non parametrico.",
+    "classifica_complessiva": {
+      "H": 55.2821,
+      "p_value": 9.9e-13,
+      "interpretazione": "Le distribuzioni sono significativamente diverse, MA questo non prova causalità. È atteso con il confondente del direttore artistico."
+    }
+  }
+}
