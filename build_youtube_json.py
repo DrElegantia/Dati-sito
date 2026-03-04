@@ -26,6 +26,7 @@ from googleapiclient.discovery import build
 CHANNEL_ID = "UCq5fU1zDj0KcdWM6wjI0jhA"  # EconomiaItalia
 SHORTS_MAX_SECS = 60
 OUTPUT = Path("docs/youtube_dashboard.json")
+HISTORICAL_CSV = Path("yt/Totali.csv")
 
 
 def yt_client():
@@ -187,13 +188,67 @@ def load_fixed_fields():
     return fixed
 
 
-def update_sub_history(hist, current):
+def load_historical_csv():
+    """Carica yt/Totali.csv → lista di (date, daily_gain)."""
+    if not HISTORICAL_CSV.exists():
+        return []
+    rows = []
+    with open(HISTORICAL_CSV, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("Date"):
+                continue
+            parts = line.split(",")
+            if len(parts) >= 2:
+                rows.append((parts[0], int(parts[1])))
+    return rows
+
+
+def historical_monthly_snapshots(csv_rows, anchor_count):
+    """Dai gain giornalieri del CSV, ricostruisce snapshot mensili cumulativi.
+
+    anchor_count è il conteggio iscritti attuale (dall'API).
+    offset = anchor_count − sum(tutti i gain) → valore iniziale stimato.
+    Per ogni mese prende l'ultimo giorno disponibile e riporta offset + cumsum.
+    """
+    if not csv_rows:
+        return []
+    cumsum = 0
+    cumulative = []
+    for date_str, gain in csv_rows:
+        cumsum += gain
+        cumulative.append((date_str, cumsum))
+
+    offset = anchor_count - cumsum
+
+    monthly = {}
+    for date_str, cum in cumulative:
+        month = date_str[:7]
+        monthly[month] = {"date": date_str, "count": max(0, offset + cum)}
+
+    return [monthly[m] for m in sorted(monthly)]
+
+
+def build_full_sub_history(csv_rows, existing_history, current_count):
+    """Combina storico CSV (mensile) + snapshot API giornalieri."""
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    if hist and hist[-1]["date"] == today:
-        hist[-1]["count"] = current
+
+    if csv_rows:
+        hist_monthly = historical_monthly_snapshots(csv_rows, current_count)
+        last_csv_date = csv_rows[-1][0]
+        # Mantieni solo le entry API successive all'ultimo giorno del CSV
+        api_entries = [e for e in existing_history if e["date"] > last_csv_date]
     else:
-        hist.append({"date": today, "count": current})
-    return hist
+        hist_monthly = []
+        api_entries = list(existing_history)
+
+    # Aggiorna / aggiungi il dato di oggi
+    if api_entries and api_entries[-1]["date"] == today:
+        api_entries[-1]["count"] = current_count
+    else:
+        api_entries.append({"date": today, "count": current_count})
+
+    return hist_monthly + api_entries
 
 
 def monthly_sub_gains(hist):
@@ -226,7 +281,11 @@ def main():
     print("Computing monthly aggregations...")
     m_views, m_count, m_avg, bp = monthly_aggregations(vids)
 
-    sub_hist = update_sub_history(load_sub_history(), ch["subscribers"])
+    print("Building subscriber history (CSV + API)...")
+    csv_rows = load_historical_csv()
+    existing_hist = load_sub_history()
+    sub_hist = build_full_sub_history(csv_rows, existing_hist, ch["subscribers"])
+    print(f"  {len(sub_hist)} data points ({len(csv_rows)} giorni da CSV storico)")
     sub_gains = monthly_sub_gains(sub_hist)
     fixed = load_fixed_fields()
 
