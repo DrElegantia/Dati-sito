@@ -1,0 +1,586 @@
+{
+  "metadata": {
+    "fonte": "INPS - Casellario dei Pensionati",
+    "anno_riferimento": 2023,
+    "data_estrazione": "2026-03-05",
+    "unita_importo_complessivo": "milioni_euro",
+    "unita_importo_medio": "euro",
+    "note": "Dati estratti dall'Osservatorio Statistico INPS - Casellario dei Pensionati (pubblicato ottobre 2024, dati al 31.12.2023). Tavola 2 completamente verificata da fonti ufficiali. Tavole 6, 7 e 10: dati parziali ricavati da comunicati stampa e fonti secondarie; i valori non disponibili sono impostati a null. Per i dati completi consultare il PDF originale: https://servizi2.inps.it/servizi/osservatoristatistici/api/getAllegato/?idAllegato=1007"
+  },
+
+  "tavola_2_categorie": [
+    {
+      "categoria": "Vecchiaia",
+      "numero_pensioni": 12296749,
+      "pct_numero": 53.7,
+      "importo_complessivo_mln": 254069,
+      "pct_importo": 73.2,
+      "importo_medio": 20661.51
+    },
+    {
+      "categoria": "Invalidità",
+      "numero_pensioni": 930138,
+      "pct_numero": 4.1,
+      "importo_complessivo_mln": 13154,
+      "pct_importo": 3.8,
+      "importo_medio": 14141.56
+    },
+    {
+      "categoria": "Superstiti",
+      "numero_pensioni": 4525709,
+      "pct_numero": 19.7,
+      "importo_complessivo_mln": 47671,
+      "pct_importo": 13.7,
+      "importo_medio": 10533.42
+    },
+    {
+      "categoria": "Indennitarie",
+      "numero_pensioni": 627143,
+      "pct_numero": 2.7,
+      "importo_complessivo_mln": 4262,
+      "pct_importo": 1.2,
+      "importo_medio": 6796.17
+    },
+    {
+      "categoria": "Assistenziali",
+      "numero_pensioni": 4540149,
+      "pct_numero": 19.8,
+      "importo_complessivo_mln": 27875,
+      "pct_importo": 8.1,
+      "importo_medio": 6139.77
+    },
+    {
+      "categoria": "Totale",
+      "numero_pensioni": 22919888,
+      "pct_numero": 100.0,
+      "importo_complessivo_mln": 347032,
+      "pct_importo": 100.0,
+      "importo_medio": 15141.08
+    }
+  ],
+
+  "tavola_6_classi_importo_pensioni": [
+    {
+      "classe_importo": "fino a 499,99",
+      "classe_min": 0,
+      "classe_max": 499.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "500,00-999,99",
+      "classe_min": 500,
+      "classe_max": 999.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "1.000,00-1.499,99",
+      "classe_min": 1000,
+      "classe_max": 1499.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "1.500,00-1.999,99",
+      "classe_min": 1500,
+      "classe_max": 1999.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "2.000,00-2.499,99",
+      "classe_min": 2000,
+      "classe_max": 2499.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "2.500,00-2.999,99",
+      "classe_min": 2500,
+      "classe_max": 2999.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "3.000,00-3.499,99",
+      "classe_min": 3000,
+      "classe_max": 3499.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "3.500,00-3.999,99",
+      "classe_min": 3500,
+      "classe_max": 3999.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "4.000,00-4.499,99",
+      "classe_min": 4000,
+      "classe_max": 4499.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "4.500,00-4.999,99",
+      "classe_min": 4500,
+      "classe_max": 4999.99,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "5.000,00 e più",
+      "classe_min": 5000,
+      "classe_max": null,
+      "numero_pensioni": null,
+      "pct_numero": null,
+      "importo_complessivo_mln": null,
+      "pct_importo": null
+    },
+    {
+      "classe_importo": "Totale",
+      "classe_min": 0,
+      "classe_max": null,
+      "numero_pensioni": 22919888,
+      "pct_numero": 100.0,
+      "importo_complessivo_mln": 347032,
+      "pct_importo": 100.0
+    }
+  ],
+
+  "tavola_7_classi_importo_pensionati": [
+    {
+      "classe_importo": "fino a 499,99",
+      "classe_min": 0,
+      "classe_max": 499.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": 1699780,
+        "pct": 10.5,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "500,00-999,99",
+      "classe_min": 500,
+      "classe_max": 999.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": 3086741,
+        "pct": 19.0,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "1.000,00-1.499,99",
+      "classe_min": 1000,
+      "classe_max": 1499.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": 18.5,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "1.500,00-1.999,99",
+      "classe_min": 1500,
+      "classe_max": 1999.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "2.000,00-2.499,99",
+      "classe_min": 2000,
+      "classe_max": 2499.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "2.500,00-2.999,99",
+      "classe_min": 2500,
+      "classe_max": 2999.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "3.000,00-3.499,99",
+      "classe_min": 3000,
+      "classe_max": 3499.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "3.500,00-3.999,99",
+      "classe_min": 3500,
+      "classe_max": 3999.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "4.000,00-4.499,99",
+      "classe_min": 4000,
+      "classe_max": 4499.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "4.500,00-4.999,99",
+      "classe_min": 4500,
+      "classe_max": 4999.99,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "5.000,00 e più",
+      "classe_min": 5000,
+      "classe_max": null,
+      "maschi": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "femmine": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      },
+      "totale": {
+        "numero": null,
+        "pct": null,
+        "importo_complessivo_mln": null,
+        "pct_importo": null
+      }
+    },
+    {
+      "classe_importo": "Totale",
+      "classe_min": 0,
+      "classe_max": null,
+      "maschi": {
+        "numero": 7790475,
+        "pct": 48.0,
+        "importo_complessivo_mln": null,
+        "pct_importo": 56.0
+      },
+      "femmine": {
+        "numero": 8439682,
+        "pct": 52.0,
+        "importo_complessivo_mln": null,
+        "pct_importo": 44.0
+      },
+      "totale": {
+        "numero": 16230157,
+        "pct": 100.0,
+        "importo_complessivo_mln": null,
+        "pct_importo": 100.0
+      }
+    }
+  ],
+
+  "tavola_10_tipologie_per_classe": [
+    {
+      "classe_importo": "fino a 499,99",
+      "classe_min": 0,
+      "classe_max": 499.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": 1699780
+    },
+    {
+      "classe_importo": "500,00-999,99",
+      "classe_min": 500,
+      "classe_max": 999.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": 3086741
+    },
+    {
+      "classe_importo": "1.000,00-1.499,99",
+      "classe_min": 1000,
+      "classe_max": 1499.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "1.500,00-1.999,99",
+      "classe_min": 1500,
+      "classe_max": 1999.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "2.000,00-2.499,99",
+      "classe_min": 2000,
+      "classe_max": 2499.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "2.500,00-2.999,99",
+      "classe_min": 2500,
+      "classe_max": 2999.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "3.000,00-3.499,99",
+      "classe_min": 3000,
+      "classe_max": 3499.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "3.500,00-3.999,99",
+      "classe_min": 3500,
+      "classe_max": 3999.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "4.000,00-4.499,99",
+      "classe_min": 4000,
+      "classe_max": 4499.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "4.500,00-4.999,99",
+      "classe_min": 4500,
+      "classe_max": 4999.99,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "5.000,00 e più",
+      "classe_min": 5000,
+      "classe_max": null,
+      "vecchiaia": null,
+      "invalidita_previdenziale": null,
+      "superstiti": null,
+      "indennitarie": null,
+      "assistenziali": null,
+      "totale_pensionati": null
+    },
+    {
+      "classe_importo": "Totale",
+      "classe_min": 0,
+      "classe_max": null,
+      "vecchiaia": null,
+      "invalidita_previdenziale": 922044,
+      "superstiti": null,
+      "indennitarie": 618425,
+      "assistenziali": null,
+      "totale_pensionati": 16230157
+    }
+  ]
+}
