@@ -17,7 +17,12 @@
       "UNICEF Argentina",
       "ISPI – Istituto per gli Studi di Politica Internazionale",
       "UTDT – Universidad Torcuato Di Tella",
-      "CEDLAS – Centro de Estudios Distributivos, Laborales y Sociales"
+      "CEDLAS – Centro de Estudios Distributivos, Laborales y Sociales",
+      "US Treasury – Exchange Stabilization Fund",
+      "CNBC / Fortune / Axios – Reporting swap USA-Argentina",
+      "CFR – Council on Foreign Relations",
+      "PIIE – Peterson Institute for International Economics",
+      "Osservatorio CPI – Unicatt (articolo originale)"
     ],
     "ultimo_aggiornamento": "2026-03-08"
   },
@@ -42,6 +47,11 @@
     "poverta_infantile_2024h2": 52.7,
     "disoccupazione_2024": 8.2,
     "riserve_lorde_dic2025_mld": 32.3,
+    "riserve_nette_mld": -2.4,
+    "swap_usa_mld": 20.0,
+    "swap_cina_preesistente_mld": 18.0,
+    "vendita_record_bcra_19set_mln": 678,
+    "reer_dic_2025": 58.6,
     "trade_surplus_2024_mld": 18.9,
     "trade_surplus_2025_mld": 11.3,
     "embi_dic2025_bp": 550,
@@ -570,37 +580,126 @@
       "nota": "stima / Osservatorio CPI ~7%"
     }
   ],
-  "riserve_internazionali": [
-    {
-      "anno": 2019,
-      "riserve_lorde": 44.8
-    },
-    {
-      "anno": 2020,
-      "riserve_lorde": 39.4
-    },
-    {
-      "anno": 2021,
-      "riserve_lorde": 39.7
-    },
-    {
-      "anno": 2022,
-      "riserve_lorde": 44.6
-    },
-    {
-      "anno": 2023,
-      "riserve_lorde": 23.1
-    },
-    {
-      "anno": 2024,
-      "riserve_lorde": 29.6
-    },
-    {
-      "anno": 2025,
-      "riserve_lorde": 32.3,
-      "nota": "dic 2025"
+  "riserve_internazionali": {
+    "serie_lorde": [
+      {
+        "anno": 2019,
+        "riserve_lorde": 44.8
+      },
+      {
+        "anno": 2020,
+        "riserve_lorde": 39.4
+      },
+      {
+        "anno": 2021,
+        "riserve_lorde": 39.7
+      },
+      {
+        "anno": 2022,
+        "riserve_lorde": 44.6
+      },
+      {
+        "anno": 2023,
+        "riserve_lorde": 23.1
+      },
+      {
+        "anno": 2024,
+        "riserve_lorde": 29.6
+      },
+      {
+        "anno": 2025,
+        "riserve_lorde": 32.3,
+        "nota": "dic 2025"
+      }
+    ],
+    "nette_e_crisi": {
+      "riserve_liquide_jp_morgan_mld": 18.5,
+      "riserve_nette_mld": -2.4,
+      "nota_riserve_nette": "Escludendo riserve obbligatorie in valuta e swap, le riserve nette BCRA risultano negative per ~2.4 mld USD (JP Morgan).",
+      "crisi_settembre_2025": {
+        "vendita_record_19_set": 678,
+        "unita": "milioni USD",
+        "nota": "più grande vendita giornaliera BCRA in quasi 6 anni",
+        "vendita_3_sedute_mld": 1.0,
+        "trigger": "Sconfitta LLA alle elezioni provinciali Buenos Aires (7 set), sell-off bond (rendimenti 10y >17%), peso -7% in un giorno"
+      },
+      "obiettivo_acquisti_2026_mld": 10.0,
+      "nota_obiettivo": "BCRA si impegna ad acquistare $10 mld di riserve entro fine 2026"
     }
-  ],
+  },
+  "swap_usa": {
+    "importo_mld_usd": 20.0,
+    "meccanismo": "Exchange Stabilization Fund (ESF) del Tesoro USA",
+    "annuncio": "22 settembre 2025 (Bessent su X)",
+    "firma": "20 ottobre 2025",
+    "cancellazione_operazioni": "dicembre 2025",
+    "funzionamento": "Il Tesoro USA acquista fino a $20 mld di pesos dal BCRA in cambio di dollari. L'Argentina dovrà restituire i dollari con interessi.",
+    "utilizzo_a_fine_ott_2025_mld": 2.5,
+    "impatto_riserve": "Aumenta le riserve lorde ma NON le riserve nette, essendo un passivo. Senza swap e obblighi, le riserve nette restano negative.",
+    "fondi_aggiuntivi": {
+      "ipotesi_iniziale_mld": 20.0,
+      "ridotto_a_mld": 5.0,
+      "tipo": "repo agreement con JPMorgan, Citigroup, Bank of America",
+      "nota": "Ridimensionato da $20 a ~$5 mld; banche attendevano garanzie collaterali"
+    },
+    "contesto_politico": {
+      "obiettivo_pre_elezioni": "Contenere il dollaro prima delle legislative del 26 ottobre 2025",
+      "opposizione_argentina_pct": "55-60%",
+      "nota": "Sondaggi: 55-60% degli argentini contrari all'assistenza USA",
+      "opposizione_usa": "8 senatori Dem (incl. Warren) hanno proposto legge per bloccare il bailout. Critiche per impatto su agricoltori USA (export soia argentina a Cina)."
+    },
+    "dimensione_geopolitica": {
+      "swap_cina_preesistente_mld": 18.0,
+      "nota": "L'admin USA vedeva rischio di rafforzamento legami Argentina-Cina. Milei ha negato che USA abbiano chiesto di eliminare lo swap cinese."
+    },
+    "confronto_storico": "Più grande bailout bilaterale USA dal salvataggio del Messico di Clinton nel 1995.",
+    "rischio_krugman": "Krugman e altri: effetti perlopiù temporanei, rinviano il momento in cui, esaurite le riserve, l'Argentina dovrà svalutare.",
+    "uso_per_debito_2026": "Milei ha dichiarato che se il rischio paese è troppo alto per emettere sui mercati, userà la linea di swap per i pagamenti 2026 — 'prendere debito per pagare debito'."
+  },
+  "regime_cambio_e_itcrm": {
+    "fasi": [
+      {
+        "periodo": "dic 2023",
+        "tipo": "svalutazione iniziale",
+        "dettaglio": "da 366.5 a 800 ARS/USD (-54%)"
+      },
+      {
+        "periodo": "gen 2024 – gen 2025",
+        "tipo": "crawling peg 2% mensile",
+        "dettaglio": "Svalutazione nominale 2%/mese, ma inflazione molto superiore → forte apprezzamento reale del peso"
+      },
+      {
+        "periodo": "feb 2025 – apr 2025",
+        "tipo": "crawling peg 1% mensile",
+        "dettaglio": "Rallentamento del ritmo di svalutazione, apprezzamento reale accelera"
+      },
+      {
+        "periodo": "apr 2025",
+        "tipo": "banda gestita FMI",
+        "dettaglio": "Fluttuazione libera tra 1000 e 1400 ARS/USD, banda ampia 40%"
+      },
+      {
+        "periodo": "gen 2026",
+        "tipo": "banda indicizzata all'inflazione",
+        "dettaglio": "Banda si espande mensilmente al tasso di inflazione INDEC (t-2). Gen 2026: +2.5% (inflaz. nov 2025). Feb 2026: +2.8% (inflaz. dic 2025)."
+      }
+    ],
+    "itcrm": {
+      "descrizione": "Indice del Tasso di Cambio Reale Multilaterale BCRA. Misura il prezzo relativo dei beni argentini vs 12 partner commerciali. Ponderazioni: Brasile 32%, Cina 16%, Eurozona 19%, USA 12%.",
+      "reer_dic_2025": 58.6,
+      "reer_nov_2025": 59.4,
+      "reer_massimo_storico": {
+        "valore": 123.1,
+        "data": "giugno 2002"
+      },
+      "reer_minimo_storico": {
+        "valore": 41.1,
+        "data": "ottobre 2001"
+      },
+      "interpretazione": "Calo dell'indice = apprezzamento reale del peso = export più cari, import più economici. Valore dic 2025 (58.6) indica un peso significativamente apprezzato in termini reali, vicino a livelli storicamente associati a crisi di cambio."
+    },
+    "paradosso": "Peso forte → bene per inflazione (import economici, ancoraggio aspettative). Ma male per competitività, export, riserve. Ogni ondata di tensione riapre il fronte valutario e frena l'aggiustamento ordinato."
+  },
   "bilancia_commerciale": [
     {
       "anno": 2019,
