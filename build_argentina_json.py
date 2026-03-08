@@ -347,6 +347,46 @@ RISERVE = [
     {"anno": 2025, "riserve_lorde": 32.3, "nota": "dic 2025"},
 ]
 
+# ── Riserve mensili BCRA (mld USD) ────────────────────────────────────────
+# Lorde = dato BCRA ufficiale; nette_stima = escludendo encajes, swap,
+# prestiti BIS e altri passivi (stime JP Morgan / FT / analisti di mercato)
+RISERVE_MENSILI = [
+    {"mese": "2023-11", "lorde": 21.6, "nette_stima": -11.2},
+    {"mese": "2023-12", "lorde": 23.1, "nette_stima": -10.5,
+     "nota": "post-svalutazione, inizio acquisti BCRA"},
+    {"mese": "2024-01", "lorde": 24.3, "nette_stima": -9.5},
+    {"mese": "2024-02", "lorde": 26.0, "nette_stima": -7.0},
+    {"mese": "2024-03", "lorde": 27.5, "nette_stima": -5.1},
+    {"mese": "2024-04", "lorde": 28.6, "nette_stima": -3.2},
+    {"mese": "2024-05", "lorde": 29.0, "nette_stima": -2.5},
+    {"mese": "2024-06", "lorde": 29.6, "nette_stima": -1.8},
+    {"mese": "2024-07", "lorde": 27.5, "nette_stima": -3.4,
+     "nota": "pagamento interessi bond ristrutturati"},
+    {"mese": "2024-08", "lorde": 26.7, "nette_stima": -4.1},
+    {"mese": "2024-09", "lorde": 27.1, "nette_stima": -3.8},
+    {"mese": "2024-10", "lorde": 28.0, "nette_stima": -3.2},
+    {"mese": "2024-11", "lorde": 29.0, "nette_stima": -2.5},
+    {"mese": "2024-12", "lorde": 29.6, "nette_stima": -2.1},
+    {"mese": "2025-01", "lorde": 30.5, "nette_stima": -1.5},
+    {"mese": "2025-02", "lorde": 28.3, "nette_stima": -3.2,
+     "nota": "pagamento scadenze + fuga depositi"},
+    {"mese": "2025-03", "lorde": 29.8, "nette_stima": -2.0},
+    {"mese": "2025-04", "lorde": 32.0, "nette_stima": -0.5,
+     "nota": "accordo FMI, disbursamento $12 mld"},
+    {"mese": "2025-05", "lorde": 33.8, "nette_stima": 0.5},
+    {"mese": "2025-06", "lorde": 35.2, "nette_stima": 1.0},
+    {"mese": "2025-07", "lorde": 37.5, "nette_stima": 1.5,
+     "nota": "stagione export soia"},
+    {"mese": "2025-08", "lorde": 40.0, "nette_stima": 2.0},
+    {"mese": "2025-09", "lorde": 40.4, "nette_stima": -0.5,
+     "nota": "crisi post-elezioni BA, vendita record $678 mln il 19/9"},
+    {"mese": "2025-10", "lorde": 37.5, "nette_stima": -2.0,
+     "nota": "deflussi + swap USA attivato"},
+    {"mese": "2025-11", "lorde": 34.8, "nette_stima": -2.2},
+    {"mese": "2025-12", "lorde": 32.3, "nette_stima": -2.4,
+     "nota": "JP Morgan stima nette −$2.4 mld"},
+]
+
 # ── Riserve nette e crisi settembre 2025 ─────────────────────────────────
 RISERVE_NETTE_E_CRISI = {
     "riserve_lorde_set_2025_mld": 40.374,
@@ -477,6 +517,71 @@ REGIME_CAMBIO = {
             "significativamente apprezzato in termini reali, vicino a livelli "
             "storicamente associati a crisi di cambio."
         ),
+        # Serie mensile ITCRM BCRA (base dic 2015 = 100)
+        # Fonte: BCRA / Trading Economics / CEPAL
+        "serie_mensile": [
+            # Riferimenti storici
+            {"mese": "2001-10", "valore": 41.1, "nota": "minimo storico, pre-default"},
+            {"mese": "2002-01", "valore": 65.0, "nota": "post-default, svalutazione"},
+            {"mese": "2002-06", "valore": 123.1, "nota": "massimo storico, overshooting"},
+            # Serie Macri → Fernández → Milei
+            {"mese": "2017-01", "valore": 80.5},
+            {"mese": "2017-06", "valore": 82.3},
+            {"mese": "2017-12", "valore": 78.1},
+            {"mese": "2018-06", "valore": 95.6, "nota": "crisi Macri, svalutazione"},
+            {"mese": "2018-09", "valore": 112.5, "nota": "overshooting"},
+            {"mese": "2018-12", "valore": 101.0},
+            {"mese": "2019-06", "valore": 88.5},
+            {"mese": "2019-08", "valore": 109.0, "nota": "PASO, svalutazione"},
+            {"mese": "2019-12", "valore": 92.3},
+            {"mese": "2020-06", "valore": 86.0},
+            {"mese": "2020-12", "valore": 78.5},
+            {"mese": "2021-06", "valore": 80.2},
+            {"mese": "2021-12", "valore": 76.0},
+            {"mese": "2022-06", "valore": 76.5},
+            {"mese": "2022-12", "valore": 78.0},
+            {"mese": "2023-06", "valore": 72.5},
+            {"mese": "2023-08", "valore": 100.5, "nota": "svalutazione pre-PASO"},
+            {"mese": "2023-10", "valore": 73.6},
+            {"mese": "2023-11", "valore": 68.5},
+            # Era Milei
+            {"mese": "2023-12", "valore": 118.0,
+             "nota": "svalutazione Milei: 366→800 ARS/USD"},
+            {"mese": "2024-01", "valore": 110.0},
+            {"mese": "2024-02", "valore": 103.0},
+            {"mese": "2024-03", "valore": 97.5},
+            {"mese": "2024-04", "valore": 93.0},
+            {"mese": "2024-05", "valore": 90.5},
+            {"mese": "2024-06", "valore": 87.5},
+            {"mese": "2024-07", "valore": 84.8},
+            {"mese": "2024-08", "valore": 82.0},
+            {"mese": "2024-09", "valore": 79.5},
+            {"mese": "2024-10", "valore": 77.0},
+            {"mese": "2024-11", "valore": 74.8},
+            {"mese": "2024-12", "valore": 72.5},
+            {"mese": "2025-01", "valore": 70.0},
+            {"mese": "2025-02", "valore": 68.5},
+            {"mese": "2025-03", "valore": 67.0},
+            {"mese": "2025-04", "valore": 78.0,
+             "nota": "passaggio a banda FMI, svalutazione controllata"},
+            {"mese": "2025-05", "valore": 74.5},
+            {"mese": "2025-06", "valore": 72.0},
+            {"mese": "2025-07", "valore": 69.5},
+            {"mese": "2025-08", "valore": 67.0},
+            {"mese": "2025-09", "valore": 71.5,
+             "nota": "crisi post-elezioni BA, peso -7%"},
+            {"mese": "2025-10", "valore": 66.0},
+            {"mese": "2025-11", "valore": 59.4},
+            {"mese": "2025-12", "valore": 58.6,
+             "nota": "minimo dal 2001, livello convertibilità"},
+        ],
+        # Soglie storiche di riferimento per il grafico
+        "soglie": [
+            {"livello": 41.1, "etichetta": "Minimo ott 2001 (pre-default)", "colore": "red"},
+            {"livello": 58.6, "etichetta": "Dic 2025 (attuale)", "colore": "orange"},
+            {"livello": 80.0, "etichetta": "Media 2017-2023", "colore": "green"},
+            {"livello": 100.0, "etichetta": "Equilibrio teorico (base 2015)", "colore": "gray"},
+        ],
     },
     "paradosso": (
         "Peso forte → bene per inflazione (import economici, ancoraggio aspettative). "
@@ -555,6 +660,36 @@ RATING = [
         "data": "dic 2025",
         "nota": "upgrade da SD/SD",
     },
+    {
+        "agenzia": "Moody's",
+        "rating_lc": "Ca",
+        "data": "dic 2025",
+        "nota": "outlook stabile, invariato dal 2020",
+    },
+    {
+        "agenzia": "Fitch",
+        "rating_lc": "CCC+",
+        "data": "nov 2025",
+        "nota": "upgrade da CCC- (lug 2025)",
+    },
+]
+
+# ── Storico rating Argentina (timeline per grafico) ─────────────────────
+RATING_STORICO = [
+    {"data": "2019-08", "sp": "SD", "moodys": "Caa2", "fitch": "RD",
+     "evento": "Default selettivo post-PASO"},
+    {"data": "2020-03", "sp": "SD", "moodys": "Ca", "fitch": "RD",
+     "evento": "Ristrutturazione debito"},
+    {"data": "2020-09", "sp": "CCC+", "moodys": "Ca", "fitch": "CCC-",
+     "evento": "Post-ristrutturazione"},
+    {"data": "2023-11", "sp": "CCC-", "moodys": "Ca", "fitch": "CCC-",
+     "evento": "Pre-Milei"},
+    {"data": "2024-07", "sp": "CCC", "moodys": "Ca", "fitch": "CCC-",
+     "evento": "Primi segnali stabilizzazione"},
+    {"data": "2025-07", "sp": "CCC", "moodys": "Ca", "fitch": "CCC+",
+     "evento": "Fitch upgrade su disciplina fiscale"},
+    {"data": "2025-12", "sp": "CCC+", "moodys": "Ca", "fitch": "CCC+",
+     "evento": "S&P upgrade post-vittoria legislativa"},
 ]
 
 # ── Programma IMF ─────────────────────────────────────────────────────────
@@ -690,6 +825,7 @@ def main():
         "mercato_lavoro": MERCATO_LAVORO,
         "riserve_internazionali": {
             "serie_lorde": RISERVE,
+            "serie_mensile": RISERVE_MENSILI,
             "nette_e_crisi": RISERVE_NETTE_E_CRISI,
         },
         "swap_usa": SWAP_USA,
@@ -701,6 +837,7 @@ def main():
         "country_risk_embi": EMBI,
         "cambio_usd_ars": CAMBIO,
         "rating_sovrano": RATING,
+        "rating_storico": RATING_STORICO,
         "imf_programma": IMF_PROGRAMMA,
         "debito_estero_scadenze_2026": DEBITO_ESTERO_2026,
         "elezioni_2025": ELEZIONI_2025,
