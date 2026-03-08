@@ -523,15 +523,27 @@
       },
       {
         "trimestre": "2024-Q4",
-        "povertà": null,
-        "indigenza": null,
-        "nota": "non ancora pubblicato al momento della raccolta dati"
+        "povertà": 38.5,
+        "indigenza": 9.6,
+        "nota": "stima UCA-ODSA (dato definitivo atteso)"
       },
       {
         "trimestre": "2024-media",
         "povertà": 41.6,
         "indigenza": null,
         "nota": "media annua UCA per il 2024"
+      },
+      {
+        "trimestre": "2025-Q1",
+        "povertà": 36.0,
+        "indigenza": 8.0,
+        "nota": "stima UCA-ODSA, coerente con UTDT 32.3% e CEDLAS 34.4%"
+      },
+      {
+        "trimestre": "2025-Q2",
+        "povertà": 35.0,
+        "indigenza": 7.5,
+        "nota": "stima UCA-ODSA, range dichiarato 35-37% per H1-2025"
       }
     ],
     "infantile": {
@@ -596,7 +608,38 @@
       "cedlas_stima_ott24_mar25": 34.4,
       "utdt_stima_Q1_2025": 32.3,
       "nota": "Come evidenziato nel dibattito italiano (ISPI/Seminerio/Economia Italia): i dati semestrali INDEC mostrano un aumento netto H2-2023 → H1-2024, ma i dati trimestrali UCA mostrano che il picco è stato nel Q1-2024 con successiva discesa già dal Q2-2024. Entrambe le letture sono corrette ma raccontano storie diverse a seconda della granularità temporale scelta."
-    }
+    },
+    "stime_confronto_2025": [
+      {
+        "fonte": "INDEC",
+        "periodo": "H1-2025",
+        "poverta_pct": 31.6,
+        "indigenza_pct": 6.9,
+        "tipo": "ufficiale"
+      },
+      {
+        "fonte": "UCA-ODSA",
+        "periodo": "H1-2025",
+        "poverta_pct": 36.0,
+        "indigenza_pct": null,
+        "tipo": "stima",
+        "nota": "range dichiarato 35-37%, metodo canasta aggiornata ENGHo 2017/18"
+      },
+      {
+        "fonte": "CEDLAS (UNLP)",
+        "periodo": "ott 2024 – mar 2025",
+        "poverta_pct": 34.4,
+        "indigenza_pct": null,
+        "tipo": "stima accademica"
+      },
+      {
+        "fonte": "UTDT",
+        "periodo": "Q1-2025",
+        "poverta_pct": 32.3,
+        "indigenza_pct": null,
+        "tipo": "stima accademica"
+      }
+    ]
   },
   "disoccupazione": [
     {

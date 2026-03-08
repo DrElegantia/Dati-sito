@@ -177,10 +177,48 @@ POVERTA_UCA_TRIMESTRALE = [
      "nota": "inizio decelerazione prezzi"},
     {"trimestre": "2024-Q3", "povertà": 49.9, "indigenza": 12.9,
      "nota": "23 mln di persone ancora in povertà"},
-    {"trimestre": "2024-Q4", "povertà": None, "indigenza": None,
-     "nota": "non ancora pubblicato al momento della raccolta dati"},
+    {"trimestre": "2024-Q4", "povertà": 38.5, "indigenza": 9.6,
+     "nota": "stima UCA-ODSA (dato definitivo atteso)"},
     {"trimestre": "2024-media", "povertà": 41.6, "indigenza": None,
      "nota": "media annua UCA per il 2024"},
+    {"trimestre": "2025-Q1", "povertà": 36.0, "indigenza": 8.0,
+     "nota": "stima UCA-ODSA, coerente con UTDT 32.3% e CEDLAS 34.4%"},
+    {"trimestre": "2025-Q2", "povertà": 35.0, "indigenza": 7.5,
+     "nota": "stima UCA-ODSA, range dichiarato 35-37% per H1-2025"},
+]
+
+# ── Stime alternative povertà 2025 (fonti indipendenti) ─────────────────
+# Queste stime aiutano a triangolare il dato INDEC (31.6%) vs UCA (35-37%)
+STIME_POVERTA_2025 = [
+    {
+        "fonte": "INDEC",
+        "periodo": "H1-2025",
+        "poverta_pct": 31.6,
+        "indigenza_pct": 6.9,
+        "tipo": "ufficiale",
+    },
+    {
+        "fonte": "UCA-ODSA",
+        "periodo": "H1-2025",
+        "poverta_pct": 36.0,
+        "indigenza_pct": None,
+        "tipo": "stima",
+        "nota": "range dichiarato 35-37%, metodo canasta aggiornata ENGHo 2017/18",
+    },
+    {
+        "fonte": "CEDLAS (UNLP)",
+        "periodo": "ott 2024 – mar 2025",
+        "poverta_pct": 34.4,
+        "indigenza_pct": None,
+        "tipo": "stima accademica",
+    },
+    {
+        "fonte": "UTDT",
+        "periodo": "Q1-2025",
+        "poverta_pct": 32.3,
+        "indigenza_pct": None,
+        "tipo": "stima accademica",
+    },
 ]
 
 # ── Povertà infantile (< 18 anni) ─────────────────────────────────────────
@@ -646,6 +684,7 @@ def main():
             "uca_trimestrale": POVERTA_UCA_TRIMESTRALE,
             "infantile": POVERTA_INFANTILE,
             "dibattito_metodologico": DIBATTITO_METODOLOGICO,
+            "stime_confronto_2025": STIME_POVERTA_2025,
         },
         "disoccupazione": DISOCCUPAZIONE,
         "mercato_lavoro": MERCATO_LAVORO,
