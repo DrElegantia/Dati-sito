@@ -107,24 +107,111 @@ DEBITO_PIL = [
     {"anno": 2026, "debito_pil": 68.0, "nota": "stima IMF"},
 ]
 
-# ── Tasso di povertà (% popolazione, INDEC) ────────────────────────────────
-POVERTA = [
-    {"periodo": "2018-H2", "tasso": 32.0},
-    {"periodo": "2019-H1", "tasso": 35.4},
-    {"periodo": "2019-H2", "tasso": 35.5},
-    {"periodo": "2020-H1", "tasso": 40.9},
-    {"periodo": "2020-H2", "tasso": 42.0},
-    {"periodo": "2021-H1", "tasso": 40.6},
-    {"periodo": "2021-H2", "tasso": 37.3},
-    {"periodo": "2022-H1", "tasso": 36.5},
-    {"periodo": "2022-H2", "tasso": 39.2},
-    {"periodo": "2023-H1", "tasso": 40.1},
-    {"periodo": "2023-H2", "tasso": 41.7},
-    {"periodo": "2024-H1", "tasso": 52.9},
-    {"periodo": "2024-H2", "tasso": 38.1},
-    {"periodo": "2025-H1", "tasso": 32.0},
-    {"periodo": "2025-Q3", "tasso": 27.0, "nota": "Osservatorio CPI"},
+# ── Povertà: dati INDEC semestrali (% popolazione, ufficiali) ──────────────
+# NOTA METODOLOGICA: l'INDEC pubblica dati semestrali. La UCA-ODSA pubblica
+# stime trimestrali basate sulla stessa EPH ma con metodologia diversa.
+# La UCA contesta la Canasta Básica Total INDEC (basata su ENGHo 2004/05)
+# e stima che la povertà reale sia 4-5 pp più alta.
+POVERTA_INDEC = [
+    {"periodo": "2018-H2", "povertà": 32.0, "indigenza": None},
+    {"periodo": "2019-H1", "povertà": 35.4, "indigenza": 7.7},
+    {"periodo": "2019-H2", "povertà": 35.5, "indigenza": 8.0},
+    {"periodo": "2020-H1", "povertà": 40.9, "indigenza": 10.5},
+    {"periodo": "2020-H2", "povertà": 42.0, "indigenza": 10.5},
+    {"periodo": "2021-H1", "povertà": 40.6, "indigenza": 10.7},
+    {"periodo": "2021-H2", "povertà": 37.3, "indigenza": 8.2},
+    {"periodo": "2022-H1", "povertà": 36.5, "indigenza": 8.8},
+    {"periodo": "2022-H2", "povertà": 39.2, "indigenza": 8.1},
+    {"periodo": "2023-H1", "povertà": 40.1, "indigenza": 9.3},
+    {"periodo": "2023-H2", "povertà": 41.7, "indigenza": 11.9},
+    {"periodo": "2024-H1", "povertà": 52.9, "indigenza": 18.1,
+     "nota": "picco massimo dal 2003, 24.9 mln di persone"},
+    {"periodo": "2024-H2", "povertà": 38.1, "indigenza": 8.2,
+     "nota": "calo di 14.8 pp, il più forte in 20 anni"},
+    {"periodo": "2025-H1", "povertà": 31.6, "indigenza": 6.9,
+     "nota": "minimo dal H1-2018 (27.3%). UCA contesta: stima 35-37%"},
 ]
+
+# ── Povertà: stime trimestrali UCA-ODSA (% popolazione) ───────────────────
+# Fonte: Observatorio de la Deuda Social Argentina, Univ. Católica Argentina
+# Basate su microdati EPH-INDEC ma con canasta aggiornata
+POVERTA_UCA_TRIMESTRALE = [
+    {"trimestre": "2023-Q4", "povertà": 45.2, "indigenza": 14.6},
+    {"trimestre": "2024-Q1", "povertà": 54.9, "indigenza": 20.3,
+     "nota": "tassi più alti dal 2004, shock svalutazione + inflazione"},
+    {"trimestre": "2024-Q2", "povertà": 51.0, "indigenza": 15.8,
+     "nota": "inizio decelerazione prezzi"},
+    {"trimestre": "2024-Q3", "povertà": 49.9, "indigenza": 12.9,
+     "nota": "23 mln di persone ancora in povertà"},
+    {"trimestre": "2024-Q4", "povertà": None, "indigenza": None,
+     "nota": "non ancora pubblicato al momento della raccolta dati"},
+    {"trimestre": "2024-media", "povertà": 41.6, "indigenza": None,
+     "nota": "media annua UCA per il 2024"},
+]
+
+# ── Povertà infantile (< 18 anni) ─────────────────────────────────────────
+POVERTA_INFANTILE = {
+    "fonte_primaria": "UCA-ODSA / UNICEF / INDEC",
+    "nota_metodologica": (
+        "I dati UCA includono dimensioni non monetarie. I dati INDEC "
+        "sono puramente monetari (sotto la linea di povertà)."
+    ),
+    "serie": [
+        {"periodo": "2023", "povertà_pct": 56.6, "indigenza_pct": None,
+         "fonte": "UCA-ODSA"},
+        {"periodo": "2024-H1", "povertà_pct": 67.3, "indigenza_pct": 30.6,
+         "fonte": "UCA-ODSA",
+         "nota": "record dal 2001, oltre 8 mln di minori"},
+        {"periodo": "2024-H2", "povertà_pct": 52.7, "indigenza_pct": None,
+         "fonte": "INDEC/UNICEF",
+         "nota": "calo di 14 pp, 1.7 mln di minori usciti dalla povertà"},
+        {"periodo": "2024-Q3", "povertà_pct": 65.5, "indigenza_pct": 19.2,
+         "fonte": "UCA-ODSA"},
+        {"periodo": "2025-H1", "povertà_pct": 45.4, "indigenza_pct": None,
+         "fonte": "INDEC",
+         "nota": "< 14 anni"},
+    ],
+    "disuguaglianze_H2_2024": {
+        "capofamiglia_senza_primaria": 80.9,
+        "capofamiglia_con_secondaria": 10.6,
+        "lavoratori_informali": 68.4,
+        "insediamenti_informali": 72.3,
+        "madre_sola": 60.0,
+        "buenos_aires_citta": 27.1,
+        "concordia_massimo": 75.0,
+    },
+    "effetto_trasferimenti": {
+        "nota": (
+            "Senza AUH e Tarjeta Alimentar, l'indigenza infantile sarebbe "
+            "stata 10 pp più alta nel H2-2024 (~1 mln di minori in più)"
+        ),
+        "auh_aumento_gen_2024": "100%",
+        "auh_aumento_mar_2024": "27%",
+        "auh_aumento_giu_2024": "41%",
+    },
+}
+
+# ── Dibattito metodologico INDEC vs UCA ───────────────────────────────────
+DIBATTITO_METODOLOGICO = {
+    "questione": (
+        "La Canasta Básica Total INDEC usa la struttura di spesa ENGHo "
+        "2004/05. La UCA propone di usare ENGHo 2017/18, il che alza "
+        "la CBT da ~$1.276.649 a ~$1.942.000 (pesos, giu 2025)."
+    ),
+    "differenza_stimata_pp": "4-5",
+    "indec_H1_2025": 31.6,
+    "uca_stima_H1_2025": "35-37",
+    "cedlas_stima_ott24_mar25": 34.4,
+    "utdt_stima_Q1_2025": 32.3,
+    "nota": (
+        "Come evidenziato nel dibattito italiano (ISPI/Seminerio/Economia "
+        "Italia): i dati semestrali INDEC mostrano un aumento netto H2-2023 "
+        "→ H1-2024, ma i dati trimestrali UCA mostrano che il picco è stato "
+        "nel Q1-2024 con successiva discesa già dal Q2-2024. Entrambe le "
+        "letture sono corrette ma raccontano storie diverse a seconda della "
+        "granularità temporale scelta."
+    ),
+}
 
 # ── Disoccupazione (%, INDEC) ──────────────────────────────────────────────
 DISOCCUPAZIONE = [
@@ -256,8 +343,15 @@ KPI = {
     "surplus_complessivo_2024_pil": 0.3,
     "debito_pil_2024": 91.5,
     "debito_pil_2023": 155.4,
-    "poverta_picco_2024h1": 52.9,
-    "poverta_2025q3": 27.0,
+    "poverta_indec_picco_2024h1": 52.9,
+    "indigenza_indec_picco_2024h1": 18.1,
+    "poverta_indec_2024h2": 38.1,
+    "poverta_indec_2025h1": 31.6,
+    "poverta_uca_picco_Q1_2024": 54.9,
+    "indigenza_uca_picco_Q1_2024": 20.3,
+    "poverta_uca_Q3_2024": 49.9,
+    "poverta_infantile_picco_2024h1": 67.3,
+    "poverta_infantile_2024h2": 52.7,
     "disoccupazione_2024": 8.2,
     "riserve_lorde_dic2025_mld": 32.3,
     "trade_surplus_2024_mld": 18.9,
@@ -292,6 +386,11 @@ def main():
                 "Allianz Trade – Country Risk Report",
                 "BBVA Research – Argentina Economic Outlook",
                 "JP Morgan – EMBI+",
+                "UCA-ODSA – Observatorio de la Deuda Social Argentina",
+                "UNICEF Argentina",
+                "ISPI – Istituto per gli Studi di Politica Internazionale",
+                "UTDT – Universidad Torcuato Di Tella",
+                "CEDLAS – Centro de Estudios Distributivos, Laborales y Sociales",
             ],
             "ultimo_aggiornamento": "2026-03-08",
         },
@@ -308,7 +407,12 @@ def main():
         },
         "bilancio_fiscale": BILANCIO_FISCALE,
         "debito_pubblico": DEBITO_PIL,
-        "poverta": POVERTA,
+        "poverta": {
+            "indec_semestrale": POVERTA_INDEC,
+            "uca_trimestrale": POVERTA_UCA_TRIMESTRALE,
+            "infantile": POVERTA_INFANTILE,
+            "dibattito_metodologico": DIBATTITO_METODOLOGICO,
+        },
         "disoccupazione": DISOCCUPAZIONE,
         "riserve_internazionali": RISERVE,
         "bilancia_commerciale": BILANCIA_COMMERCIALE,
