@@ -73,7 +73,41 @@ INFLAZIONE_MENSILE = [
     {"mese": "2025-04", "var_mm": 2.8},
     {"mese": "2025-05", "var_mm": 2.3},
     {"mese": "2025-06", "var_mm": 1.5},
+    {"mese": "2025-07", "var_mm": 1.8},
+    {"mese": "2025-08", "var_mm": 1.9},
+    {"mese": "2025-09", "var_mm": 2.1},
 ]
+
+# ── Inflazione annua a settembre 2025 (INDEC confermato) ────────────────────
+INFLAZIONE_ANNUA_SET_2025 = {
+    "valore_pct": 31.8,
+    "nota": (
+        "Ancora alta per standard internazionali e superiore ai livelli "
+        "pre-pandemia, ma in forte calo dal 211.4% di fine 2023. Il "
+        "'collasso' dell'inflazione è relativo: dal 25% mensile (dic 2023) "
+        "a ~2% mensile (2025), ma l'inflazione annua del 31.8% resta elevata."
+    ),
+}
+
+# ── Tasso di policy BCRA ────────────────────────────────────────────────────
+TASSO_POLICY_BCRA = [
+    {"data": "2023-12", "tasso_pct": 117.0, "nota": "picco post-elezioni"},
+    {"data": "2024-06", "tasso_pct": 50.0},
+    {"data": "2024-12", "tasso_pct": 32.0},
+    {"data": "2025-02", "tasso_pct": 29.0, "nota": "tassi reali ancora positivi per sostenere disinflazione"},
+]
+
+# ── Spesa primaria (IMF, aprile 2025) ──────────────────────────────────────
+SPESA_PRIMARIA = {
+    "taglio_aa_pct": -30,
+    "fonte": "IMF Country Report, aprile 2025",
+    "dettaglio": (
+        "Tagli profondi a sussidi, pensioni e trasferimenti provinciali. "
+        "L'assenza di finanziamento monetario e il regime di cambi semi-fisso "
+        "con crawl rate hanno sostenuto la disinflazione."
+    ),
+    "surplus_cassa_2024_pil_pct": 0.3,
+}
 
 # ── Stime inflazione 2025-2027 ─────────────────────────────────────────────
 STIME_INFLAZIONE = [
@@ -224,6 +258,46 @@ DISOCCUPAZIONE = [
     {"anno": 2025, "tasso": 7.0, "nota": "stima / Osservatorio CPI ~7%"},
 ]
 
+# ── Mercato del lavoro: qualità e informalità ──────────────────────────────
+# Fonte: INDEC (EPH Q2-2025), CIPPEC, CEPA, UCA-ODSA
+MERCATO_LAVORO = {
+    "disoccupazione_Q2_2025_pct": 7.6,
+    "disoccupazione_Q1_2025_pct": 7.9,
+    "tasso_occupazione_Q2_2025_pct": 44.5,
+    "informalita": {
+        "occupati_in_nero_pct": 43.2,
+        "salariati_senza_contributi_pct": 38.0,
+        "nota": (
+            "L'informalità ha aiutato a contenere la disoccupazione ma "
+            "a scapito della qualità del lavoro."
+        ),
+    },
+    "cippec": {
+        "occupazione_formale_privata": (
+            "Stagnante da oltre un decennio: il numero di salariati registrati "
+            "è rimasto pressoché costante, facendo scendere la loro quota "
+            "nell'occupazione totale da quasi il 60% a meno del 50%."
+        ),
+        "monotributistas_aumento_dal_2010_pct": 64,
+        "raccomandazione": (
+            "Riforma del diritto del lavoro per ridurre costi contributivi "
+            "e incertezza legale, favorendo la formalizzazione."
+        ),
+    },
+    "cepa": {
+        "nota": (
+            "Conferma la riduzione della povertà ma ricorda che l'obsolescenza "
+            "del paniere di consumo può far sottostimare la povertà effettiva."
+        ),
+    },
+    "sintesi_esperto": (
+        "I costi sociali NON sono aumentati in termini di povertà ufficiale. "
+        "Tuttavia l'austerità non ha risolto i problemi strutturali: la qualità "
+        "dell'occupazione è bassa, l'informalità resta molto elevata e il sistema "
+        "di misurazione ufficiale potrebbe attenuare l'entità della povertà."
+    ),
+}
+
 # ── Riserve internazionali BCRA (mld USD, lorde) ──────────────────────────
 RISERVE = [
     {"anno": 2019, "riserve_lorde": 44.8},
@@ -237,6 +311,8 @@ RISERVE = [
 
 # ── Riserve nette e crisi settembre 2025 ─────────────────────────────────
 RISERVE_NETTE_E_CRISI = {
+    "riserve_lorde_set_2025_mld": 40.374,
+    "nota_set_2025": "Appena 387 mln in più rispetto ad agosto; struttura fragile",
     "riserve_liquide_jp_morgan_mld": 18.5,
     "riserve_nette_mld": -2.4,
     "nota_riserve_nette": (
@@ -475,6 +551,10 @@ KPI = {
     "inflazione_2023_dic": 211.4,
     "inflazione_2024_dic": 117.8,
     "inflazione_2025_giu_mm": 1.5,
+    "inflazione_2025_set_mm": 2.1,
+    "inflazione_annua_set_2025": 31.8,
+    "tasso_policy_bcra_feb_2025": 29.0,
+    "spesa_primaria_taglio_aa_pct": -30,
     "surplus_primario_2024_pil": 1.8,
     "surplus_complessivo_2024_pil": 0.3,
     "debito_pil_2024": 91.5,
@@ -489,6 +569,9 @@ KPI = {
     "poverta_infantile_picco_2024h1": 67.3,
     "poverta_infantile_2024h2": 52.7,
     "disoccupazione_2024": 8.2,
+    "disoccupazione_Q2_2025": 7.6,
+    "tasso_occupazione_Q2_2025": 44.5,
+    "informalita_pct": 43.2,
     "riserve_lorde_dic2025_mld": 32.3,
     "riserve_nette_mld": -2.4,
     "swap_usa_mld": 20.0,
@@ -514,7 +597,9 @@ def main():
             "descrizione": (
                 "Dati ispirati all'articolo dell'Osservatorio CPI (Unicatt) "
                 "'L'Argentina di Milei, due anni dopo', arricchiti con fonti "
-                "IMF, OECD, World Bank, INDEC, BCRA, Trading Economics."
+                "IMF, OECD, World Bank, INDEC, BCRA, Trading Economics, "
+                "UCA-ODSA, CIPPEC, CEPA, lavoce.info. "
+                "Verificati da revisione esperta indipendente (mar 2026)."
             ),
             "fonti": [
                 "Osservatorio CPI – Università Cattolica",
@@ -551,6 +636,9 @@ def main():
             "mensile": INFLAZIONE_MENSILE,
             "stime": STIME_INFLAZIONE,
         },
+        "tasso_policy_bcra": TASSO_POLICY_BCRA,
+        "spesa_primaria_imf": SPESA_PRIMARIA,
+        "inflazione_annua_set_2025": INFLAZIONE_ANNUA_SET_2025,
         "bilancio_fiscale": BILANCIO_FISCALE,
         "debito_pubblico": DEBITO_PIL,
         "poverta": {
@@ -560,6 +648,7 @@ def main():
             "dibattito_metodologico": DIBATTITO_METODOLOGICO,
         },
         "disoccupazione": DISOCCUPAZIONE,
+        "mercato_lavoro": MERCATO_LAVORO,
         "riserve_internazionali": {
             "serie_lorde": RISERVE,
             "nette_e_crisi": RISERVE_NETTE_E_CRISI,
@@ -576,6 +665,35 @@ def main():
         "imf_programma": IMF_PROGRAMMA,
         "debito_estero_scadenze_2026": DEBITO_ESTERO_2026,
         "elezioni_2025": ELEZIONI_2025,
+        "valutazione_complessiva": {
+            "disinflazione": (
+                "Rapida e reale: dal 25% mensile (dic 2023) a ~2% (2025). "
+                "Deriva da severo riequilibrio fiscale (spesa primaria -30%, IMF) "
+                "e tassi reali positivi. Tuttavia l'inflazione annua (31.8% a "
+                "set 2025) resta alta per standard internazionali."
+            ),
+            "costi_sociali": (
+                "CORREZIONE: i dati CONTRADDICONO l'idea di 'costi sociali in crescita'. "
+                "La povertà è SCESA dal 52.9% (H1-2024) al 31.6% (H1-2025). "
+                "L'indigenza è calata dal 18.1% al 6.9%. I trasferimenti mirati "
+                "(AUH +100%, Tarjeta Alimentar) hanno attenuato l'impatto dell'austerità. "
+                "Le ombre riguardano la QUALITÀ del lavoro e la fragilità macro, "
+                "NON l'aumento della povertà."
+            ),
+            "fragilita_strutturali": (
+                "Bassa produttività, elevata informalità (43.2% in nero), "
+                "occupazione formale stagnante da un decennio, scarsa credibilità "
+                "del regime di cambio, dipendenza da sostegni esterni (swap USA $20 mld). "
+                "Senza ricostruire le riserve e adottare un regime di cambio credibile, "
+                "il rischio di nuove tensioni resta elevato."
+            ),
+            "conclusione": (
+                "L'intervento di Milei ha ottenuto un risultato significativo sul fronte "
+                "dell'inflazione a costo di una contrazione brusca della spesa pubblica. "
+                "Ciò NON ha provocato un aumento della povertà, ma NON ha neppure risolto "
+                "le debolezze strutturali dell'economia."
+            ),
+        },
     }
 
     out_path.write_text(
