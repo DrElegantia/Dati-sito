@@ -1,0 +1,3387 @@
+{
+  "metadata": {
+    "fonte_dati": "INPS - Casellario dei Pensionati",
+    "anno_riferimento": 2024,
+    "trattamento_minimo_mensile": 598.61,
+    "orizzonte_anni": 5,
+    "nota": "Risparmio aggregato da sotto-indicizzazione. Fasce fino a 4x il minimo escluse (k=1)."
+  },
+  "scenari": [
+    {
+      "inflazione": 0.02,
+      "k": 0.75,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 11766532874.32,
+        "risparmio_nominale_5y": 12655570265.1,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 3274.6
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 4782681871.97,
+          "risparmio_nominale_5y": 5144044310.49,
+          "risparmio_medio_per_pensionato": 2548.21
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 2431672547.15,
+          "risparmio_nominale_5y": 2615401079.56,
+          "risparmio_medio_per_pensionato": 3096.09
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 1258854698.37,
+          "risparmio_nominale_5y": 1353969283.81,
+          "risparmio_medio_per_pensionato": 3660.44
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 770863140.82,
+          "risparmio_nominale_5y": 829106819.12,
+          "risparmio_medio_per_pensionato": 4242.6
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 545399187.65,
+          "risparmio_nominale_5y": 586607611.23,
+          "risparmio_medio_per_pensionato": 4814.06
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 479815686.27,
+          "risparmio_nominale_5y": 516068853.65,
+          "risparmio_medio_per_pensionato": 5389.43
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 400327663.69,
+          "risparmio_nominale_5y": 430574998.69,
+          "risparmio_medio_per_pensionato": 5951.77
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 282063978.02,
+          "risparmio_nominale_5y": 303375729.39,
+          "risparmio_medio_per_pensionato": 6515.23
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 198708117.92,
+          "risparmio_nominale_5y": 213721796.84,
+          "risparmio_medio_per_pensionato": 7089.88
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 142639897.05,
+          "risparmio_nominale_5y": 153417260.55,
+          "risparmio_medio_per_pensionato": 7656.87
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 104342938.05,
+          "risparmio_nominale_5y": 112226719.49,
+          "risparmio_medio_per_pensionato": 8222.45
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 73243961.09,
+          "risparmio_nominale_5y": 78778014.38,
+          "risparmio_medio_per_pensionato": 8792.79
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 54446631.94,
+          "risparmio_nominale_5y": 58560425.88,
+          "risparmio_medio_per_pensionato": 9358.31
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 39293873.84,
+          "risparmio_nominale_5y": 42262779.24,
+          "risparmio_medio_per_pensionato": 9930.22
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 30015380.81,
+          "risparmio_nominale_5y": 32283236.27,
+          "risparmio_medio_per_pensionato": 10502.23
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 25312994.85,
+          "risparmio_nominale_5y": 27225554.74,
+          "risparmio_medio_per_pensionato": 11073.05
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 21386038.78,
+          "risparmio_nominale_5y": 23001891.84,
+          "risparmio_medio_per_pensionato": 11654.52
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 17856745.88,
+          "risparmio_nominale_5y": 19205938.12,
+          "risparmio_medio_per_pensionato": 12205.57
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 16263566.41,
+          "risparmio_nominale_5y": 17492383.67,
+          "risparmio_medio_per_pensionato": 12785.82
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 14061328.59,
+          "risparmio_nominale_5y": 15123752.58,
+          "risparmio_medio_per_pensionato": 13353.59
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 11149231.22,
+          "risparmio_nominale_5y": 11991627.49,
+          "risparmio_medio_per_pensionato": 13901.78
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 9391442.9,
+          "risparmio_nominale_5y": 10101026.94,
+          "risparmio_medio_per_pensionato": 14470.64
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 7505726.86,
+          "risparmio_nominale_5y": 8072832.89,
+          "risparmio_medio_per_pensionato": 15041.54
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 5526592.48,
+          "risparmio_nominale_5y": 5944162.16,
+          "risparmio_medio_per_pensionato": 15611.84
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 4939030.07,
+          "risparmio_nominale_5y": 5312205.62,
+          "risparmio_medio_per_pensionato": 16193.54
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 3587732.13,
+          "risparmio_nominale_5y": 3858808.41,
+          "risparmio_medio_per_pensionato": 16765.1
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 2977238.12,
+          "risparmio_nominale_5y": 3202187.64,
+          "risparmio_medio_per_pensionato": 17309.52
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 2809700.31,
+          "risparmio_nominale_5y": 3021991.28,
+          "risparmio_medio_per_pensionato": 17896.18
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 2177048.59,
+          "risparmio_nominale_5y": 2341538.64,
+          "risparmio_medio_per_pensionato": 18449.56
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 2113450.68,
+          "risparmio_nominale_5y": 2273135.49,
+          "risparmio_medio_per_pensionato": 19040.1
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 1845529.16,
+          "risparmio_nominale_5y": 1984970.78,
+          "risparmio_medio_per_pensionato": 19633.29
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 1573718.5,
+          "risparmio_nominale_5y": 1692623.08,
+          "risparmio_medio_per_pensionato": 20175.88
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 1328767.38,
+          "risparmio_nominale_5y": 1429164.32,
+          "risparmio_medio_per_pensionato": 20761.99
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 1236289.42,
+          "risparmio_nominale_5y": 1329699.06,
+          "risparmio_medio_per_pensionato": 21315.33
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 1028600.31,
+          "risparmio_nominale_5y": 1106317.69,
+          "risparmio_medio_per_pensionato": 21885.11
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 830837.02,
+          "risparmio_nominale_5y": 893612.11,
+          "risparmio_medio_per_pensionato": 22455.05
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 896973.01,
+          "risparmio_nominale_5y": 964745.1,
+          "risparmio_medio_per_pensionato": 22999.31
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 967890.01,
+          "risparmio_nominale_5y": 1041020.34,
+          "risparmio_medio_per_pensionato": 23607.07
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 652125.69,
+          "risparmio_nominale_5y": 701397.99,
+          "risparmio_medio_per_pensionato": 24152.8
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 692393.66,
+          "risparmio_nominale_5y": 744708.46,
+          "risparmio_medio_per_pensionato": 24728.35
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 709448.13,
+          "risparmio_nominale_5y": 763051.5,
+          "risparmio_medio_per_pensionato": 25337.43
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 879913.29,
+          "risparmio_nominale_5y": 946396.41,
+          "risparmio_medio_per_pensionato": 25879.8
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 687507.82,
+          "risparmio_nominale_5y": 739453.47,
+          "risparmio_medio_per_pensionato": 26442.61
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 620008.12,
+          "risparmio_nominale_5y": 666853.73,
+          "risparmio_medio_per_pensionato": 26956.87
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 413315.86,
+          "risparmio_nominale_5y": 444544.54,
+          "risparmio_medio_per_pensionato": 27554.39
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 590682.62,
+          "risparmio_nominale_5y": 635312.5,
+          "risparmio_medio_per_pensionato": 28127.74
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 10151431.81,
+          "risparmio_nominale_5y": 10918437.9,
+          "risparmio_medio_per_pensionato": 41098.91
+        }
+      ]
+    },
+    {
+      "inflazione": 0.02,
+      "k": 0.5,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 23379946449.48,
+        "risparmio_nominale_5y": 25144563807.34,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 6506.6
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 9503126132.89,
+          "risparmio_nominale_5y": 10220381040.39,
+          "risparmio_medio_per_pensionato": 5063.26
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 4831701448.71,
+          "risparmio_nominale_5y": 5196377401.36,
+          "risparmio_medio_per_pensionato": 6151.89
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 2501327770.04,
+          "risparmio_nominale_5y": 2690117184.51,
+          "risparmio_medio_per_pensionato": 7273.25
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 1531694947.43,
+          "risparmio_nominale_5y": 1647300665.22,
+          "risparmio_medio_per_pensionato": 8429.99
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 1083701030.47,
+          "risparmio_nominale_5y": 1165494102.72,
+          "risparmio_medio_per_pensionato": 9565.47
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 953387473.64,
+          "risparmio_nominale_5y": 1025345041.56,
+          "risparmio_medio_per_pensionato": 10708.73
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 795445815.64,
+          "risparmio_nominale_5y": 855482629.52,
+          "risparmio_medio_per_pensionato": 11826.08
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 560457423.77,
+          "risparmio_nominale_5y": 602758328.97,
+          "risparmio_medio_per_pensionato": 12945.68
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 394830423.34,
+          "risparmio_nominale_5y": 424630518.04,
+          "risparmio_medio_per_pensionato": 14087.5
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 283423604.07,
+          "risparmio_nominale_5y": 304815193.33,
+          "risparmio_medio_per_pensionato": 15214.11
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 207328048.98,
+          "risparmio_nominale_5y": 222976274.47,
+          "risparmio_medio_per_pensionato": 16337.91
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 145534789.75,
+          "risparmio_nominale_5y": 156519126.98,
+          "risparmio_medio_per_pensionato": 17471.16
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 108184743.35,
+          "risparmio_nominale_5y": 116350060.43,
+          "risparmio_medio_per_pensionato": 18594.83
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 78076411.8,
+          "risparmio_nominale_5y": 83969282.07,
+          "risparmio_medio_per_pensionato": 19731.21
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 59640167.88,
+          "risparmio_nominale_5y": 64141550.11,
+          "risparmio_medio_per_pensionato": 20867.8
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 50296588.66,
+          "risparmio_nominale_5y": 54092757.9,
+          "risparmio_medio_per_pensionato": 22002.01
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 42493778.48,
+          "risparmio_nominale_5y": 45701025.31,
+          "risparmio_medio_per_pensionato": 23157.37
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 35481119.8,
+          "risparmio_nominale_5y": 38159081.44,
+          "risparmio_medio_per_pensionato": 24252.3
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 32315493.08,
+          "risparmio_nominale_5y": 34754526.9,
+          "risparmio_medio_per_pensionato": 25405.26
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 27939675.42,
+          "risparmio_nominale_5y": 30048441.42,
+          "risparmio_medio_per_pensionato": 26533.4
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 22153376.15,
+          "risparmio_nominale_5y": 23825417.28,
+          "risparmio_medio_per_pensionato": 27622.66
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 18660673.83,
+          "risparmio_nominale_5y": 20069100.88,
+          "risparmio_medio_per_pensionato": 28752.96
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 14913780.79,
+          "risparmio_nominale_5y": 16039408.54,
+          "risparmio_medio_per_pensionato": 29887.34
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 10981266.75,
+          "risparmio_nominale_5y": 11810085.32,
+          "risparmio_medio_per_pensionato": 31020.53
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 9813787.94,
+          "risparmio_nominale_5y": 10554490.26,
+          "risparmio_medio_per_pensionato": 32176.35
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 7128776.67,
+          "risparmio_nominale_5y": 7666825.94,
+          "risparmio_medio_per_pensionato": 33312.04
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 5915733.08,
+          "risparmio_nominale_5y": 6362227.05,
+          "risparmio_medio_per_pensionato": 34393.8
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 5582837.66,
+          "risparmio_nominale_5y": 6004206.13,
+          "risparmio_medio_per_pensionato": 35559.48
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 4325766.99,
+          "risparmio_nominale_5y": 4652257.2,
+          "risparmio_medio_per_pensionato": 36659.04
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 4199398.76,
+          "risparmio_nominale_5y": 4516351.24,
+          "risparmio_medio_per_pensionato": 37832.42
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 3667042.23,
+          "risparmio_nominale_5y": 3943814.73,
+          "risparmio_medio_per_pensionato": 39011.09
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 3126958.02,
+          "risparmio_nominale_5y": 3362967.3,
+          "risparmio_medio_per_pensionato": 40089.21
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 2640243.35,
+          "risparmio_nominale_5y": 2839517.52,
+          "risparmio_medio_per_pensionato": 41253.8
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 2456490.87,
+          "risparmio_nominale_5y": 2641896.18,
+          "risparmio_medio_per_pensionato": 42353.29
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 2043815.33,
+          "risparmio_nominale_5y": 2198073.68,
+          "risparmio_medio_per_pensionato": 43485.43
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 1650862.26,
+          "risparmio_nominale_5y": 1775462.22,
+          "risparmio_medio_per_pensionato": 44617.9
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 1782273.6,
+          "risparmio_nominale_5y": 1916791.91,
+          "risparmio_medio_per_pensionato": 45699.32
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 1923184.75,
+          "risparmio_nominale_5y": 2068338.43,
+          "risparmio_medio_per_pensionato": 46906.95
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 1295765.19,
+          "risparmio_nominale_5y": 1393563.95,
+          "risparmio_medio_per_pensionato": 47991.3
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 1375777.12,
+          "risparmio_nominale_5y": 1479614.83,
+          "risparmio_medio_per_pensionato": 49134.9
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 1409664.12,
+          "risparmio_nominale_5y": 1516059.48,
+          "risparmio_medio_per_pensionato": 50345.15
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 1748376.15,
+          "risparmio_nominale_5y": 1880336.03,
+          "risparmio_medio_per_pensionato": 51422.83
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 1366069.02,
+          "risparmio_nominale_5y": 1469174.0,
+          "risparmio_medio_per_pensionato": 52541.12
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 1231948.01,
+          "risparmio_nominale_5y": 1324930.12,
+          "risparmio_medio_per_pensionato": 53562.96
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 821253.19,
+          "risparmio_nominale_5y": 883237.83,
+          "risparmio_medio_per_pensionato": 54750.21
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 1173678.62,
+          "risparmio_nominale_5y": 1262262.81,
+          "risparmio_medio_per_pensionato": 55889.46
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 20170761.82,
+          "risparmio_nominale_5y": 21693163.79,
+          "risparmio_medio_per_pensionato": 81663.0
+        }
+      ]
+    },
+    {
+      "inflazione": 0.02,
+      "k": 0.25,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 34841928268.09,
+        "risparmio_nominale_5y": 37468829144.36,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 9696.45
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 14162018709.51,
+          "risparmio_nominale_5y": 15229761547.14,
+          "risparmio_medio_per_pensionato": 7545.51
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 7200435452.35,
+          "risparmio_nominale_5y": 7743310980.18,
+          "risparmio_medio_per_pensionato": 9167.85
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 3727599758.49,
+          "risparmio_nominale_5y": 4008641467.68,
+          "risparmio_medio_per_pensionato": 10838.94
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 2282605976.12,
+          "risparmio_nominale_5y": 2454702640.59,
+          "risparmio_medio_per_pensionato": 12562.78
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 1614983748.97,
+          "risparmio_nominale_5y": 1736745156.45,
+          "risparmio_medio_per_pensionato": 14254.93
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 1420784176.73,
+          "risparmio_nominale_5y": 1527903942.6,
+          "risparmio_medio_per_pensionato": 15958.67
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 1185411870.36,
+          "risparmio_nominale_5y": 1274785783.79,
+          "risparmio_medio_per_pensionato": 17623.8
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 835220790.54,
+          "risparmio_nominale_5y": 898192110.89,
+          "risparmio_medio_per_pensionato": 19292.28
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 588395414.75,
+          "risparmio_nominale_5y": 632757380.56,
+          "risparmio_medio_per_pensionato": 20993.88
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 422371578.31,
+          "risparmio_nominale_5y": 454216207.01,
+          "risparmio_medio_per_pensionato": 22672.8
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 308970297.52,
+          "risparmio_nominale_5y": 332265057.19,
+          "risparmio_medio_per_pensionato": 24347.54
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 216882990.55,
+          "risparmio_nominale_5y": 233234844.38,
+          "risparmio_medio_per_pensionato": 26036.37
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 161222142.9,
+          "risparmio_nominale_5y": 173377457.19,
+          "risparmio_medio_per_pensionato": 27710.92
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 116353249.36,
+          "risparmio_nominale_5y": 125125681.54,
+          "risparmio_medio_per_pensionato": 29404.41
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 88878665.99,
+          "risparmio_nominale_5y": 95579656.92,
+          "risparmio_medio_per_pensionato": 31098.2
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 74954411.81,
+          "risparmio_nominale_5y": 80605586.12,
+          "risparmio_medio_per_pensionato": 32788.46
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 63326286.27,
+          "risparmio_nominale_5y": 68100760.16,
+          "risparmio_medio_per_pensionato": 34510.24
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 52875682.73,
+          "risparmio_nominale_5y": 56862235.27,
+          "risparmio_medio_per_pensionato": 36141.96
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 48158112.53,
+          "risparmio_nominale_5y": 51788984.71,
+          "risparmio_medio_per_pensionato": 37860.15
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 41637057.17,
+          "risparmio_nominale_5y": 44776275.55,
+          "risparmio_medio_per_pensionato": 39541.36
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 33014033.82,
+          "risparmio_nominale_5y": 35503120.92,
+          "risparmio_medio_per_pensionato": 41164.63
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 27809039.7,
+          "risparmio_nominale_5y": 29905697.22,
+          "risparmio_medio_per_pensionato": 42849.06
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 22225238.27,
+          "risparmio_nominale_5y": 23900906.09,
+          "risparmio_medio_per_pensionato": 44539.56
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 16364815.43,
+          "risparmio_nominale_5y": 17598637.72,
+          "risparmio_medio_per_pensionato": 46228.29
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 14624981.98,
+          "risparmio_nominale_5y": 15727629.85,
+          "risparmio_medio_per_pensionato": 47950.76
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 10623648.18,
+          "risparmio_nominale_5y": 11424616.21,
+          "risparmio_medio_per_pensionato": 49643.22
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 8815911.87,
+          "risparmio_nominale_5y": 9480585.95,
+          "risparmio_medio_per_pensionato": 51255.3
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 8319815.0,
+          "risparmio_nominale_5y": 8947085.95,
+          "risparmio_medio_per_pensionato": 52992.45
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 6446467.43,
+          "risparmio_nominale_5y": 6932497.67,
+          "risparmio_medio_per_pensionato": 54631.08
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 6258147.38,
+          "risparmio_nominale_5y": 6729979.26,
+          "risparmio_medio_per_pensionato": 56379.71
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 5464803.89,
+          "risparmio_nominale_5y": 5876821.79,
+          "risparmio_medio_per_pensionato": 58136.21
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 4659944.25,
+          "risparmio_nominale_5y": 5011279.9,
+          "risparmio_medio_per_pensionato": 59742.88
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 3934618.49,
+          "risparmio_nominale_5y": 4231268.34,
+          "risparmio_medio_per_pensionato": 61478.41
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 3660781.63,
+          "risparmio_nominale_5y": 3936785.6,
+          "risparmio_medio_per_pensionato": 63116.92
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 3045792.56,
+          "risparmio_nominale_5y": 3275429.54,
+          "risparmio_medio_per_pensionato": 64804.1
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 2460194.88,
+          "risparmio_nominale_5y": 2645680.83,
+          "risparmio_medio_per_pensionato": 66491.75
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 2656030.42,
+          "risparmio_nominale_5y": 2856281.35,
+          "risparmio_medio_per_pensionato": 68103.34
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 2866023.04,
+          "risparmio_nominale_5y": 3082106.33,
+          "risparmio_medio_per_pensionato": 69903.0
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 1931012.03,
+          "risparmio_nominale_5y": 2076600.34,
+          "risparmio_medio_per_pensionato": 71518.96
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 2050249.68,
+          "risparmio_nominale_5y": 2204827.89,
+          "risparmio_medio_per_pensionato": 73223.2
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 2100749.72,
+          "risparmio_nominale_5y": 2259135.37,
+          "risparmio_medio_per_pensionato": 75026.78
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 2605514.8,
+          "risparmio_nominale_5y": 2801957.12,
+          "risparmio_medio_per_pensionato": 76632.79
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 2035782.19,
+          "risparmio_nominale_5y": 2189269.62,
+          "risparmio_medio_per_pensionato": 78299.32
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 1835908.57,
+          "risparmio_nominale_5y": 1974326.56,
+          "risparmio_medio_per_pensionato": 79822.11
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 1223871.27,
+          "risparmio_nominale_5y": 1316144.82,
+          "risparmio_medio_per_pensionato": 81591.42
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 1749072.71,
+          "risparmio_nominale_5y": 1880943.73,
+          "risparmio_medio_per_pensionato": 83289.18
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 30059445.94,
+          "risparmio_nominale_5y": 32325772.43,
+          "risparmio_medio_per_pensionato": 121698.16
+        }
+      ]
+    },
+    {
+      "inflazione": 0.02,
+      "k": 0.0,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 46154152589.52,
+        "risparmio_nominale_5y": 49630200176.34,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 12844.62
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 18760040129.38,
+          "risparmio_nominale_5y": 20172931246.68,
+          "risparmio_medio_per_pensionato": 9995.33
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 9538220560.63,
+          "risparmio_nominale_5y": 10256580809.97,
+          "risparmio_medio_per_pensionato": 12144.4
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 4937849786.1,
+          "risparmio_nominale_5y": 5309738335.02,
+          "risparmio_medio_per_pensionato": 14358.05
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 3023705912.97,
+          "risparmio_nominale_5y": 3251432889.9,
+          "risparmio_medio_per_pensionato": 16641.57
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 2139324947.98,
+          "risparmio_nominale_5y": 2300445776.88,
+          "risparmio_medio_per_pensionato": 18883.12
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 1882074068.49,
+          "risparmio_nominale_5y": 2023820339.56,
+          "risparmio_medio_per_pensionato": 21140.01
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 1570282790.46,
+          "risparmio_nominale_5y": 1688546855.52,
+          "risparmio_medio_per_pensionato": 23345.76
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 1106394213.21,
+          "risparmio_nominale_5y": 1189721036.88,
+          "risparmio_medio_per_pensionato": 25555.96
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 779431366.32,
+          "risparmio_nominale_5y": 838133354.51,
+          "risparmio_medio_per_pensionato": 27810.02
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 559504115.98,
+          "risparmio_nominale_5y": 601642533.07,
+          "risparmio_medio_per_pensionato": 30034.04
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 409284530.63,
+          "risparmio_nominale_5y": 440109330.24,
+          "risparmio_medio_per_pensionato": 32252.52
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 287298985.38,
+          "risparmio_nominale_5y": 308936582.19,
+          "risparmio_medio_per_pensionato": 34489.67
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 213566577.8,
+          "risparmio_nominale_5y": 229651102.07,
+          "risparmio_medio_per_pensionato": 36707.9
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 154129977.65,
+          "risparmio_nominale_5y": 165738101.88,
+          "risparmio_medio_per_pensionato": 38951.22
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 117735146.01,
+          "risparmio_nominale_5y": 126602234.82,
+          "risparmio_medio_per_pensionato": 41194.94
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 99290066.08,
+          "risparmio_nominale_5y": 106767984.64,
+          "risparmio_medio_per_pensionato": 43433.97
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 83886605.15,
+          "risparmio_nominale_5y": 90204429.55,
+          "risparmio_medio_per_pensionato": 45714.77
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 70042975.53,
+          "risparmio_nominale_5y": 75318182.69,
+          "risparmio_medio_per_pensionato": 47876.26
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 63793738.88,
+          "risparmio_nominale_5y": 68598291.88,
+          "risparmio_medio_per_pensionato": 50152.31
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 55155474.6,
+          "risparmio_nominale_5y": 59309446.54,
+          "risparmio_medio_per_pensionato": 52379.37
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 43732790.64,
+          "risparmio_nominale_5y": 47026476.1,
+          "risparmio_medio_per_pensionato": 54529.66
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 36837876.82,
+          "risparmio_nominale_5y": 39612279.68,
+          "risparmio_medio_per_pensionato": 56760.98
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 29441167.28,
+          "risparmio_nominale_5y": 31658495.36,
+          "risparmio_medio_per_pensionato": 59000.34
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 21678024.89,
+          "risparmio_nominale_5y": 23310680.72,
+          "risparmio_medio_per_pensionato": 61237.36
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 19373314.96,
+          "risparmio_nominale_5y": 20832394.17,
+          "risparmio_medio_per_pensionato": 63519.07
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 14072857.14,
+          "risparmio_nominale_5y": 15132738.4,
+          "risparmio_medio_per_pensionato": 65761.01
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 11678198.14,
+          "risparmio_nominale_5y": 12557728.37,
+          "risparmio_medio_per_pensionato": 67896.5
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 11021032.13,
+          "risparmio_nominale_5y": 11851068.65,
+          "risparmio_medio_per_pensionato": 70197.66
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 8539459.67,
+          "risparmio_nominale_5y": 9182599.38,
+          "risparmio_medio_per_pensionato": 72368.3
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 8289997.23,
+          "risparmio_nominale_5y": 8914348.96,
+          "risparmio_medio_per_pensionato": 74684.66
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 7239076.74,
+          "risparmio_nominale_5y": 7784279.58,
+          "risparmio_medio_per_pensionato": 77011.45
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 6172901.12,
+          "risparmio_nominale_5y": 6637806.16,
+          "risparmio_medio_per_pensionato": 79139.76
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 5212081.85,
+          "risparmio_nominale_5y": 5604623.88,
+          "risparmio_medio_per_pensionato": 81438.78
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 4849337.64,
+          "risparmio_nominale_5y": 5214559.99,
+          "risparmio_medio_per_pensionato": 83609.27
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 4034678.38,
+          "risparmio_nominale_5y": 4338545.6,
+          "risparmio_medio_per_pensionato": 85844.22
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 3258953.09,
+          "risparmio_nominale_5y": 3504397.44,
+          "risparmio_medio_per_pensionato": 88079.81
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 3518371.09,
+          "risparmio_nominale_5y": 3783353.22,
+          "risparmio_medio_per_pensionato": 90214.64
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 3796542.6,
+          "risparmio_nominale_5y": 4082474.89,
+          "risparmio_medio_per_pensionato": 92598.6
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 2557959.0,
+          "risparmio_nominale_5y": 2750608.78,
+          "risparmio_medio_per_pensionato": 94739.22
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 2715909.86,
+          "risparmio_nominale_5y": 2920455.53,
+          "risparmio_medio_per_pensionato": 96996.78
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 2782805.89,
+          "risparmio_nominale_5y": 2992389.76,
+          "risparmio_medio_per_pensionato": 99385.92
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 3451454.43,
+          "risparmio_nominale_5y": 3711396.81,
+          "risparmio_medio_per_pensionato": 101513.37
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 2696745.18,
+          "risparmio_nominale_5y": 2899847.48,
+          "risparmio_medio_per_pensionato": 103720.97
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 2431978.04,
+          "risparmio_nominale_5y": 2615139.7,
+          "risparmio_medio_per_pensionato": 105738.18
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 1621228.91,
+          "risparmio_nominale_5y": 1743329.92,
+          "risparmio_medio_per_pensionato": 108081.93
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 2316948.94,
+          "risparmio_nominale_5y": 2491447.31,
+          "risparmio_medio_per_pensionato": 110330.9
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 39818928.62,
+          "risparmio_nominale_5y": 42817846.01,
+          "risparmio_medio_per_pensionato": 161210.24
+        }
+      ]
+    },
+    {
+      "inflazione": 0.03,
+      "k": 0.75,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 17423131284.56,
+        "risparmio_nominale_5y": 19427505141.73,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 4848.83
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 7081890225.24,
+          "risparmio_nominale_5y": 7896597719.26,
+          "risparmio_medio_per_pensionato": 3773.22
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 3600665589.66,
+          "risparmio_nominale_5y": 4014889638.05,
+          "risparmio_medio_per_pensionato": 4584.49
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 1864031734.09,
+          "risparmio_nominale_5y": 2078471745.8,
+          "risparmio_medio_per_pensionato": 5420.15
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 1141444965.01,
+          "risparmio_nominale_5y": 1272757896.65,
+          "risparmio_medio_per_pensionato": 6282.17
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 807592325.67,
+          "risparmio_nominale_5y": 900498527.1,
+          "risparmio_medio_per_pensionato": 7128.35
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 710480460.43,
+          "risparmio_nominale_5y": 792214819.06,
+          "risparmio_medio_per_pensionato": 7980.33
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 592779667.2,
+          "risparmio_nominale_5y": 660973612.86,
+          "risparmio_medio_per_pensionato": 8812.99
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 417662345.59,
+          "risparmio_nominale_5y": 465710625.37,
+          "risparmio_medio_per_pensionato": 9647.34
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 294234305.27,
+          "risparmio_nominale_5y": 328083304.04,
+          "risparmio_medio_per_pensionato": 10498.24
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 211212060.45,
+          "risparmio_nominale_5y": 235510099.96,
+          "risparmio_medio_per_pensionato": 11337.81
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 154504366.56,
+          "risparmio_nominale_5y": 172278698.17,
+          "risparmio_medio_per_pensionato": 12175.28
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 108454985.29,
+          "risparmio_nominale_5y": 120931751.59,
+          "risparmio_medio_per_pensionato": 13019.81
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 80621099.39,
+          "risparmio_nominale_5y": 89895828.56,
+          "risparmio_medio_per_pensionato": 13857.18
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 58183861.79,
+          "risparmio_nominale_5y": 64877389.47,
+          "risparmio_medio_per_pensionato": 14704.03
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 44444861.2,
+          "risparmio_nominale_5y": 49557840.98,
+          "risparmio_medio_per_pensionato": 15551.04
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 37481868.03,
+          "risparmio_nominale_5y": 41793818.35,
+          "risparmio_medio_per_pensionato": 16396.27
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 31667082.0,
+          "risparmio_nominale_5y": 35310093.71,
+          "risparmio_medio_per_pensionato": 17257.27
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 26441130.21,
+          "risparmio_nominale_5y": 29482943.37,
+          "risparmio_medio_per_pensionato": 18073.23
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 24082051.67,
+          "risparmio_nominale_5y": 26852474.17,
+          "risparmio_medio_per_pensionato": 18932.43
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 20821118.39,
+          "risparmio_nominale_5y": 23216399.96,
+          "risparmio_medio_per_pensionato": 19773.14
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 16509070.37,
+          "risparmio_nominale_5y": 18408289.77,
+          "risparmio_medio_per_pensionato": 20584.88
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 13906249.56,
+          "risparmio_nominale_5y": 15506037.95,
+          "risparmio_medio_per_pensionato": 21427.2
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 11114001.54,
+          "risparmio_nominale_5y": 12392567.01,
+          "risparmio_medio_per_pensionato": 22272.55
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 8183425.6,
+          "risparmio_nominale_5y": 9124854.78,
+          "risparmio_medio_per_pensionato": 23117.02
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 7313400.66,
+          "risparmio_nominale_5y": 8154741.34,
+          "risparmio_medio_per_pensionato": 23978.36
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 5312484.87,
+          "risparmio_nominale_5y": 5923638.27,
+          "risparmio_medio_per_pensionato": 24824.7
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 4408504.28,
+          "risparmio_nominale_5y": 4915662.87,
+          "risparmio_medio_per_pensionato": 25630.84
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 4160424.99,
+          "risparmio_nominale_5y": 4639044.3,
+          "risparmio_medio_per_pensionato": 26499.52
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 3223634.68,
+          "risparmio_nominale_5y": 3594484.73,
+          "risparmio_medio_per_pensionato": 27318.94
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 3129462.94,
+          "risparmio_nominale_5y": 3489479.38,
+          "risparmio_medio_per_pensionato": 28193.36
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 2732741.85,
+          "risparmio_nominale_5y": 3047119.11,
+          "risparmio_medio_per_pensionato": 29071.72
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 2330261.97,
+          "risparmio_nominale_5y": 2598337.56,
+          "risparmio_medio_per_pensionato": 29875.15
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 1967553.98,
+          "risparmio_nominale_5y": 2193903.29,
+          "risparmio_medio_per_pensionato": 30743.03
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 1830618.52,
+          "risparmio_nominale_5y": 2041214.64,
+          "risparmio_medio_per_pensionato": 31562.39
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 1523085.73,
+          "risparmio_nominale_5y": 1698302.98,
+          "risparmio_medio_per_pensionato": 32406.08
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 1230250.46,
+          "risparmio_nominale_5y": 1371779.67,
+          "risparmio_medio_per_pensionato": 33250.01
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 1328180.41,
+          "risparmio_nominale_5y": 1480975.57,
+          "risparmio_medio_per_pensionato": 34055.91
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 1433189.79,
+          "risparmio_nominale_5y": 1598065.32,
+          "risparmio_medio_per_pensionato": 34955.85
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 965626.12,
+          "risparmio_nominale_5y": 1076712.69,
+          "risparmio_medio_per_pensionato": 35763.93
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 1025252.37,
+          "risparmio_nominale_5y": 1143198.39,
+          "risparmio_medio_per_pensionato": 36616.16
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 1050505.53,
+          "risparmio_nominale_5y": 1171356.7,
+          "risparmio_medio_per_pensionato": 37518.05
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 1302919.46,
+          "risparmio_nominale_5y": 1452808.58,
+          "risparmio_medio_per_pensionato": 38321.16
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 1018017.72,
+          "risparmio_nominale_5y": 1135131.46,
+          "risparmio_medio_per_pensionato": 39154.53
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 918068.48,
+          "risparmio_nominale_5y": 1023683.96,
+          "risparmio_medio_per_pensionato": 39916.02
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 612011.76,
+          "risparmio_nominale_5y": 682418.18,
+          "risparmio_medio_per_pensionato": 40800.78
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 874645.14,
+          "risparmio_nominale_5y": 975265.17,
+          "risparmio_medio_per_pensionato": 41649.77
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 15031592.65,
+          "risparmio_nominale_5y": 16760841.6,
+          "risparmio_medio_per_pensionato": 60856.65
+        }
+      ]
+    },
+    {
+      "inflazione": 0.03,
+      "k": 0.5,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 34510209638.42,
+        "risparmio_nominale_5y": 38473908484.04,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 9604.13
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 14027186750.62,
+          "risparmio_nominale_5y": 15638290957.56,
+          "risparmio_medio_per_pensionato": 7473.67
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 7131882456.0,
+          "risparmio_nominale_5y": 7951020750.26,
+          "risparmio_medio_per_pensionato": 9080.56
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 3692110497.55,
+          "risparmio_nominale_5y": 4116170921.13,
+          "risparmio_medio_per_pensionato": 10735.75
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 2260874029.46,
+          "risparmio_nominale_5y": 2520548597.5,
+          "risparmio_medio_per_pensionato": 12443.17
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 1599608015.68,
+          "risparmio_nominale_5y": 1783332325.44,
+          "risparmio_medio_per_pensionato": 14119.21
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 1407257354.2,
+          "risparmio_nominale_5y": 1568889068.66,
+          "risparmio_medio_per_pensionato": 15806.73
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 1174125950.75,
+          "risparmio_nominale_5y": 1308981163.87,
+          "risparmio_medio_per_pensionato": 17456.01
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 827268925.94,
+          "risparmio_nominale_5y": 922285586.84,
+          "risparmio_medio_per_pensionato": 19108.61
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 582793494.0,
+          "risparmio_nominale_5y": 649730725.73,
+          "risparmio_medio_per_pensionato": 20794.0
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 418350316.34,
+          "risparmio_nominale_5y": 466400290.05,
+          "risparmio_medio_per_pensionato": 22456.94
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 306028692.14,
+          "risparmio_nominale_5y": 341177872.24,
+          "risparmio_medio_per_pensionato": 24115.74
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 214818118.37,
+          "risparmio_nominale_5y": 239491232.12,
+          "risparmio_medio_per_pensionato": 25788.49
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 159687199.49,
+          "risparmio_nominale_5y": 178028205.67,
+          "risparmio_medio_per_pensionato": 27447.1
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 115245488.04,
+          "risparmio_nominale_5y": 128482104.47,
+          "risparmio_medio_per_pensionato": 29124.46
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 88032481.21,
+          "risparmio_nominale_5y": 98143525.09,
+          "risparmio_medio_per_pensionato": 30802.13
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 74240795.31,
+          "risparmio_nominale_5y": 82767783.64,
+          "risparmio_medio_per_pensionato": 32476.29
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 62723377.36,
+          "risparmio_nominale_5y": 69927523.06,
+          "risparmio_medio_per_pensionato": 34181.68
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 52372270.61,
+          "risparmio_nominale_5y": 58387531.34,
+          "risparmio_medio_per_pensionato": 35797.86
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 47699614.85,
+          "risparmio_nominale_5y": 53178193.81,
+          "risparmio_medio_per_pensionato": 37499.7
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 41240644.33,
+          "risparmio_nominale_5y": 45977372.85,
+          "risparmio_medio_per_pensionato": 39164.9
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 32699717.98,
+          "risparmio_nominale_5y": 36455471.29,
+          "risparmio_medio_per_pensionato": 40772.72
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 27544278.91,
+          "risparmio_nominale_5y": 30707899.99,
+          "risparmio_medio_per_pensionato": 42441.11
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 22013639.03,
+          "risparmio_nominale_5y": 24542033.86,
+          "risparmio_medio_per_pensionato": 44115.51
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 16209011.36,
+          "risparmio_nominale_5y": 18070710.85,
+          "risparmio_medio_per_pensionato": 45788.17
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 14485742.3,
+          "risparmio_nominale_5y": 16149514.29,
+          "risparmio_medio_per_pensionato": 47494.24
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 10522503.89,
+          "risparmio_nominale_5y": 11731074.83,
+          "risparmio_medio_per_pensionato": 49170.58
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 8731978.45,
+          "risparmio_nominale_5y": 9734897.11,
+          "risparmio_medio_per_pensionato": 50767.32
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 8240604.76,
+          "risparmio_nominale_5y": 9187086.27,
+          "risparmio_medio_per_pensionato": 52487.93
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 6385092.71,
+          "risparmio_nominale_5y": 7118457.85,
+          "risparmio_medio_per_pensionato": 54110.96
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 6198565.6,
+          "risparmio_nominale_5y": 6910507.01,
+          "risparmio_medio_per_pensionato": 55842.93
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 5412775.27,
+          "risparmio_nominale_5y": 6034464.08,
+          "risparmio_medio_per_pensionato": 57582.72
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 4615578.44,
+          "risparmio_nominale_5y": 5145704.55,
+          "risparmio_medio_per_pensionato": 59174.08
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 3897158.27,
+          "risparmio_nominale_5y": 4344769.62,
+          "risparmio_medio_per_pensionato": 60893.1
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 3625928.53,
+          "risparmio_nominale_5y": 4042387.56,
+          "risparmio_medio_per_pensionato": 62516.01
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 3016794.56,
+          "risparmio_nominale_5y": 3363291.01,
+          "risparmio_medio_per_pensionato": 64187.12
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 2436772.17,
+          "risparmio_nominale_5y": 2716649.66,
+          "risparmio_medio_per_pensionato": 65858.71
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 2630743.22,
+          "risparmio_nominale_5y": 2932899.42,
+          "risparmio_medio_per_pensionato": 67454.95
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 2838736.57,
+          "risparmio_nominale_5y": 3164782.02,
+          "risparmio_medio_per_pensionato": 69237.48
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 1912627.5,
+          "risparmio_nominale_5y": 2132303.92,
+          "risparmio_medio_per_pensionato": 70838.06
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 2030729.92,
+          "risparmio_nominale_5y": 2263971.1,
+          "risparmio_medio_per_pensionato": 72526.07
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 2080749.17,
+          "risparmio_nominale_5y": 2319735.35,
+          "risparmio_medio_per_pensionato": 74312.47
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 2580708.55,
+          "risparmio_nominale_5y": 2877117.97,
+          "risparmio_medio_per_pensionato": 75903.19
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 2016400.18,
+          "risparmio_nominale_5y": 2247995.5,
+          "risparmio_medio_per_pensionato": 77553.85
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 1818429.48,
+          "risparmio_nominale_5y": 2027286.72,
+          "risparmio_medio_per_pensionato": 79062.15
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 1212219.19,
+          "risparmio_nominale_5y": 1351449.63,
+          "risparmio_medio_per_pensionato": 80814.61
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 1732420.36,
+          "risparmio_nominale_5y": 1931398.94,
+          "risparmio_medio_per_pensionato": 82496.21
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 29773259.77,
+          "risparmio_nominale_5y": 33192892.29,
+          "risparmio_medio_per_pensionato": 120539.51
+        }
+      ]
+    },
+    {
+      "inflazione": 0.03,
+      "k": 0.25,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 51266734543.17,
+        "risparmio_nominale_5y": 57145510759.79,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 14267.44
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 20838124922.06,
+          "risparmio_nominale_5y": 23227640741.27,
+          "risparmio_medio_per_pensionato": 11102.53
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 10594787122.3,
+          "risparmio_nominale_5y": 11809695446.57,
+          "risparmio_medio_per_pensionato": 13489.65
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 5484824658.13,
+          "risparmio_nominale_5y": 6113771616.43,
+          "risparmio_medio_per_pensionato": 15948.52
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 3358647481.96,
+          "risparmio_nominale_5y": 3743784883.69,
+          "risparmio_medio_per_pensionato": 18484.98
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 2376301980.56,
+          "risparmio_nominale_5y": 2648793444.88,
+          "risparmio_medio_per_pensionato": 20974.83
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 2090554939.18,
+          "risparmio_nominale_5y": 2330279680.09,
+          "risparmio_medio_per_pensionato": 23481.73
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 1744225957.14,
+          "risparmio_nominale_5y": 1944237020.15,
+          "risparmio_medio_per_pensionato": 25931.82
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 1228951573.07,
+          "risparmio_nominale_5y": 1369875923.79,
+          "risparmio_medio_per_pensionato": 28386.84
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 865770439.06,
+          "risparmio_nominale_5y": 965048669.11,
+          "risparmio_medio_per_pensionato": 30890.59
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 621481435.16,
+          "risparmio_nominale_5y": 692746950.94,
+          "risparmio_medio_per_pensionato": 33360.97
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 454621744.89,
+          "risparmio_nominale_5y": 506753395.67,
+          "risparmio_medio_per_pensionato": 35825.2
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 319123632.26,
+          "risparmio_nominale_5y": 355717662.21,
+          "risparmio_medio_per_pensionato": 38310.16
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 237223747.75,
+          "risparmio_nominale_5y": 264426286.37,
+          "risparmio_medio_per_pensionato": 40774.11
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 171203244.04,
+          "risparmio_nominale_5y": 190835186.05,
+          "risparmio_medio_per_pensionato": 43265.92
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 130776888.71,
+          "risparmio_nominale_5y": 145773124.96,
+          "risparmio_medio_per_pensionato": 45758.18
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 110288612.72,
+          "risparmio_nominale_5y": 122935450.46,
+          "risparmio_medio_per_pensionato": 48245.24
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 93178881.57,
+          "risparmio_nominale_5y": 103863739.85,
+          "risparmio_medio_per_pensionato": 50778.68
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 77801767.16,
+          "risparmio_nominale_5y": 86723325.8,
+          "risparmio_medio_per_pensionato": 53179.61
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 70860290.86,
+          "risparmio_nominale_5y": 78985867.73,
+          "risparmio_medio_per_pensionato": 55707.78
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 61265149.86,
+          "risparmio_nominale_5y": 68290448.22,
+          "risparmio_medio_per_pensionato": 58181.53
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 48577153.79,
+          "risparmio_nominale_5y": 54147514.75,
+          "risparmio_medio_per_pensionato": 60570.02
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 40918477.46,
+          "risparmio_nominale_5y": 45610615.04,
+          "risparmio_medio_per_pensionato": 63048.5
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 32702420.54,
+          "risparmio_nominale_5y": 36452419.71,
+          "risparmio_medio_per_pensionato": 65535.91
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 24079340.32,
+          "risparmio_nominale_5y": 26840527.56,
+          "risparmio_medio_per_pensionato": 68020.74
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 21519333.35,
+          "risparmio_nominale_5y": 23986963.61,
+          "risparmio_medio_per_pensionato": 70555.19
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 15631733.89,
+          "risparmio_nominale_5y": 17424230.85,
+          "risparmio_medio_per_pensionato": 73045.49
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 12971814.03,
+          "risparmio_nominale_5y": 14459296.94,
+          "risparmio_medio_per_pensionato": 75417.52
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 12241852.51,
+          "risparmio_nominale_5y": 13645630.46,
+          "risparmio_medio_per_pensionato": 77973.58
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 9485391.62,
+          "risparmio_nominale_5y": 10573085.13,
+          "risparmio_medio_per_pensionato": 80384.67
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 9208295.76,
+          "risparmio_nominale_5y": 10264214.58,
+          "risparmio_medio_per_pensionato": 82957.62
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 8040962.83,
+          "risparmio_nominale_5y": 8963023.14,
+          "risparmio_medio_per_pensionato": 85542.16
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 6856684.94,
+          "risparmio_nominale_5y": 7642943.65,
+          "risparmio_medio_per_pensionato": 87906.22
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 5789433.93,
+          "risparmio_nominale_5y": 6453310.55,
+          "risparmio_medio_per_pensionato": 90459.91
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 5386507.85,
+          "risparmio_nominale_5y": 6004180.78,
+          "risparmio_medio_per_pensionato": 92870.83
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 4481607.26,
+          "risparmio_nominale_5y": 4995514.89,
+          "risparmio_medio_per_pensionato": 95353.35
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 3619953.43,
+          "risparmio_nominale_5y": 4035054.89,
+          "risparmio_medio_per_pensionato": 97836.58
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 3908107.65,
+          "risparmio_nominale_5y": 4356251.86,
+          "risparmio_medio_per_pensionato": 100207.89
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 4217092.73,
+          "risparmio_nominale_5y": 4700668.38,
+          "risparmio_medio_per_pensionato": 102855.92
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 2841308.91,
+          "risparmio_nominale_5y": 3167122.9,
+          "risparmio_medio_per_pensionato": 105233.66
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 3016756.29,
+          "risparmio_nominale_5y": 3362688.89,
+          "risparmio_medio_per_pensionato": 107741.3
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 3091062.52,
+          "risparmio_nominale_5y": 3445515.85,
+          "risparmio_medio_per_pensionato": 110395.09
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 3833778.51,
+          "risparmio_nominale_5y": 4273399.37,
+          "risparmio_medio_per_pensionato": 112758.19
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 2995468.69,
+          "risparmio_nominale_5y": 3338960.24,
+          "risparmio_medio_per_pensionato": 115210.33
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 2701372.8,
+          "risparmio_nominale_5y": 3011140.26,
+          "risparmio_medio_per_pensionato": 117450.99
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 1800815.47,
+          "risparmio_nominale_5y": 2007315.68,
+          "risparmio_medio_per_pensionato": 120054.36
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 2573601.71,
+          "risparmio_nominale_5y": 2868717.61,
+          "risparmio_medio_per_pensionato": 122552.46
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 44229745.95,
+          "risparmio_nominale_5y": 49301587.97,
+          "risparmio_medio_per_pensionato": 179067.8
+        }
+      ]
+    },
+    {
+      "inflazione": 0.03,
+      "k": 0.0,
+      "soglia_esenzione": "4x minimo",
+      "totale": {
+        "risparmio_reale_5y": 67698141066.35,
+        "risparmio_nominale_5y": 75448538395.28,
+        "n_pensionati_coinvolti": 3593268,
+        "n_pensionati_esclusi": 12712612,
+        "risparmio_medio_per_pensionato_coinvolto": 18840.27
+      },
+      "per_fascia": [
+        {
+          "classe": "Fino a 1 volta il minimo",
+          "n_pensionati": 2264759,
+          "reddito_totale_annuo": 10082078243.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 1 a 2 volte il minimo",
+          "n_pensionati": 3803807,
+          "reddito_totale_annuo": 42699923315.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 2 a 3 volte il minimo",
+          "n_pensionati": 3821491,
+          "reddito_totale_annuo": 73730695951.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 3 a 4 volte il minimo",
+          "n_pensionati": 2822555,
+          "reddito_totale_annuo": 76545535703.0,
+          "risparmio_reale_5y": 0.0,
+          "risparmio_nominale_5y": 0.0,
+          "risparmio_medio_per_pensionato": 0.0
+        },
+        {
+          "classe": "Da 4 a 5 volte il minimo",
+          "n_pensionati": 1876880,
+          "reddito_totale_annuo": 65470817166.0,
+          "risparmio_reale_5y": 27516913903.37,
+          "risparmio_nominale_5y": 30667177893.75,
+          "risparmio_medio_per_pensionato": 14660.99
+        },
+        {
+          "classe": "Da 5 a 6 volte il minimo",
+          "n_pensionati": 785401,
+          "reddito_totale_annuo": 33287513785.0,
+          "risparmio_reale_5y": 13990502800.0,
+          "risparmio_nominale_5y": 15592200480.67,
+          "risparmio_medio_per_pensionato": 17813.2
+        },
+        {
+          "classe": "Da 6 a 7 volte il minimo",
+          "n_pensionati": 343908,
+          "reddito_totale_annuo": 17232642271.0,
+          "risparmio_reale_5y": 7242755692.15,
+          "risparmio_nominale_5y": 8071939972.34,
+          "risparmio_medio_per_pensionato": 21060.15
+        },
+        {
+          "classe": "Da 7 a 8 volte il minimo",
+          "n_pensionati": 181696,
+          "reddito_totale_annuo": 10552455945.0,
+          "risparmio_reale_5y": 4435121391.13,
+          "risparmio_nominale_5y": 4942874668.28,
+          "risparmio_medio_per_pensionato": 24409.57
+        },
+        {
+          "classe": "Da 8 a 9 volte il minimo",
+          "n_pensionati": 113293,
+          "reddito_totale_annuo": 7466047597.0,
+          "risparmio_reale_5y": 3137926145.08,
+          "risparmio_nominale_5y": 3497170491.09,
+          "risparmio_medio_per_pensionato": 27697.44
+        },
+        {
+          "classe": "Da 9 a 10 volte il minimo",
+          "n_pensionati": 89029,
+          "reddito_totale_annuo": 6568265653.0,
+          "risparmio_reale_5y": 2760594846.55,
+          "risparmio_nominale_5y": 3076640554.57,
+          "risparmio_medio_per_pensionato": 31007.82
+        },
+        {
+          "classe": "Da 10 a 11 volte il minimo",
+          "n_pensionati": 67262,
+          "reddito_totale_annuo": 5480142727.0,
+          "risparmio_reale_5y": 2303264601.31,
+          "risparmio_nominale_5y": 2566953020.7,
+          "risparmio_medio_per_pensionato": 34243.18
+        },
+        {
+          "classe": "Da 11 a 12 volte il minimo",
+          "n_pensionati": 43293,
+          "reddito_totale_annuo": 3861214195.0,
+          "risparmio_reale_5y": 1622840574.86,
+          "risparmio_nominale_5y": 1808630894.34,
+          "risparmio_medio_per_pensionato": 37485.06
+        },
+        {
+          "classe": "Da 12 a 13 volte il minimo",
+          "n_pensionati": 28027,
+          "reddito_totale_annuo": 2720143887.0,
+          "risparmio_reale_5y": 1143256925.5,
+          "risparmio_nominale_5y": 1274142283.39,
+          "risparmio_medio_per_pensionato": 40791.27
+        },
+        {
+          "classe": "Da 13 a 14 volte il minimo",
+          "n_pensionati": 18629,
+          "reddito_totale_annuo": 1952617981.0,
+          "risparmio_reale_5y": 820671303.57,
+          "risparmio_nominale_5y": 914625562.56,
+          "risparmio_medio_per_pensionato": 44053.43
+        },
+        {
+          "classe": "Da 14 a 15 volte il minimo",
+          "n_pensionati": 12690,
+          "reddito_totale_annuo": 1428365424.0,
+          "risparmio_reale_5y": 600331721.77,
+          "risparmio_nominale_5y": 669060482.99,
+          "risparmio_medio_per_pensionato": 47307.46
+        },
+        {
+          "classe": "Da 15 a 16 volte il minimo",
+          "n_pensionati": 8330,
+          "reddito_totale_annuo": 1002647074.0,
+          "risparmio_reale_5y": 421405358.98,
+          "risparmio_nominale_5y": 469649799.93,
+          "risparmio_medio_per_pensionato": 50588.88
+        },
+        {
+          "classe": "Da 16 a 17 volte il minimo",
+          "n_pensionati": 5818,
+          "reddito_totale_annuo": 745327743.0,
+          "risparmio_reale_5y": 313255893.57,
+          "risparmio_nominale_5y": 349118881.86,
+          "risparmio_medio_per_pensionato": 53842.54
+        },
+        {
+          "classe": "Da 17 a 18 volte il minimo",
+          "n_pensionati": 3957,
+          "reddito_totale_annuo": 537899467.0,
+          "risparmio_reale_5y": 226075279.99,
+          "risparmio_nominale_5y": 251957427.1,
+          "risparmio_medio_per_pensionato": 57133.0
+        },
+        {
+          "classe": "Da 18 a 19 volte il minimo",
+          "n_pensionati": 2858,
+          "reddito_totale_annuo": 410884847.0,
+          "risparmio_reale_5y": 172691948.08,
+          "risparmio_nominale_5y": 192462523.64,
+          "risparmio_medio_per_pensionato": 60424.05
+        },
+        {
+          "classe": "Da 19 a 20 volte il minimo",
+          "n_pensionati": 2286,
+          "reddito_totale_annuo": 346513212.0,
+          "risparmio_reale_5y": 145637012.55,
+          "risparmio_nominale_5y": 162310213.54,
+          "risparmio_medio_per_pensionato": 63708.23
+        },
+        {
+          "classe": "Da 20 a 21 volte il minimo",
+          "n_pensionati": 1835,
+          "reddito_totale_annuo": 292756548.0,
+          "risparmio_reale_5y": 123043473.03,
+          "risparmio_nominale_5y": 137130060.78,
+          "risparmio_medio_per_pensionato": 67053.66
+        },
+        {
+          "classe": "Da 21 a 22 volte il minimo",
+          "n_pensionati": 1463,
+          "reddito_totale_annuo": 244443552.0,
+          "risparmio_reale_5y": 102737868.04,
+          "risparmio_nominale_5y": 114499775.91,
+          "risparmio_medio_per_pensionato": 70224.11
+        },
+        {
+          "classe": "Da 22 a 23 volte il minimo",
+          "n_pensionati": 1272,
+          "reddito_totale_annuo": 222634290.0,
+          "risparmio_reale_5y": 93571591.97,
+          "risparmio_nominale_5y": 104284102.02,
+          "risparmio_medio_per_pensionato": 73562.57
+        },
+        {
+          "classe": "Da 23 a 24 volte il minimo",
+          "n_pensionati": 1053,
+          "reddito_totale_annuo": 192487541.0,
+          "risparmio_reale_5y": 80901130.04,
+          "risparmio_nominale_5y": 90163066.81,
+          "risparmio_medio_per_pensionato": 76829.18
+        },
+        {
+          "classe": "Da 24 a 25 volte il minimo",
+          "n_pensionati": 802,
+          "reddito_totale_annuo": 152623423.0,
+          "risparmio_reale_5y": 64146527.75,
+          "risparmio_nominale_5y": 71490319.91,
+          "risparmio_medio_per_pensionato": 79983.2
+        },
+        {
+          "classe": "Da 25 a 26 volte il minimo",
+          "n_pensionati": 649,
+          "reddito_totale_annuo": 128560807.0,
+          "risparmio_reale_5y": 54033183.19,
+          "risparmio_nominale_5y": 60219152.73,
+          "risparmio_medio_per_pensionato": 83256.06
+        },
+        {
+          "classe": "Da 26 a 27 volte il minimo",
+          "n_pensionati": 499,
+          "reddito_totale_annuo": 102746970.0,
+          "risparmio_reale_5y": 43183813.03,
+          "risparmio_nominale_5y": 48127696.33,
+          "risparmio_medio_per_pensionato": 86540.71
+        },
+        {
+          "classe": "Da 27 a 28 volte il minimo",
+          "n_pensionati": 354,
+          "reddito_totale_annuo": 75654316.0,
+          "risparmio_reale_5y": 31796965.27,
+          "risparmio_nominale_5y": 35437229.4,
+          "risparmio_medio_per_pensionato": 89821.94
+        },
+        {
+          "classe": "Da 28 a 29 volte il minimo",
+          "n_pensionati": 305,
+          "reddito_totale_annuo": 67611090.0,
+          "risparmio_reale_5y": 28416455.19,
+          "risparmio_nominale_5y": 31669702.84,
+          "risparmio_medio_per_pensionato": 93168.71
+        },
+        {
+          "classe": "Da 29 a 30 volte il minimo",
+          "n_pensionati": 214,
+          "reddito_totale_annuo": 49112979.0,
+          "risparmio_reale_5y": 20641832.09,
+          "risparmio_nominale_5y": 23005004.81,
+          "risparmio_medio_per_pensionato": 96457.16
+        },
+        {
+          "classe": "Da 30 a 31 volte il minimo",
+          "n_pensionati": 172,
+          "reddito_totale_annuo": 40755839.0,
+          "risparmio_reale_5y": 17129386.21,
+          "risparmio_nominale_5y": 19090437.83,
+          "risparmio_medio_per_pensionato": 99589.45
+        },
+        {
+          "classe": "Da 31 a 32 volte il minimo",
+          "n_pensionati": 157,
+          "reddito_totale_annuo": 38462390.0,
+          "risparmio_reale_5y": 16165466.08,
+          "risparmio_nominale_5y": 18016163.65,
+          "risparmio_medio_per_pensionato": 102964.75
+        },
+        {
+          "classe": "Da 32 a 33 volte il minimo",
+          "n_pensionati": 118,
+          "reddito_totale_annuo": 29801930.0,
+          "risparmio_reale_5y": 12525536.99,
+          "risparmio_nominale_5y": 13959518.58,
+          "risparmio_medio_per_pensionato": 106148.62
+        },
+        {
+          "classe": "Da 33 a 34 volte il minimo",
+          "n_pensionati": 111,
+          "reddito_totale_annuo": 28931329.0,
+          "risparmio_reale_5y": 12159629.64,
+          "risparmio_nominale_5y": 13551720.47,
+          "risparmio_medio_per_pensionato": 109546.21
+        },
+        {
+          "classe": "Da 34 a 35 volte il minimo",
+          "n_pensionati": 94,
+          "reddito_totale_annuo": 25263713.0,
+          "risparmio_reale_5y": 10618157.0,
+          "risparmio_nominale_5y": 11833772.88,
+          "risparmio_medio_per_pensionato": 112959.12
+        },
+        {
+          "classe": "Da 35 a 36 volte il minimo",
+          "n_pensionati": 78,
+          "reddito_totale_annuo": 21542858.0,
+          "risparmio_reale_5y": 9054308.38,
+          "risparmio_nominale_5y": 10090887.62,
+          "risparmio_medio_per_pensionato": 116080.88
+        },
+        {
+          "classe": "Da 36 a 37 volte il minimo",
+          "n_pensionati": 64,
+          "reddito_totale_annuo": 18189687.0,
+          "risparmio_reale_5y": 7644994.71,
+          "risparmio_nominale_5y": 8520229.18,
+          "risparmio_medio_per_pensionato": 119453.04
+        },
+        {
+          "classe": "Da 37 a 38 volte il minimo",
+          "n_pensionati": 58,
+          "reddito_totale_annuo": 16923743.0,
+          "risparmio_reale_5y": 7112927.55,
+          "risparmio_nominale_5y": 7927248.5,
+          "risparmio_medio_per_pensionato": 122636.68
+        },
+        {
+          "classe": "Da 38 a 39 volte il minimo",
+          "n_pensionati": 47,
+          "reddito_totale_annuo": 14080657.0,
+          "risparmio_reale_5y": 5917998.94,
+          "risparmio_nominale_5y": 6595518.92,
+          "risparmio_medio_per_pensionato": 125914.87
+        },
+        {
+          "classe": "Da 39 a 40 volte il minimo",
+          "n_pensionati": 37,
+          "reddito_totale_annuo": 11373447.0,
+          "risparmio_reale_5y": 4780178.03,
+          "risparmio_nominale_5y": 5327434.99,
+          "risparmio_medio_per_pensionato": 129194.0
+        },
+        {
+          "classe": "Da 40 a 41 volte il minimo",
+          "n_pensionati": 39,
+          "reddito_totale_annuo": 12278792.0,
+          "risparmio_reale_5y": 5160688.03,
+          "risparmio_nominale_5y": 5751507.54,
+          "risparmio_medio_per_pensionato": 132325.33
+        },
+        {
+          "classe": "Da 41 a 42 volte il minimo",
+          "n_pensionati": 41,
+          "reddito_totale_annuo": 13249585.0,
+          "risparmio_reale_5y": 5568705.35,
+          "risparmio_nominale_5y": 6206236.58,
+          "risparmio_medio_per_pensionato": 135822.08
+        },
+        {
+          "classe": "Da 42 a 43 volte il minimo",
+          "n_pensionati": 27,
+          "reddito_totale_annuo": 8927042.0,
+          "risparmio_reale_5y": 3751971.59,
+          "risparmio_nominale_5y": 4181514.71,
+          "risparmio_medio_per_pensionato": 138961.91
+        },
+        {
+          "classe": "Da 43 a 44 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9478276.0,
+          "risparmio_reale_5y": 3983651.28,
+          "risparmio_nominale_5y": 4439718.16,
+          "risparmio_medio_per_pensionato": 142273.26
+        },
+        {
+          "classe": "Da 44 a 45 volte il minimo",
+          "n_pensionati": 28,
+          "reddito_totale_annuo": 9711737.0,
+          "risparmio_reale_5y": 4081773.26,
+          "risparmio_nominale_5y": 4549073.6,
+          "risparmio_medio_per_pensionato": 145777.62
+        },
+        {
+          "classe": "Da 45 a 46 volte il minimo",
+          "n_pensionati": 34,
+          "reddito_totale_annuo": 12045259.0,
+          "risparmio_reale_5y": 5062535.79,
+          "risparmio_nominale_5y": 5642118.37,
+          "risparmio_medio_per_pensionato": 148898.11
+        },
+        {
+          "classe": "Da 46 a 47 volte il minimo",
+          "n_pensionati": 26,
+          "reddito_totale_annuo": 9411393.0,
+          "risparmio_reale_5y": 3955540.84,
+          "risparmio_nominale_5y": 4408389.51,
+          "risparmio_medio_per_pensionato": 152136.19
+        },
+        {
+          "classe": "Da 47 a 48 volte il minimo",
+          "n_pensionati": 23,
+          "reddito_totale_annuo": 8487380.0,
+          "risparmio_reale_5y": 3567184.81,
+          "risparmio_nominale_5y": 3975572.68,
+          "risparmio_medio_per_pensionato": 155094.99
+        },
+        {
+          "classe": "Da 48 a 49 volte il minimo",
+          "n_pensionati": 15,
+          "reddito_totale_annuo": 5657940.0,
+          "risparmio_reale_5y": 2377991.52,
+          "risparmio_nominale_5y": 2650235.02,
+          "risparmio_medio_per_pensionato": 158532.77
+        },
+        {
+          "classe": "Da 49 a 50 volte il minimo",
+          "n_pensionati": 21,
+          "reddito_totale_annuo": 8085939.0,
+          "risparmio_reale_5y": 3398462.05,
+          "risparmio_nominale_5y": 3787533.75,
+          "risparmio_medio_per_pensionato": 161831.53
+        },
+        {
+          "classe": "Oltre 50 volte il minimo",
+          "n_pensionati": 247,
+          "reddito_totale_annuo": 138964404.0,
+          "risparmio_reale_5y": 58405740.24,
+          "risparmio_nominale_5y": 65092300.4,
+          "risparmio_medio_per_pensionato": 236460.49
+        }
+      ]
+    }
+  ]
+}
