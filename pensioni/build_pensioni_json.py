@@ -30,6 +30,13 @@ SCONTI = [0.10, 0.20, 0.33]
 SOGLIA_ESENZIONE = 4  # fasce fino a 4x il minimo hanno k=1
 ORIZZONTE_RISPARMIO = 5
 
+# Soglia alternativa: 60% mediana redditi (fonte FT, mediana 30.755 EUR/anno)
+MEDIANA_REDDITI_ANNUA = 30755
+SOGLIA_MEDIANA_FRAZ = 0.60
+SOGLIA_MEDIANA_ANNUA = MEDIANA_REDDITI_ANNUA * SOGLIA_MEDIANA_FRAZ  # 18.453 EUR/anno
+SOGLIA_MEDIANA_MENSILE = SOGLIA_MEDIANA_ANNUA / 12  # 1.537,75 EUR/mese
+SOGLIA_MEDIANA_MULTIPLO = SOGLIA_MEDIANA_ANNUA / TRATTAMENTO_MINIMO_ANNUO  # ~2.57x minimo
+
 # ---------------------------------------------------------------------------
 # Lettura dati
 # ---------------------------------------------------------------------------
@@ -112,12 +119,17 @@ def calcola_convergenza(PA, sconto, i, k):
     }
 
 
-def genera_convergenza(fasce):
+def genera_convergenza(fasce, soglia_multiplo, soglia_label, soglia_annua=None):
     fasce_output = []
     for fascia in fasce:
         mult = moltiplicatore_fascia(fascia["classe"])
-        if mult < SOGLIA_ESENZIONE:
-            continue  # esclusa, indicizzazione piena
+        if soglia_annua is not None:
+            # Soglia basata su importo annuo (60% mediana)
+            if fascia["reddito_medio_annuo"] < soglia_annua:
+                continue
+        else:
+            if mult < soglia_multiplo:
+                continue
 
         PA = fascia["reddito_medio_annuo"]
         scenari = []
@@ -142,7 +154,8 @@ def genera_convergenza(fasce):
             "anno_riferimento": 2024,
             "trattamento_minimo_mensile": TRATTAMENTO_MINIMO_MENSILE,
             "trattamento_minimo_annuo": TRATTAMENTO_MINIMO_ANNUO,
-            "nota": "Simulazione della convergenza tramite sotto-indicizzazione"
+            "soglia": soglia_label,
+            "nota": f"Simulazione della convergenza tramite sotto-indicizzazione. Soglia: {soglia_label}"
         },
         "parametri": {
             "tassi_inflazione": TASSI_INFLAZIONE,
@@ -156,7 +169,7 @@ def genera_convergenza(fasce):
 # ---------------------------------------------------------------------------
 # Livello 2: Risparmio aggregato (5 anni)
 # ---------------------------------------------------------------------------
-def genera_risparmio(fasce):
+def genera_risparmio(fasce, soglia_multiplo, soglia_label, soglia_annua=None):
     scenari_output = []
 
     for i in TASSI_INFLAZIONE:
@@ -172,8 +185,12 @@ def genera_risparmio(fasce):
                 reddito_totale = fascia["reddito_totale_annuo"]
                 n = fascia["n_pensionati"]
 
-                if mult < SOGLIA_ESENZIONE:
-                    # Fascia esente: k_effettivo = 1, nessun risparmio
+                if soglia_annua is not None:
+                    esente = fascia["reddito_medio_annuo"] < soglia_annua
+                else:
+                    esente = mult < soglia_multiplo
+
+                if esente:
                     k_eff = 1.0
                     n_esclusi += n
                 else:
@@ -213,7 +230,7 @@ def genera_risparmio(fasce):
             scenari_output.append({
                 "inflazione": i,
                 "k": k,
-                "soglia_esenzione": f"{SOGLIA_ESENZIONE}x minimo",
+                "soglia_esenzione": soglia_label,
                 "totale": {
                     "risparmio_reale_5y": round(totale_risparmio_reale, 2),
                     "risparmio_nominale_5y": round(totale_risparmio_nominale, 2),
@@ -230,10 +247,7 @@ def genera_risparmio(fasce):
             "anno_riferimento": 2024,
             "trattamento_minimo_mensile": TRATTAMENTO_MINIMO_MENSILE,
             "orizzonte_anni": ORIZZONTE_RISPARMIO,
-            "nota": (
-                "Risparmio aggregato da sotto-indicizzazione. "
-                f"Fasce fino a {SOGLIA_ESENZIONE}x il minimo escluse (k=1)."
-            ),
+            "nota": f"Risparmio aggregato da sotto-indicizzazione. Soglia: {soglia_label}.",
         },
         "scenari": scenari_output,
     }
@@ -248,32 +262,59 @@ def main():
         "..", "pensioni_classi_reddito.xlsx"
     )
     fasce = leggi_dati(xlsx_path)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Genera convergenza
-    convergenza = genera_convergenza(fasce)
-    out_conv = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pensioni_convergenza.json")
+    # Definizione soglie
+    soglie = [
+        {
+            "id": "4x_minimo",
+            "label": f"{SOGLIA_ESENZIONE}x minimo ({SOGLIA_ESENZIONE * TRATTAMENTO_MINIMO_MENSILE:.2f} EUR/mese)",
+            "multiplo": SOGLIA_ESENZIONE,
+            "annua": None,
+        },
+        {
+            "id": "60pct_mediana",
+            "label": f"60% mediana redditi ({SOGLIA_MEDIANA_MENSILE:.2f} EUR/mese, {SOGLIA_MEDIANA_ANNUA:.0f} EUR/anno)",
+            "multiplo": SOGLIA_MEDIANA_MULTIPLO,
+            "annua": SOGLIA_MEDIANA_ANNUA,
+        },
+    ]
+
+    # Output unico con entrambe le soglie
+    all_convergenza = {}
+    all_risparmio = {}
+
+    for soglia in soglie:
+        sid = soglia["id"]
+        label = soglia["label"]
+        print(f"\n=== Soglia: {label} ===")
+
+        conv = genera_convergenza(fasce, soglia["multiplo"], label, soglia["annua"])
+        risp = genera_risparmio(fasce, soglia["multiplo"], label, soglia["annua"])
+
+        all_convergenza[sid] = conv
+        all_risparmio[sid] = risp
+
+        # Sanity check
+        for s in risp["scenari"]:
+            tot = s["totale"]
+            print(
+                f"  i={s['inflazione']}, k={s['k']}: "
+                f"risparmio reale 5y = {tot['risparmio_reale_5y']/1e9:.2f} mld EUR, "
+                f"coinvolti = {tot['n_pensionati_coinvolti']:,}, "
+                f"esclusi = {tot['n_pensionati_esclusi']:,}"
+            )
+
+    # Scrivi JSON con entrambe le soglie
+    out_conv = os.path.join(base_dir, "pensioni_convergenza.json")
     with open(out_conv, "w", encoding="utf-8") as f:
-        json.dump(convergenza, f, ensure_ascii=False, indent=2)
-    print(f"Scritto {out_conv}")
+        json.dump(all_convergenza, f, ensure_ascii=False, indent=2)
+    print(f"\nScritto {out_conv}")
 
-    # Genera risparmio
-    risparmio = genera_risparmio(fasce)
-    out_risp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "pensioni_risparmio.json")
+    out_risp = os.path.join(base_dir, "pensioni_risparmio.json")
     with open(out_risp, "w", encoding="utf-8") as f:
-        json.dump(risparmio, f, ensure_ascii=False, indent=2)
+        json.dump(all_risparmio, f, ensure_ascii=False, indent=2)
     print(f"Scritto {out_risp}")
-
-    # Sanity check
-    print("\n--- Sanity check ---")
-    for s in risparmio["scenari"]:
-        tot = s["totale"]
-        print(
-            f"i={s['inflazione']}, k={s['k']}: "
-            f"risparmio reale 5y = {tot['risparmio_reale_5y']/1e9:.2f} mld EUR, "
-            f"nominale 5y = {tot['risparmio_nominale_5y']/1e9:.2f} mld EUR, "
-            f"coinvolti = {tot['n_pensionati_coinvolti']:,}, "
-            f"esclusi = {tot['n_pensionati_esclusi']:,}"
-        )
 
 
 if __name__ == "__main__":
