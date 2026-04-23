@@ -98022,5 +98022,217 @@
       "quota_su_totale_pct": 69.3
     },
     "soglia_turistica_procapite": 454
+  },
+  "redistribuzione_turistici": {
+    "criterio": "IMU pro capite ≥ 2×mediana (≥ €454/cap) E popolazione < 50.000",
+    "n_comuni": 918,
+    "popolazione": 2478860,
+    "gettito_totale_eur": 1864304247,
+    "gettito_totale_mld": 1.86,
+    "excess_totale_eur": 1301134047,
+    "excess_totale_mld": 1.3,
+    "top_comuni_excess": [
+      {
+        "comune": "Lignano Sabbiadoro",
+        "den_prov": "Udine",
+        "den_reg": "Friuli-Venezia Giulia",
+        "popolazione_istat": 6901.0,
+        "imu_totale_eur": 23446591.38,
+        "imu_pro_capite_eur": 3397.564321112882,
+        "gettito_atteso_mediana": 1567832.6104635475,
+        "excess_mediana_eur": 21878758.76953645
+      },
+      {
+        "comune": "Alassio",
+        "den_prov": "Savona",
+        "den_reg": "Liguria",
+        "popolazione_istat": 10051.0,
+        "imu_totale_eur": 22552269.75,
+        "imu_pro_capite_eur": 2243.783678240971,
+        "gettito_atteso_mediana": 2283478.5636529657,
+        "excess_mediana_eur": 20268791.186347034
+      },
+      {
+        "comune": "Arzachena",
+        "den_prov": "Sassari",
+        "den_reg": "Sardegna",
+        "popolazione_istat": 13436.0,
+        "imu_totale_eur": 20124279.01,
+        "imu_pro_capite_eur": 1497.7879584697828,
+        "gettito_atteso_mediana": 3052513.9768422293,
+        "excess_mediana_eur": 17071765.033157773
+      },
+      {
+        "comune": "Jesolo",
+        "den_prov": "Venezia",
+        "den_reg": "Veneto",
+        "popolazione_istat": 26937.0,
+        "imu_totale_eur": 22820515.05,
+        "imu_pro_capite_eur": 847.1810168170175,
+        "gettito_atteso_mediana": 6119795.251131224,
+        "excess_mediana_eur": 16700719.798868775
+      },
+      {
+        "comune": "Castiglione Della Pescaia",
+        "den_prov": "Grosseto",
+        "den_reg": "Toscana",
+        "popolazione_istat": 7105.0,
+        "imu_totale_eur": 17365989.44,
+        "imu_pro_capite_eur": 2444.192743138635,
+        "gettito_atteso_mediana": 1614179.2055272432,
+        "excess_mediana_eur": 15751810.234472759
+      },
+      {
+        "comune": "Cortina D'Ampezzo",
+        "den_prov": "Belluno",
+        "den_reg": "Veneto",
+        "popolazione_istat": 5529.0,
+        "imu_totale_eur": 16544367.51,
+        "imu_pro_capite_eur": 2992.289294628323,
+        "gettito_atteso_mediana": 1256129.0397410453,
+        "excess_mediana_eur": 15288238.470258955
+      },
+      {
+        "comune": "Comacchio",
+        "den_prov": "Ferrara",
+        "den_reg": "Emilia-Romagna",
+        "popolazione_istat": 22054.0,
+        "imu_totale_eur": 19985289.23,
+        "imu_pro_capite_eur": 906.1979337081708,
+        "gettito_atteso_mediana": 5010430.429091882,
+        "excess_mediana_eur": 14974858.800908118
+      },
+      {
+        "comune": "Finale Ligure",
+        "den_prov": "Savona",
+        "den_reg": "Liguria",
+        "popolazione_istat": 11046.0,
+        "imu_totale_eur": 17350078.849999998,
+        "imu_pro_capite_eur": 1570.7114656889369,
+        "gettito_atteso_mediana": 2509531.809184226,
+        "excess_mediana_eur": 14840547.04081577
+      },
+      {
+        "comune": "Riccione",
+        "den_prov": "Rimini",
+        "den_reg": "Emilia-Romagna",
+        "popolazione_istat": 34465.0,
+        "imu_totale_eur": 22465610.049999997,
+        "imu_pro_capite_eur": 651.8383882199332,
+        "gettito_atteso_mediana": 7830075.48465819,
+        "excess_mediana_eur": 14635534.565341808
+      },
+      {
+        "comune": "Chiavari",
+        "den_prov": "Genova",
+        "den_reg": "Liguria",
+        "popolazione_istat": 27398.0,
+        "imu_totale_eur": 20680561.01,
+        "imu_pro_capite_eur": 754.8200967223884,
+        "gettito_atteso_mediana": 6224529.468407517,
+        "excess_mediana_eur": 14456031.541592484
+      },
+      {
+        "comune": "Lecco",
+        "den_prov": "Lecco",
+        "den_reg": "Lombardia",
+        "popolazione_istat": 47125.0,
+        "imu_totale_eur": 24614137.59,
+        "imu_pro_capite_eur": 522.3159170291777,
+        "gettito_atteso_mediana": 10706290.648905184,
+        "excess_mediana_eur": 13907846.941094816
+      },
+      {
+        "comune": "Camaiore",
+        "den_prov": "Lucca",
+        "den_reg": "Toscana",
+        "popolazione_istat": 31864.0,
+        "imu_totale_eur": 21145018.2,
+        "imu_pro_capite_eur": 663.6021277931208,
+        "gettito_atteso_mediana": 7239156.39759607,
+        "excess_mediana_eur": 13905861.80240393
+      },
+      {
+        "comune": "Forte Dei Marmi",
+        "den_prov": "Lucca",
+        "den_reg": "Toscana",
+        "popolazione_istat": 6777.0,
+        "imu_totale_eur": 15091153.58,
+        "imu_pro_capite_eur": 2226.8191795779844,
+        "gettito_atteso_mediana": 1539661.1507189483,
+        "excess_mediana_eur": 13551492.429281052
+      },
+      {
+        "comune": "Mantova",
+        "den_prov": "Mantova",
+        "den_reg": "Lombardia",
+        "popolazione_istat": 49044.0,
+        "imu_totale_eur": 24678055.72,
+        "imu_pro_capite_eur": 503.181953348014,
+        "gettito_atteso_mediana": 11142266.707372008,
+        "excess_mediana_eur": 13535789.01262799
+      },
+      {
+        "comune": "Cervia",
+        "den_prov": "Ravenna",
+        "den_reg": "Emilia-Romagna",
+        "popolazione_istat": 28964.0,
+        "imu_totale_eur": 19993467.17,
+        "imu_pro_capite_eur": 690.2868101781522,
+        "gettito_atteso_mediana": 6580307.742278828,
+        "excess_mediana_eur": 13413159.427721173
+      },
+      {
+        "comune": "Rapallo",
+        "den_prov": "Genova",
+        "den_reg": "Liguria",
+        "popolazione_istat": 29455.0,
+        "imu_totale_eur": 19080121.040000003,
+        "imu_pro_capite_eur": 647.7718906806995,
+        "gettito_atteso_mediana": 6691857.635299781,
+        "excess_mediana_eur": 12388263.404700221
+      },
+      {
+        "comune": "Pietra Ligure",
+        "den_prov": "Savona",
+        "den_reg": "Liguria",
+        "popolazione_istat": 8284.0,
+        "imu_totale_eur": 14233374.19,
+        "imu_pro_capite_eur": 1718.1765077257362,
+        "gettito_atteso_mediana": 1882035.2622924254,
+        "excess_mediana_eur": 12351338.927707573
+      },
+      {
+        "comune": "Merano",
+        "den_prov": "Bolzano/Bozen",
+        "den_reg": "Trentino-Alto Adige/Südtirol",
+        "popolazione_istat": 41404.0,
+        "imu_totale_eur": 21573849.26,
+        "imu_pro_capite_eur": 521.0571263646024,
+        "gettito_atteso_mediana": 9406541.284398308,
+        "excess_mediana_eur": 12167307.975601694
+      },
+      {
+        "comune": "Santa Marinella",
+        "den_prov": "Roma",
+        "den_reg": "Lazio",
+        "popolazione_istat": 18446.0,
+        "imu_totale_eur": 15611420.42,
+        "imu_pro_capite_eur": 846.3309346199718,
+        "gettito_atteso_mediana": 4190731.8262006375,
+        "excess_mediana_eur": 11420688.593799362
+      },
+      {
+        "comune": "Lerici",
+        "den_prov": "La Spezia",
+        "den_reg": "Liguria",
+        "popolazione_istat": 9346.0,
+        "imu_totale_eur": 13476751.53,
+        "imu_pro_capite_eur": 1441.980690134817,
+        "gettito_atteso_mediana": 2123310.183653429,
+        "excess_mediana_eur": 11353441.34634657
+      }
+    ],
+    "nota": "Eccedenza trattenuta SOLO dai comuni turistici ad alta intensità (filtro UB: >2×mediana pro capite E <50k ab). È il perimetro corretto per l'angolo Tortuga: il trasferimento implicito fiscalmente rilevante riguarda i piccoli comuni turistici, non le grandi città che stanno sopra la mediana solo per pochi euro pro capite."
   }
 }
