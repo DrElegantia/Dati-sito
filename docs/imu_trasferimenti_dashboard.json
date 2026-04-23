@@ -50059,7 +50059,7 @@
       "imu_pro_capite_eur": 184.54815519452757
     },
     {
-      "comune": NaN,
+      "comune": null,
       "den_prov": "Torino",
       "den_reg": "Piemonte",
       "popolazione_istat": 7688.0,
@@ -62076,8 +62076,8 @@
     },
     {
       "comune": "Bardello Con Malgesso E Bregano",
-      "den_prov": NaN,
-      "den_reg": NaN,
+      "den_prov": null,
+      "den_reg": null,
       "popolazione_istat": 3661.0,
       "imu_totale_eur": 731832.75,
       "imu_pro_capite_eur": 199.89968587817535
@@ -92140,8 +92140,8 @@
     },
     {
       "comune": "Moransengo - Tonengo",
-      "den_prov": NaN,
-      "den_reg": NaN,
+      "den_prov": null,
+      "den_reg": null,
       "popolazione_istat": 399.0,
       "imu_totale_eur": 68617.9,
       "imu_pro_capite_eur": 171.97468671679198
