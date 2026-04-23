@@ -96726,7 +96726,11 @@
       "comuni": 68,
       "popolazione": 265523.0,
       "gettito_eur": 199690176.91,
-      "imu_pro_capite_eur": 752.0635760743891
+      "imu_pro_capite_eur": 752.0635760743891,
+      "reddito_tot_eur": 4913430499,
+      "contribuenti": 211345,
+      "reddito_pro_capite_eur": 18504.726517100215,
+      "imu_su_reddito_pct": 4.064170175005867
     },
     {
       "cod_prov": "007",
@@ -96734,7 +96738,11 @@
       "comuni": 73,
       "popolazione": 122769.0,
       "gettito_eur": 78181232.98,
-      "imu_pro_capite_eur": 636.81575137046
+      "imu_pro_capite_eur": 636.81575137046,
+      "reddito_tot_eur": 2500343200,
+      "contribuenti": 99839,
+      "reddito_pro_capite_eur": 20366.242292435385,
+      "imu_su_reddito_pct": 3.1268200693408814
     },
     {
       "cod_prov": "008",
@@ -96742,7 +96750,11 @@
       "comuni": 65,
       "popolazione": 208290.0,
       "gettito_eur": 106136649.74000001,
-      "imu_pro_capite_eur": 509.56190762878686
+      "imu_pro_capite_eur": 509.56190762878686,
+      "reddito_tot_eur": 3163619614,
+      "contribuenti": 156339,
+      "reddito_pro_capite_eur": 15188.533362139326,
+      "imu_su_reddito_pct": 3.354911863307218
     },
     {
       "cod_prov": "022",
@@ -96750,7 +96762,11 @@
       "comuni": 165,
       "popolazione": 542004.0,
       "gettito_eur": 235399995.25,
-      "imu_pro_capite_eur": 434.31412913926835
+      "imu_pro_capite_eur": 434.31412913926835,
+      "reddito_tot_eur": 11118337824,
+      "contribuenti": 447073,
+      "reddito_pro_capite_eur": 20513.38703035402,
+      "imu_su_reddito_pct": 2.1172229066638586
     },
     {
       "cod_prov": "053",
@@ -96758,7 +96774,11 @@
       "comuni": 28,
       "popolazione": 215802.0,
       "gettito_eur": 93648780.61,
-      "imu_pro_capite_eur": 433.95696337383345
+      "imu_pro_capite_eur": 433.95696337383345,
+      "reddito_tot_eur": 3642494492,
+      "contribuenti": 169055,
+      "reddito_pro_capite_eur": 16878.87272592469,
+      "imu_su_reddito_pct": 2.571006787125706
     },
     {
       "cod_prov": "021",
@@ -96766,7 +96786,11 @@
       "comuni": 115,
       "popolazione": 538508.0,
       "gettito_eur": 230159582.96,
-      "imu_pro_capite_eur": 427.40234678036353
+      "imu_pro_capite_eur": 427.40234678036353,
+      "reddito_tot_eur": 12326771810,
+      "contribuenti": 451748,
+      "reddito_pro_capite_eur": 22890.601086706232,
+      "imu_su_reddito_pct": 1.8671521344565234
     },
     {
       "cod_prov": "014",
@@ -96774,7 +96798,11 @@
       "comuni": 74,
       "popolazione": 175746.0,
       "gettito_eur": 73550511.99,
-      "imu_pro_capite_eur": 418.5046145573725
+      "imu_pro_capite_eur": 418.5046145573725,
+      "reddito_tot_eur": 3189060631,
+      "contribuenti": 139928,
+      "reddito_pro_capite_eur": 18145.850437563302,
+      "imu_su_reddito_pct": 2.306337837388078
     },
     {
       "cod_prov": "010",
@@ -96782,7 +96810,11 @@
       "comuni": 65,
       "popolazione": 812560.0,
       "gettito_eur": 332632097.89000005,
-      "imu_pro_capite_eur": 409.36312135719214
+      "imu_pro_capite_eur": 409.36312135719214,
+      "reddito_tot_eur": 16974206259,
+      "contribuenti": 669269,
+      "reddito_pro_capite_eur": 20889.78814979817,
+      "imu_su_reddito_pct": 1.9596327086789882
     },
     {
       "cod_prov": "046",
@@ -96790,7 +96822,11 @@
       "comuni": 31,
       "popolazione": 379261.0,
       "gettito_eur": 152972587.44,
-      "imu_pro_capite_eur": 403.3438382538674
+      "imu_pro_capite_eur": 403.3438382538674,
+      "reddito_tot_eur": 6889731853,
+      "contribuenti": 290944,
+      "reddito_pro_capite_eur": 18166.201779249644,
+      "imu_su_reddito_pct": 2.2202981292137087
     },
     {
       "cod_prov": "052",
@@ -96798,7 +96834,11 @@
       "comuni": 33,
       "popolazione": 254402.0,
       "gettito_eur": 101606420.13,
-      "imu_pro_capite_eur": 399.393165659075
+      "imu_pro_capite_eur": 399.393165659075,
+      "reddito_tot_eur": 4987402469,
+      "contribuenti": 205134,
+      "reddito_pro_capite_eur": 19604.415330854317,
+      "imu_su_reddito_pct": 2.0372612950639337
     },
     {
       "cod_prov": "049",
@@ -96806,7 +96846,11 @@
       "comuni": 19,
       "popolazione": 326315.0,
       "gettito_eur": 130272589.29,
-      "imu_pro_capite_eur": 399.22341691310544
+      "imu_pro_capite_eur": 399.22341691310544,
+      "reddito_tot_eur": 5925610678,
+      "contribuenti": 250865,
+      "reddito_pro_capite_eur": 18159.17343058088,
+      "imu_su_reddito_pct": 2.1984668985031828
     },
     {
       "cod_prov": "011",
@@ -96814,7 +96858,11 @@
       "comuni": 31,
       "popolazione": 214210.0,
       "gettito_eur": 83541811.2,
-      "imu_pro_capite_eur": 389.99958545352695
+      "imu_pro_capite_eur": 389.99958545352695,
+      "reddito_tot_eur": 4059849025,
+      "contribuenti": 166168,
+      "reddito_pro_capite_eur": 18952.658722748703,
+      "imu_su_reddito_pct": 2.057756598473511
     },
     {
       "cod_prov": "103",
@@ -96822,7 +96870,11 @@
       "comuni": 71,
       "popolazione": 152266.0,
       "gettito_eur": 58181850.54,
-      "imu_pro_capite_eur": 382.10664586972797
+      "imu_pro_capite_eur": 382.10664586972797,
+      "reddito_tot_eur": 2565453438,
+      "contribuenti": 117127,
+      "reddito_pro_capite_eur": 16848.498272759512,
+      "imu_su_reddito_pct": 2.2678973501603656
     },
     {
       "cod_prov": "099",
@@ -96830,7 +96882,11 @@
       "comuni": 26,
       "popolazione": 339473.0,
       "gettito_eur": 125534948.58,
-      "imu_pro_capite_eur": 369.7936171065151
+      "imu_pro_capite_eur": 369.7936171065151,
+      "reddito_tot_eur": 5821553061,
+      "contribuenti": 273731,
+      "reddito_pro_capite_eur": 17148.795518347557,
+      "imu_su_reddito_pct": 2.1563824509474827
     },
     {
       "cod_prov": "033",
@@ -96838,7 +96894,11 @@
       "comuni": 44,
       "popolazione": 275658.0,
       "gettito_eur": 100510190.61,
-      "imu_pro_capite_eur": 364.6191679907712
+      "imu_pro_capite_eur": 364.6191679907712,
+      "reddito_tot_eur": 5814167533,
+      "contribuenti": 224896,
+      "reddito_pro_capite_eur": 21091.96008459758,
+      "imu_su_reddito_pct": 1.7287116348045557
     },
     {
       "cod_prov": "034",
@@ -96846,7 +96906,11 @@
       "comuni": 41,
       "popolazione": 443702.0,
       "gettito_eur": 161415913.91,
-      "imu_pro_capite_eur": 363.79352337830346
+      "imu_pro_capite_eur": 363.79352337830346,
+      "reddito_tot_eur": 9628279317,
+      "contribuenti": 352432,
+      "reddito_pro_capite_eur": 21699.87810963214,
+      "imu_su_reddito_pct": 1.6764772665558099
     },
     {
       "cod_prov": "025",
@@ -96854,7 +96918,11 @@
       "comuni": 59,
       "popolazione": 191963.0,
       "gettito_eur": 69565211.14,
-      "imu_pro_capite_eur": 362.38864333230885
+      "imu_pro_capite_eur": 362.38864333230885,
+      "reddito_tot_eur": 4075807044,
+      "contribuenti": 165624,
+      "reddito_pro_capite_eur": 21232.253319650143,
+      "imu_su_reddito_pct": 1.7067837213345765
     },
     {
       "cod_prov": "032",
@@ -96862,7 +96930,11 @@
       "comuni": 6,
       "popolazione": 228396.0,
       "gettito_eur": 82451318.0,
-      "imu_pro_capite_eur": 361.00158496646173
+      "imu_pro_capite_eur": 361.00158496646173,
+      "reddito_tot_eur": 4847970649,
+      "contribuenti": 185153,
+      "reddito_pro_capite_eur": 21226.162669223628,
+      "imu_su_reddito_pct": 1.7007388032971569
     },
     {
       "cod_prov": "048",
@@ -96870,7 +96942,11 @@
       "comuni": 41,
       "popolazione": 988785.0,
       "gettito_eur": 356768637.61,
-      "imu_pro_capite_eur": 360.81517985204067
+      "imu_pro_capite_eur": 360.81517985204067,
+      "reddito_tot_eur": 19751875470,
+      "contribuenti": 769165,
+      "reddito_pro_capite_eur": 19975.90524734902,
+      "imu_su_reddito_pct": 1.8062519589690387
     },
     {
       "cod_prov": "037",
@@ -96878,7 +96954,11 @@
       "comuni": 55,
       "popolazione": 1017536.0,
       "gettito_eur": 354573450.27,
-      "imu_pro_capite_eur": 348.4628064952984
+      "imu_pro_capite_eur": 348.4628064952984,
+      "reddito_tot_eur": 22560880555,
+      "contribuenti": 810592,
+      "reddito_pro_capite_eur": 22172.071115911378,
+      "imu_su_reddito_pct": 1.5716294823050179
     },
     {
       "cod_prov": "038",
@@ -96886,7 +96966,11 @@
       "comuni": 21,
       "popolazione": 339664.0,
       "gettito_eur": 117339059.85,
-      "imu_pro_capite_eur": 345.4562739943002
+      "imu_pro_capite_eur": 345.4562739943002,
+      "reddito_tot_eur": 6393210271,
+      "contribuenti": 273864,
+      "reddito_pro_capite_eur": 18822.16034375147,
+      "imu_su_reddito_pct": 1.8353699452410828
     },
     {
       "cod_prov": "030",
@@ -96894,7 +96978,11 @@
       "comuni": 134,
       "popolazione": 517143.0,
       "gettito_eur": 176410473.26,
-      "imu_pro_capite_eur": 341.1251303024502
+      "imu_pro_capite_eur": 341.1251303024502,
+      "reddito_tot_eur": 10245720230,
+      "contribuenti": 417611,
+      "reddito_pro_capite_eur": 19812.16071763516,
+      "imu_su_reddito_pct": 1.7217967043786826
     },
     {
       "cod_prov": "097",
@@ -96902,7 +96990,11 @@
       "comuni": 83,
       "popolazione": 330990.0,
       "gettito_eur": 112849930.92,
-      "imu_pro_capite_eur": 340.9466476932838
+      "imu_pro_capite_eur": 340.9466476932838,
+      "reddito_tot_eur": 7092341832,
+      "contribuenti": 259126,
+      "reddito_pro_capite_eur": 21427.661959575817,
+      "imu_su_reddito_pct": 1.5911518873897392
     },
     {
       "cod_prov": "058",
@@ -96910,7 +97002,11 @@
       "comuni": 114,
       "popolazione": 4186474.0,
       "gettito_eur": 1402254342.58,
-      "imu_pro_capite_eur": 334.948776125207
+      "imu_pro_capite_eur": 334.948776125207,
+      "reddito_tot_eur": 80687522780,
+      "contribuenti": 3001253,
+      "reddito_pro_capite_eur": 19273.384423264066,
+      "imu_su_reddito_pct": 1.7378825055806228
     },
     {
       "cod_prov": "013",
@@ -96918,7 +97014,11 @@
       "comuni": 142,
       "popolazione": 583386.0,
       "gettito_eur": 195199014.47,
-      "imu_pro_capite_eur": 334.5966726489837
+      "imu_pro_capite_eur": 334.5966726489837,
+      "reddito_tot_eur": 11082127841,
+      "contribuenti": 442014,
+      "reddito_pro_capite_eur": 18996.218354571414,
+      "imu_su_reddito_pct": 1.761385694792582
     },
     {
       "cod_prov": "093",
@@ -96926,7 +97026,11 @@
       "comuni": 49,
       "popolazione": 310390.0,
       "gettito_eur": 102148822.18,
-      "imu_pro_capite_eur": 329.098302715938
+      "imu_pro_capite_eur": 329.098302715938,
+      "reddito_tot_eur": 6054259831,
+      "contribuenti": 245146,
+      "reddito_pro_capite_eur": 19505.33145719901,
+      "imu_su_reddito_pct": 1.6872223034921807
     },
     {
       "cod_prov": "027",
@@ -96934,7 +97038,11 @@
       "comuni": 44,
       "popolazione": 835405.0,
       "gettito_eur": 268829023.78,
-      "imu_pro_capite_eur": 321.7948465474829
+      "imu_pro_capite_eur": 321.7948465474829,
+      "reddito_tot_eur": 16087322372,
+      "contribuenti": 658196,
+      "reddito_pro_capite_eur": 19256.9141578037,
+      "imu_su_reddito_pct": 1.6710613336616984
     },
     {
       "cod_prov": "039",
@@ -96942,7 +97050,11 @@
       "comuni": 18,
       "popolazione": 387229.0,
       "gettito_eur": 122689420.17999999,
-      "imu_pro_capite_eur": 316.83944172569716
+      "imu_pro_capite_eur": 316.83944172569716,
+      "reddito_tot_eur": 7560089979,
+      "contribuenti": 313000,
+      "reddito_pro_capite_eur": 19523.563521843662,
+      "imu_su_reddito_pct": 1.622856613093229
     },
     {
       "cod_prov": "002",
@@ -96950,7 +97062,11 @@
       "comuni": 81,
       "popolazione": 164767.0,
       "gettito_eur": 52172211.16,
-      "imu_pro_capite_eur": 316.6423565398411
+      "imu_pro_capite_eur": 316.6423565398411,
+      "reddito_tot_eur": 3093024454,
+      "contribuenti": 128842,
+      "reddito_pro_capite_eur": 18772.11124800476,
+      "imu_su_reddito_pct": 1.6867700833250505
     },
     {
       "cod_prov": "036",
@@ -96958,7 +97074,11 @@
       "comuni": 46,
       "popolazione": 696184.0,
       "gettito_eur": 218023216.93,
-      "imu_pro_capite_eur": 313.1689566695012
+      "imu_pro_capite_eur": 313.1689566695012,
+      "reddito_tot_eur": 14633376105,
+      "contribuenti": 552276,
+      "reddito_pro_capite_eur": 21019.408812900037,
+      "imu_su_reddito_pct": 1.4899037335308072
     },
     {
       "cod_prov": "050",
@@ -96966,7 +97086,11 @@
       "comuni": 34,
       "popolazione": 403848.0,
       "gettito_eur": 126221246.29,
-      "imu_pro_capite_eur": 312.54641917256
+      "imu_pro_capite_eur": 312.54641917256,
+      "reddito_tot_eur": 7725349101,
+      "contribuenti": 315778,
+      "reddito_pro_capite_eur": 19129.348420692935,
+      "imu_su_reddito_pct": 1.6338581550141396
     },
     {
       "cod_prov": "006",
@@ -96974,7 +97098,11 @@
       "comuni": 170,
       "popolazione": 390131.0,
       "gettito_eur": 121641091.44,
-      "imu_pro_capite_eur": 311.7955031515055
+      "imu_pro_capite_eur": 311.7955031515055,
+      "reddito_tot_eur": 7517960582,
+      "contribuenti": 311669,
+      "reddito_pro_capite_eur": 19270.3491442618,
+      "imu_su_reddito_pct": 1.618006507392991
     },
     {
       "cod_prov": "056",
@@ -96982,7 +97110,11 @@
       "comuni": 59,
       "popolazione": 303701.0,
       "gettito_eur": 94590914.91,
-      "imu_pro_capite_eur": 311.46066331688075
+      "imu_pro_capite_eur": 311.46066331688075,
+      "reddito_tot_eur": 4653515096,
+      "contribuenti": 223376,
+      "reddito_pro_capite_eur": 15322.686115620298,
+      "imu_su_reddito_pct": 2.032676653210109
     },
     {
       "cod_prov": "090",
@@ -96990,7 +97122,11 @@
       "comuni": 87,
       "popolazione": 464306.0,
       "gettito_eur": 143483217.56,
-      "imu_pro_capite_eur": 309.02727416832863
+      "imu_pro_capite_eur": 309.02727416832863,
+      "reddito_tot_eur": 6889049179,
+      "contribuenti": 341541,
+      "reddito_pro_capite_eur": 14837.303801803122,
+      "imu_su_reddito_pct": 2.0827724382833877
     },
     {
       "cod_prov": "100",
@@ -96998,7 +97134,11 @@
       "comuni": 7,
       "popolazione": 259921.0,
       "gettito_eur": 79967628.0,
-      "imu_pro_capite_eur": 307.6612816971311
+      "imu_pro_capite_eur": 307.6612816971311,
+      "reddito_tot_eur": 4627633447,
+      "contribuenti": 204830,
+      "reddito_pro_capite_eur": 17803.999857649054,
+      "imu_su_reddito_pct": 1.728045855746016
     },
     {
       "cod_prov": "051",
@@ -97006,7 +97146,11 @@
       "comuni": 35,
       "popolazione": 332004.0,
       "gettito_eur": 101949367.23,
-      "imu_pro_capite_eur": 307.0727076481006
+      "imu_pro_capite_eur": 307.0727076481006,
+      "reddito_tot_eur": 6087557889,
+      "contribuenti": 260002,
+      "reddito_pro_capite_eur": 18335.79682473705,
+      "imu_su_reddito_pct": 1.674717006210633
     },
     {
       "cod_prov": "015",
@@ -97014,7 +97158,11 @@
       "comuni": 131,
       "popolazione": 3230367.0,
       "gettito_eur": 988599595.64,
-      "imu_pro_capite_eur": 306.03321407134234
+      "imu_pro_capite_eur": 306.03321407134234,
+      "reddito_tot_eur": 79070828075,
+      "contribuenti": 2486066,
+      "reddito_pro_capite_eur": 24477.35135822029,
+      "imu_su_reddito_pct": 1.2502709529009823
     },
     {
       "cod_prov": "040",
@@ -97022,7 +97170,11 @@
       "comuni": 30,
       "popolazione": 392812.0,
       "gettito_eur": 118088683.6,
-      "imu_pro_capite_eur": 300.62392085781494
+      "imu_pro_capite_eur": 300.62392085781494,
+      "reddito_tot_eur": 7412063749,
+      "contribuenti": 316685,
+      "reddito_pro_capite_eur": 18869.23960826044,
+      "imu_su_reddito_pct": 1.593195736017947
     },
     {
       "cod_prov": "023",
@@ -97030,7 +97182,11 @@
       "comuni": 97,
       "popolazione": 925628.0,
       "gettito_eur": 274880689.39,
-      "imu_pro_capite_eur": 296.96669654548043
+      "imu_pro_capite_eur": 296.96669654548043,
+      "reddito_tot_eur": 17790368754,
+      "contribuenti": 731692,
+      "reddito_pro_capite_eur": 19219.782411508728,
+      "imu_su_reddito_pct": 1.5451095656923672
     },
     {
       "cod_prov": "020",
@@ -97038,7 +97194,11 @@
       "comuni": 63,
       "popolazione": 400491.0,
       "gettito_eur": 117927523.02,
-      "imu_pro_capite_eur": 294.4573611392016
+      "imu_pro_capite_eur": 294.4573611392016,
+      "reddito_tot_eur": 7567844778,
+      "contribuenti": 310770,
+      "reddito_pro_capite_eur": 18896.41659363132,
+      "imu_su_reddito_pct": 1.5582709011529887
     },
     {
       "cod_prov": "017",
@@ -97046,7 +97206,11 @@
       "comuni": 198,
       "popolazione": 1238166.0,
       "gettito_eur": 364568894.59,
-      "imu_pro_capite_eur": 294.44266325355403
+      "imu_pro_capite_eur": 294.44266325355403,
+      "reddito_tot_eur": 23747524455,
+      "contribuenti": 951028,
+      "reddito_pro_capite_eur": 19179.59664132273,
+      "imu_su_reddito_pct": 1.5351869424572406
     },
     {
       "cod_prov": "066",
@@ -97054,7 +97218,11 @@
       "comuni": 103,
       "popolazione": 283553.0,
       "gettito_eur": 83085500.21,
-      "imu_pro_capite_eur": 293.0157685159388
+      "imu_pro_capite_eur": 293.0157685159388,
+      "reddito_tot_eur": 4616393398,
+      "contribuenti": 212906,
+      "reddito_pro_capite_eur": 16280.530969518926,
+      "imu_su_reddito_pct": 1.7997924580256925
     },
     {
       "cod_prov": "045",
@@ -97062,7 +97230,11 @@
       "comuni": 16,
       "popolazione": 185070.0,
       "gettito_eur": 54174535.38,
-      "imu_pro_capite_eur": 292.72456573188526
+      "imu_pro_capite_eur": 292.72456573188526,
+      "reddito_tot_eur": 3206466399,
+      "contribuenti": 141064,
+      "reddito_pro_capite_eur": 17325.6951369752,
+      "imu_su_reddito_pct": 1.6895400930100315
     },
     {
       "cod_prov": "004",
@@ -97070,7 +97242,11 @@
       "comuni": 246,
       "popolazione": 581130.0,
       "gettito_eur": 163712012.88,
-      "imu_pro_capite_eur": 281.7132360745444
+      "imu_pro_capite_eur": 281.7132360745444,
+      "reddito_tot_eur": 10777653795,
+      "contribuenti": 452802,
+      "reddito_pro_capite_eur": 18546.028935005936,
+      "imu_su_reddito_pct": 1.518994912936893
     },
     {
       "cod_prov": "067",
@@ -97078,7 +97254,11 @@
       "comuni": 46,
       "popolazione": 298330.0,
       "gettito_eur": 82673931.93,
-      "imu_pro_capite_eur": 277.12242124493014
+      "imu_pro_capite_eur": 277.12242124493014,
+      "reddito_tot_eur": 4583404130,
+      "contribuenti": 226199,
+      "reddito_pro_capite_eur": 15363.53745851909,
+      "imu_su_reddito_pct": 1.8037670165035176
     },
     {
       "cod_prov": "003",
@@ -97086,7 +97266,11 @@
       "comuni": 85,
       "popolazione": 361607.0,
       "gettito_eur": 99230080.57,
-      "imu_pro_capite_eur": 274.4141583818897
+      "imu_pro_capite_eur": 274.4141583818897,
+      "reddito_tot_eur": 7184681800,
+      "contribuenti": 277369,
+      "reddito_pro_capite_eur": 19868.75751852149,
+      "imu_su_reddito_pct": 1.381133964346201
     },
     {
       "cod_prov": "055",
@@ -97094,7 +97278,11 @@
       "comuni": 33,
       "popolazione": 215846.0,
       "gettito_eur": 59041168.18,
-      "imu_pro_capite_eur": 273.53376101479756
+      "imu_pro_capite_eur": 273.53376101479756,
+      "reddito_tot_eur": 3604716056,
+      "contribuenti": 160468,
+      "reddito_pro_capite_eur": 16700.407030938724,
+      "imu_su_reddito_pct": 1.6378867922683338
     },
     {
       "cod_prov": "031",
@@ -97102,7 +97290,11 @@
       "comuni": 24,
       "popolazione": 136707.0,
       "gettito_eur": 37360819.36,
-      "imu_pro_capite_eur": 273.2911947449655
+      "imu_pro_capite_eur": 273.2911947449655,
+      "reddito_tot_eur": 2645444209,
+      "contribuenti": 112385,
+      "reddito_pro_capite_eur": 19351.197883063778,
+      "imu_su_reddito_pct": 1.412270167440904
     },
     {
       "cod_prov": "096",
@@ -97110,7 +97302,11 @@
       "comuni": 74,
       "popolazione": 168583.0,
       "gettito_eur": 45994676.73,
-      "imu_pro_capite_eur": 272.83104897884124
+      "imu_pro_capite_eur": 272.83104897884124,
+      "reddito_tot_eur": 3244409685,
+      "contribuenti": 134169,
+      "reddito_pro_capite_eur": 19245.177064116786,
+      "imu_su_reddito_pct": 1.417659333919785
     },
     {
       "cod_prov": "043",
@@ -97118,7 +97314,11 @@
       "comuni": 55,
       "popolazione": 302993.0,
       "gettito_eur": 81519760.32,
-      "imu_pro_capite_eur": 269.0483289052882
+      "imu_pro_capite_eur": 269.0483289052882,
+      "reddito_tot_eur": 5186800734,
+      "contribuenti": 233887,
+      "reddito_pro_capite_eur": 17118.54971567,
+      "imu_su_reddito_pct": 1.5716771185295353
     },
     {
       "cod_prov": "047",
@@ -97126,7 +97326,11 @@
       "comuni": 20,
       "popolazione": 289889.0,
       "gettito_eur": 77508167.15,
-      "imu_pro_capite_eur": 267.3718807888537
+      "imu_pro_capite_eur": 267.3718807888537,
+      "reddito_tot_eur": 4886207041,
+      "contribuenti": 218768,
+      "reddito_pro_capite_eur": 16855.441362038575,
+      "imu_su_reddito_pct": 1.5862644889918003
     },
     {
       "cod_prov": "028",
@@ -97134,7 +97338,11 @@
       "comuni": 100,
       "popolazione": 929277.0,
       "gettito_eur": 247157546.32999998,
-      "imu_pro_capite_eur": 265.9675708427089
+      "imu_pro_capite_eur": 265.9675708427089,
+      "reddito_tot_eur": 18417616758,
+      "contribuenti": 718615,
+      "reddito_pro_capite_eur": 19819.29689209999,
+      "imu_su_reddito_pct": 1.3419626957035196
     },
     {
       "cod_prov": "016",
@@ -97142,7 +97350,11 @@
       "comuni": 230,
       "popolazione": 1086973.0,
       "gettito_eur": 288618243.87,
-      "imu_pro_capite_eur": 265.5247590050535
+      "imu_pro_capite_eur": 265.5247590050535,
+      "reddito_tot_eur": 21753987530,
+      "contribuenti": 844716,
+      "reddito_pro_capite_eur": 20013.365124984706,
+      "imu_su_reddito_pct": 1.3267371946038804
     },
     {
       "cod_prov": "001",
@@ -97150,7 +97362,11 @@
       "comuni": 307,
       "popolazione": 2202495.0,
       "gettito_eur": 582281451.26,
-      "imu_pro_capite_eur": 264.37356328164196
+      "imu_pro_capite_eur": 264.37356328164196,
+      "reddito_tot_eur": 43208710519,
+      "contribuenti": 1671705,
+      "reddito_pro_capite_eur": 19618.07428348305,
+      "imu_su_reddito_pct": 1.3476020095622978
     },
     {
       "cod_prov": "054",
@@ -97158,7 +97374,11 @@
       "comuni": 58,
       "popolazione": 633051.0,
       "gettito_eur": 166379432.17,
-      "imu_pro_capite_eur": 262.82152965558856
+      "imu_pro_capite_eur": 262.82152965558856,
+      "reddito_tot_eur": 11065217567,
+      "contribuenti": 483059,
+      "reddito_pro_capite_eur": 17479.18819652761,
+      "imu_su_reddito_pct": 1.503625492789192
     },
     {
       "cod_prov": "041",
@@ -97166,7 +97386,11 @@
       "comuni": 49,
       "popolazione": 348757.0,
       "gettito_eur": 90164448.06,
-      "imu_pro_capite_eur": 258.53086263501524
+      "imu_pro_capite_eur": 258.53086263501524,
+      "reddito_tot_eur": 6212004693,
+      "contribuenti": 274180,
+      "reddito_pro_capite_eur": 17811.842322878107,
+      "imu_su_reddito_pct": 1.4514549250357434
     },
     {
       "cod_prov": "042",
@@ -97174,7 +97398,11 @@
       "comuni": 47,
       "popolazione": 461629.0,
       "gettito_eur": 118594385.91,
-      "imu_pro_capite_eur": 256.90410678271945
+      "imu_pro_capite_eur": 256.90410678271945,
+      "reddito_tot_eur": 8553345947,
+      "contribuenti": 360370,
+      "reddito_pro_capite_eur": 18528.614855219235,
+      "imu_su_reddito_pct": 1.3865262394957354
     },
     {
       "cod_prov": "068",
@@ -97182,7 +97410,11 @@
       "comuni": 46,
       "popolazione": 312246.0,
       "gettito_eur": 79743015.66999999,
-      "imu_pro_capite_eur": 255.38522725671422
+      "imu_pro_capite_eur": 255.38522725671422,
+      "reddito_tot_eur": 4899979730,
+      "contribuenti": 227047,
+      "reddito_pro_capite_eur": 15692.690154557624,
+      "imu_su_reddito_pct": 1.6274152152462065
     },
     {
       "cod_prov": "069",
@@ -97190,7 +97422,11 @@
       "comuni": 99,
       "popolazione": 367945.0,
       "gettito_eur": 93672170.49,
-      "imu_pro_capite_eur": 254.58199048770874
+      "imu_pro_capite_eur": 254.58199048770874,
+      "reddito_tot_eur": 5591112624,
+      "contribuenti": 275483,
+      "reddito_pro_capite_eur": 15195.511894440746,
+      "imu_su_reddito_pct": 1.6753762048703813
     },
     {
       "cod_prov": "012",
@@ -97198,7 +97434,11 @@
       "comuni": 129,
       "popolazione": 862229.0,
       "gettito_eur": 217334295.4,
-      "imu_pro_capite_eur": 252.06099006180494
+      "imu_pro_capite_eur": 252.06099006180494,
+      "reddito_tot_eur": 16730094692,
+      "contribuenti": 648909,
+      "reddito_pro_capite_eur": 19403.30781265766,
+      "imu_su_reddito_pct": 1.2990619563195
     },
     {
       "cod_prov": "044",
@@ -97206,7 +97446,11 @@
       "comuni": 33,
       "popolazione": 200897.0,
       "gettito_eur": 50506351.21,
-      "imu_pro_capite_eur": 251.40420817632918
+      "imu_pro_capite_eur": 251.40420817632918,
+      "reddito_tot_eur": 3367713013,
+      "contribuenti": 155048,
+      "reddito_pro_capite_eur": 16763.38129987008,
+      "imu_su_reddito_pct": 1.4997225421238707
     },
     {
       "cod_prov": "029",
@@ -97214,7 +97458,11 @@
       "comuni": 48,
       "popolazione": 222075.0,
       "gettito_eur": 55134806.89,
-      "imu_pro_capite_eur": 248.27111061578296
+      "imu_pro_capite_eur": 248.27111061578296,
+      "reddito_tot_eur": 4062195754,
+      "contribuenti": 182460,
+      "reddito_pro_capite_eur": 18291.99934256445,
+      "imu_su_reddito_pct": 1.3572661247481577
     },
     {
       "cod_prov": "094",
@@ -97222,7 +97470,11 @@
       "comuni": 44,
       "popolazione": 74269.0,
       "gettito_eur": 18265220.41,
-      "imu_pro_capite_eur": 245.9333020506537
+      "imu_pro_capite_eur": 245.9333020506537,
+      "reddito_tot_eur": 1128408028,
+      "contribuenti": 59135,
+      "reddito_pro_capite_eur": 15193.526612718631,
+      "imu_su_reddito_pct": 1.618671611400482
     },
     {
       "cod_prov": "057",
@@ -97230,7 +97482,11 @@
       "comuni": 65,
       "popolazione": 142722.0,
       "gettito_eur": 35097310.24,
-      "imu_pro_capite_eur": 245.91380614060904
+      "imu_pro_capite_eur": 245.91380614060904,
+      "reddito_tot_eur": 2354589275,
+      "contribuenti": 108438,
+      "reddito_pro_capite_eur": 16497.731779263184,
+      "imu_su_reddito_pct": 1.49059161241614
     },
     {
       "cod_prov": "024",
@@ -97238,7 +97494,11 @@
       "comuni": 112,
       "popolazione": 845338.0,
       "gettito_eur": 207084725.46,
-      "imu_pro_capite_eur": 244.9726919409751
+      "imu_pro_capite_eur": 244.9726919409751,
+      "reddito_tot_eur": 16673746569,
+      "contribuenti": 664145,
+      "reddito_pro_capite_eur": 19724.354718467643,
+      "imu_su_reddito_pct": 1.2419807666083522
     },
     {
       "cod_prov": "070",
@@ -97246,7 +97506,11 @@
       "comuni": 82,
       "popolazione": 207898.0,
       "gettito_eur": 50642671.37,
-      "imu_pro_capite_eur": 243.59383625624102
+      "imu_pro_capite_eur": 243.59383625624102,
+      "reddito_tot_eur": 2886748693,
+      "contribuenti": 152683,
+      "reddito_pro_capite_eur": 13885.408676370143,
+      "imu_su_reddito_pct": 1.75431520910712
     },
     {
       "cod_prov": "035",
@@ -97254,7 +97518,11 @@
       "comuni": 42,
       "popolazione": 528877.0,
       "gettito_eur": 128447883.15,
-      "imu_pro_capite_eur": 242.86910406389387
+      "imu_pro_capite_eur": 242.86910406389387,
+      "reddito_tot_eur": 10609142607,
+      "contribuenti": 406017,
+      "reddito_pro_capite_eur": 20059.754171574867,
+      "imu_su_reddito_pct": 1.2107282172383
     },
     {
       "cod_prov": "019",
@@ -97262,7 +97530,11 @@
       "comuni": 109,
       "popolazione": 348097.0,
       "gettito_eur": 84055937.47,
-      "imu_pro_capite_eur": 241.47274314343414
+      "imu_pro_capite_eur": 241.47274314343414,
+      "reddito_tot_eur": 6878191660,
+      "contribuenti": 271603,
+      "reddito_pro_capite_eur": 19759.410911326442,
+      "imu_su_reddito_pct": 1.2220644847515052
     },
     {
       "cod_prov": "026",
@@ -97270,7 +97542,11 @@
       "comuni": 93,
       "popolazione": 876014.0,
       "gettito_eur": 210531875.93,
-      "imu_pro_capite_eur": 240.3293508208773
+      "imu_pro_capite_eur": 240.3293508208773,
+      "reddito_tot_eur": 16976234773,
+      "contribuenti": 679509,
+      "reddito_pro_capite_eur": 19378.953730191526,
+      "imu_su_reddito_pct": 1.2401564819593698
     },
     {
       "cod_prov": "018",
@@ -97278,7 +97554,11 @@
       "comuni": 177,
       "popolazione": 529860.0,
       "gettito_eur": 125690990.94,
-      "imu_pro_capite_eur": 237.21547378552825
+      "imu_pro_capite_eur": 237.21547378552825,
+      "reddito_tot_eur": 10344838250,
+      "contribuenti": 411173,
+      "reddito_pro_capite_eur": 19523.719944891105,
+      "imu_su_reddito_pct": 1.2150116599454805
     },
     {
       "cod_prov": "108",
@@ -97286,7 +97566,11 @@
       "comuni": 54,
       "popolazione": 868972.0,
       "gettito_eur": 205823592.38,
-      "imu_pro_capite_eur": 236.85871625322795
+      "imu_pro_capite_eur": 236.85871625322795,
+      "reddito_tot_eur": 18882582246,
+      "contribuenti": 668983,
+      "reddito_pro_capite_eur": 21729.793648126753,
+      "imu_su_reddito_pct": 1.090018249085613
     },
     {
       "cod_prov": "109",
@@ -97294,7 +97578,11 @@
       "comuni": 40,
       "popolazione": 167345.0,
       "gettito_eur": 39628500.410000004,
-      "imu_pro_capite_eur": 236.8071971675282
+      "imu_pro_capite_eur": 236.8071971675282,
+      "reddito_tot_eur": 2654486745,
+      "contribuenti": 128170,
+      "reddito_pro_capite_eur": 15862.360662105231,
+      "imu_su_reddito_pct": 1.4928874851096685
     },
     {
       "cod_prov": "083",
@@ -97302,7 +97590,11 @@
       "comuni": 87,
       "popolazione": 561972.0,
       "gettito_eur": 131702257.87,
-      "imu_pro_capite_eur": 234.35733073889804
+      "imu_pro_capite_eur": 234.35733073889804,
+      "reddito_tot_eur": 7807055089,
+      "contribuenti": 395083,
+      "reddito_pro_capite_eur": 13892.24923839622,
+      "imu_su_reddito_pct": 1.6869646283854987
     },
     {
       "cod_prov": "072",
@@ -97310,7 +97602,11 @@
       "comuni": 41,
       "popolazione": 1221682.0,
       "gettito_eur": 281356292.37,
-      "imu_pro_capite_eur": 230.30239650743812
+      "imu_pro_capite_eur": 230.30239650743812,
+      "reddito_tot_eur": 17415673699,
+      "contribuenti": 850680,
+      "reddito_pro_capite_eur": 14255.48849782513,
+      "imu_su_reddito_pct": 1.6155349326862696
     },
     {
       "cod_prov": "092",
@@ -97318,7 +97614,11 @@
       "comuni": 17,
       "popolazione": 418962.0,
       "gettito_eur": 96479952.99000001,
-      "imu_pro_capite_eur": 230.2833025190829
+      "imu_pro_capite_eur": 230.2833025190829,
+      "reddito_tot_eur": 6888403002,
+      "contribuenti": 293820,
+      "reddito_pro_capite_eur": 16441.593753132744,
+      "imu_su_reddito_pct": 1.4006142347070536
     },
     {
       "cod_prov": "089",
@@ -97326,7 +97626,11 @@
       "comuni": 20,
       "popolazione": 362018.0,
       "gettito_eur": 83038459.85,
-      "imu_pro_capite_eur": 229.37660516880374
+      "imu_pro_capite_eur": 229.37660516880374,
+      "reddito_tot_eur": 4656448063,
+      "contribuenti": 240155,
+      "reddito_pro_capite_eur": 12862.476625471661,
+      "imu_su_reddito_pct": 1.7833004626384898
     },
     {
       "cod_prov": "081",
@@ -97334,7 +97638,11 @@
       "comuni": 23,
       "popolazione": 395510.0,
       "gettito_eur": 89859891.82,
-      "imu_pro_capite_eur": 227.20005011251294
+      "imu_pro_capite_eur": 227.20005011251294,
+      "reddito_tot_eur": 4773217867,
+      "contribuenti": 266390,
+      "reddito_pro_capite_eur": 12068.513734166014,
+      "imu_su_reddito_pct": 1.8825851725992457
     },
     {
       "cod_prov": "005",
@@ -97342,7 +97650,11 @@
       "comuni": 115,
       "popolazione": 203906.0,
       "gettito_eur": 45972421.35,
-      "imu_pro_capite_eur": 225.45889453964082
+      "imu_pro_capite_eur": 225.45889453964082,
+      "reddito_tot_eur": 3666474474,
+      "contribuenti": 157833,
+      "reddito_pro_capite_eur": 17981.199542926643,
+      "imu_su_reddito_pct": 1.2538590320484528
     },
     {
       "cod_prov": "059",
@@ -97350,7 +97662,11 @@
       "comuni": 31,
       "popolazione": 558979.0,
       "gettito_eur": 124816843.49,
-      "imu_pro_capite_eur": 223.29433393741087
+      "imu_pro_capite_eur": 223.29433393741087,
+      "reddito_tot_eur": 8084108955,
+      "contribuenti": 399679,
+      "reddito_pro_capite_eur": 14462.276677656942,
+      "imu_su_reddito_pct": 1.5439777492459588
     },
     {
       "cod_prov": "071",
@@ -97358,7 +97674,11 @@
       "comuni": 56,
       "popolazione": 586622.0,
       "gettito_eur": 128980745.24000001,
-      "imu_pro_capite_eur": 219.87028314655777
+      "imu_pro_capite_eur": 219.87028314655777,
+      "reddito_tot_eur": 6870873237,
+      "contribuenti": 394328,
+      "reddito_pro_capite_eur": 11712.607500230131,
+      "imu_su_reddito_pct": 1.8772103747371174
     },
     {
       "cod_prov": "110",
@@ -97366,7 +97686,11 @@
       "comuni": 10,
       "popolazione": 377929.0,
       "gettito_eur": 82405971.2,
-      "imu_pro_capite_eur": 218.04617057701316
+      "imu_pro_capite_eur": 218.04617057701316,
+      "reddito_tot_eur": 4208085960,
+      "contribuenti": 245358,
+      "reddito_pro_capite_eur": 11134.59395812441,
+      "imu_su_reddito_pct": 1.95827680288166
     },
     {
       "cod_prov": "088",
@@ -97374,7 +97698,11 @@
       "comuni": 12,
       "popolazione": 319236.0,
       "gettito_eur": 68026039.22,
-      "imu_pro_capite_eur": 213.09012523650213
+      "imu_pro_capite_eur": 213.09012523650213,
+      "reddito_tot_eur": 3629600782,
+      "contribuenti": 213414,
+      "reddito_pro_capite_eur": 11369.64747710158,
+      "imu_su_reddito_pct": 1.8742016906475307
     },
     {
       "cod_prov": "074",
@@ -97382,7 +97710,11 @@
       "comuni": 19,
       "popolazione": 369067.0,
       "gettito_eur": 78337563.99,
-      "imu_pro_capite_eur": 212.25838124243023
+      "imu_pro_capite_eur": 212.25838124243023,
+      "reddito_tot_eur": 4898652185,
+      "contribuenti": 264230,
+      "reddito_pro_capite_eur": 13273.070160702528,
+      "imu_su_reddito_pct": 1.599165669076789
     },
     {
       "cod_prov": "065",
@@ -97390,7 +97722,11 @@
       "comuni": 143,
       "popolazione": 979471.0,
       "gettito_eur": 203055344.32,
-      "imu_pro_capite_eur": 207.31123669817686
+      "imu_pro_capite_eur": 207.31123669817686,
+      "reddito_tot_eur": 13158693385,
+      "contribuenti": 696824,
+      "reddito_pro_capite_eur": 13434.490030843179,
+      "imu_su_reddito_pct": 1.5431269532541052
     },
     {
       "cod_prov": "075",
@@ -97398,7 +97734,11 @@
       "comuni": 94,
       "popolazione": 757126.0,
       "gettito_eur": 154702108.85999998,
-      "imu_pro_capite_eur": 204.32808919519337
+      "imu_pro_capite_eur": 204.32808919519337,
+      "reddito_tot_eur": 9838174656,
+      "contribuenti": 538388,
+      "reddito_pro_capite_eur": 12994.104886108786,
+      "imu_su_reddito_pct": 1.5724675996237973
     },
     {
       "cod_prov": "077",
@@ -97406,7 +97746,11 @@
       "comuni": 25,
       "popolazione": 174097.0,
       "gettito_eur": 35063164.03,
-      "imu_pro_capite_eur": 201.4001621509848
+      "imu_pro_capite_eur": 201.4001621509848,
+      "reddito_tot_eur": 2534827753,
+      "contribuenti": 134063,
+      "reddito_pro_capite_eur": 14559.85888901015,
+      "imu_su_reddito_pct": 1.383256278005569
     },
     {
       "cod_prov": "073",
@@ -97414,7 +97758,11 @@
       "comuni": 28,
       "popolazione": 549989.0,
       "gettito_eur": 109688714.0,
-      "imu_pro_capite_eur": 199.43801421482976
+      "imu_pro_capite_eur": 199.43801421482976,
+      "reddito_tot_eur": 7300582308,
+      "contribuenti": 375421,
+      "reddito_pro_capite_eur": 13274.051495575366,
+      "imu_su_reddito_pct": 1.5024652743083626
     },
     {
       "cod_prov": "098",
@@ -97422,7 +97770,11 @@
       "comuni": 60,
       "popolazione": 229473.0,
       "gettito_eur": 45726293.0,
-      "imu_pro_capite_eur": 199.2665498773276
+      "imu_pro_capite_eur": 199.2665498773276,
+      "reddito_tot_eur": 4485566608,
+      "contribuenti": 172929,
+      "reddito_pro_capite_eur": 19547.25221703643,
+      "imu_su_reddito_pct": 1.0194095193781592
     },
     {
       "cod_prov": "078",
@@ -97430,7 +97782,11 @@
       "comuni": 143,
       "popolazione": 661751.0,
       "gettito_eur": 125763514.69,
-      "imu_pro_capite_eur": 190.04658049628938
+      "imu_pro_capite_eur": 190.04658049628938,
+      "reddito_tot_eur": 7617942371,
+      "contribuenti": 439076,
+      "reddito_pro_capite_eur": 11511.795782703766,
+      "imu_su_reddito_pct": 1.6508856140571084
     },
     {
       "cod_prov": "064",
@@ -97438,7 +97794,11 @@
       "comuni": 109,
       "popolazione": 375876.0,
       "gettito_eur": 66078256.22,
-      "imu_pro_capite_eur": 175.79801908076067
+      "imu_pro_capite_eur": 175.79801908076067,
+      "reddito_tot_eur": 5108381546,
+      "contribuenti": 268957,
+      "reddito_pro_capite_eur": 13590.603140397365,
+      "imu_su_reddito_pct": 1.293526249458423
     },
     {
       "cod_prov": "062",
@@ -97446,7 +97806,11 @@
       "comuni": 74,
       "popolazione": 251695.0,
       "gettito_eur": 42966046.8,
-      "imu_pro_capite_eur": 170.7067951290252
+      "imu_pro_capite_eur": 170.7067951290252,
+      "reddito_tot_eur": 3286493221,
+      "contribuenti": 178379,
+      "reddito_pro_capite_eur": 13057.44341762848,
+      "imu_su_reddito_pct": 1.3073523634692445
     },
     {
       "cod_prov": "080",
@@ -97454,7 +97818,11 @@
       "comuni": 88,
       "popolazione": 486626.0,
       "gettito_eur": 80384669.73,
-      "imu_pro_capite_eur": 165.18778225988748
+      "imu_pro_capite_eur": 165.18778225988748,
+      "reddito_tot_eur": 6024217375,
+      "contribuenti": 328810,
+      "reddito_pro_capite_eur": 12379.563309399826,
+      "imu_su_reddito_pct": 1.3343587179239198
     },
     {
       "cod_prov": "076",
@@ -97462,7 +97830,11 @@
       "comuni": 87,
       "popolazione": 327192.0,
       "gettito_eur": 53564858.71,
-      "imu_pro_capite_eur": 163.71078360717866
+      "imu_pro_capite_eur": 163.71078360717866,
+      "reddito_tot_eur": 4683899096,
+      "contribuenti": 241257,
+      "reddito_pro_capite_eur": 14315.445047556175,
+      "imu_su_reddito_pct": 1.1435954876940844
     },
     {
       "cod_prov": "060",
@@ -97470,7 +97842,11 @@
       "comuni": 77,
       "popolazione": 411022.0,
       "gettito_eur": 66542484.89,
-      "imu_pro_capite_eur": 161.8951902574558
+      "imu_pro_capite_eur": 161.8951902574558,
+      "reddito_tot_eur": 6493672360,
+      "contribuenti": 316439,
+      "reddito_pro_capite_eur": 15798.84376018802,
+      "imu_su_reddito_pct": 1.02472809222546
     },
     {
       "cod_prov": "061",
@@ -97478,7 +97854,11 @@
       "comuni": 84,
       "popolazione": 776349.0,
       "gettito_eur": 124890961.76,
-      "imu_pro_capite_eur": 160.8696111671426
+      "imu_pro_capite_eur": 160.8696111671426,
+      "reddito_tot_eur": 10363785767,
+      "contribuenti": 544671,
+      "reddito_pro_capite_eur": 13349.390244593604,
+      "imu_su_reddito_pct": 1.205070855069905
     },
     {
       "cod_prov": "085",
@@ -97486,7 +97866,11 @@
       "comuni": 20,
       "popolazione": 220842.0,
       "gettito_eur": 34828082.95,
-      "imu_pro_capite_eur": 157.7058845237772
+      "imu_pro_capite_eur": 157.7058845237772,
+      "reddito_tot_eur": 2772759662,
+      "contribuenti": 153029,
+      "reddito_pro_capite_eur": 12555.400068827488,
+      "imu_su_reddito_pct": 1.2560801221725217
     },
     {
       "cod_prov": "091",
@@ -97494,7 +97878,11 @@
       "comuni": 69,
       "popolazione": 188560.0,
       "gettito_eur": 29421358.41,
-      "imu_pro_capite_eur": 156.03181167798047
+      "imu_pro_capite_eur": 156.03181167798047,
+      "reddito_tot_eur": 2620333988,
+      "contribuenti": 142329,
+      "reddito_pro_capite_eur": 13896.552757742893,
+      "imu_su_reddito_pct": 1.1228094794303756
     },
     {
       "cod_prov": "086",
@@ -97502,7 +97890,11 @@
       "comuni": 17,
       "popolazione": 141613.0,
       "gettito_eur": 21916591.66,
-      "imu_pro_capite_eur": 154.76398113167576
+      "imu_pro_capite_eur": 154.76398113167576,
+      "reddito_tot_eur": 1739752604,
+      "contribuenti": 98898,
+      "reddito_pro_capite_eur": 12285.260562236517,
+      "imu_su_reddito_pct": 1.2597533470914122
     },
     {
       "cod_prov": "079",
@@ -97510,7 +97902,11 @@
       "comuni": 77,
       "popolazione": 332164.0,
       "gettito_eur": 50454585.6,
-      "imu_pro_capite_eur": 151.89661010825978
+      "imu_pro_capite_eur": 151.89661010825978,
+      "reddito_tot_eur": 4164742442,
+      "contribuenti": 221990,
+      "reddito_pro_capite_eur": 12538.21137149119,
+      "imu_su_reddito_pct": 1.2114695278916363
     },
     {
       "cod_prov": "102",
@@ -97518,7 +97914,11 @@
       "comuni": 47,
       "popolazione": 146767.0,
       "gettito_eur": 22067718.96,
-      "imu_pro_capite_eur": 150.35886105187134
+      "imu_pro_capite_eur": 150.35886105187134,
+      "reddito_tot_eur": 1698111554,
+      "contribuenti": 99473,
+      "reddito_pro_capite_eur": 11570.118309974314,
+      "imu_su_reddito_pct": 1.2995447153055528
     },
     {
       "cod_prov": "101",
@@ -97526,7 +97926,11 @@
       "comuni": 24,
       "popolazione": 156717.0,
       "gettito_eur": 22952236.64,
-      "imu_pro_capite_eur": 146.45658505458886
+      "imu_pro_capite_eur": 146.45658505458886,
+      "reddito_tot_eur": 1627088789,
+      "contribuenti": 95983,
+      "reddito_pro_capite_eur": 10382.337519222549,
+      "imu_su_reddito_pct": 1.4106320930467673
     },
     {
       "cod_prov": "111",
@@ -97534,7 +97938,11 @@
       "comuni": 107,
       "popolazione": 331817.0,
       "gettito_eur": 48070224.29,
-      "imu_pro_capite_eur": 144.86968506737148
+      "imu_pro_capite_eur": 144.86968506737148,
+      "reddito_tot_eur": 4178441625,
+      "contribuenti": 229681,
+      "reddito_pro_capite_eur": 12592.608651756842,
+      "imu_su_reddito_pct": 1.1504342672251644
     },
     {
       "cod_prov": "095",
@@ -97542,7 +97950,11 @@
       "comuni": 82,
       "popolazione": 147834.0,
       "gettito_eur": 21225084.84,
-      "imu_pro_capite_eur": 143.57377085108973
+      "imu_pro_capite_eur": 143.57377085108973,
+      "reddito_tot_eur": 1981350473,
+      "contribuenti": 105930,
+      "reddito_pro_capite_eur": 13402.535769849967,
+      "imu_su_reddito_pct": 1.0712433327286464
     },
     {
       "cod_prov": "087",
@@ -97550,7 +97962,11 @@
       "comuni": 54,
       "popolazione": 1047325.0,
       "gettito_eur": 146599057.39000002,
-      "imu_pro_capite_eur": 139.97475224023108
+      "imu_pro_capite_eur": 139.97475224023108,
+      "reddito_tot_eur": 12298479153,
+      "contribuenti": 629451,
+      "reddito_pro_capite_eur": 11742.753350679111,
+      "imu_su_reddito_pct": 1.1920096425438076
     },
     {
       "cod_prov": "084",
@@ -97558,7 +97974,11 @@
       "comuni": 35,
       "popolazione": 374930.0,
       "gettito_eur": 51968703.14,
-      "imu_pro_capite_eur": 138.6090820686528
+      "imu_pro_capite_eur": 138.6090820686528,
+      "reddito_tot_eur": 4345261496,
+      "contribuenti": 253034,
+      "reddito_pro_capite_eur": 11589.527367775318,
+      "imu_su_reddito_pct": 1.195985631424931
     },
     {
       "cod_prov": "082",
@@ -97566,7 +97986,11 @@
       "comuni": 71,
       "popolazione": 1162376.0,
       "gettito_eur": 157489301.95,
-      "imu_pro_capite_eur": 135.48912051694114
+      "imu_pro_capite_eur": 135.48912051694114,
+      "reddito_tot_eur": 14202585735,
+      "contribuenti": 706163,
+      "reddito_pro_capite_eur": 12218.581366958711,
+      "imu_su_reddito_pct": 1.1088776712109034
     }
   ],
   "redistribuzione": {
