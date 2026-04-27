@@ -204,11 +204,12 @@ def load_historical_csv():
     return rows
 
 
-def historical_monthly_snapshots(csv_rows, anchor_count):
+def historical_monthly_snapshots(csv_rows, anchor_count, anchor_cumsum=None):
     """Dai gain giornalieri del CSV, ricostruisce snapshot mensili cumulativi.
 
-    anchor_count è il conteggio iscritti attuale (dall'API).
-    offset = anchor_count − sum(tutti i gain) → valore iniziale stimato.
+    anchor_count è il conteggio iscritti al punto di ancoraggio.
+    anchor_cumsum è il cumsum CSV al punto di ancoraggio (default: cumsum totale).
+    offset = anchor_count − anchor_cumsum.
     Per ogni mese prende l'ultimo giorno disponibile e riporta offset + cumsum.
     """
     if not csv_rows:
@@ -219,7 +220,9 @@ def historical_monthly_snapshots(csv_rows, anchor_count):
         cumsum += gain
         cumulative.append((date_str, cumsum))
 
-    offset = anchor_count - cumsum
+    if anchor_cumsum is None:
+        anchor_cumsum = cumsum
+    offset = anchor_count - anchor_cumsum
 
     monthly = {}
     for date_str, cum in cumulative:
@@ -230,14 +233,28 @@ def historical_monthly_snapshots(csv_rows, anchor_count):
 
 
 def build_full_sub_history(csv_rows, existing_history, current_count):
-    """Combina storico CSV (mensile) + snapshot API giornalieri."""
+    """Combina storico CSV (mensile) + snapshot API giornalieri.
+
+    L'offset CSV è ancorato alla PRIMA entry API disponibile (continuità tra
+    fine CSV e inizio API). Senza questa correzione, il `current_count` cresce
+    nel tempo ma le entry API storiche restano scolpite nei loro valori
+    originali, creando un gradino artificiale (e gain mensili negativi falsi).
+    """
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     if csv_rows:
-        hist_monthly = historical_monthly_snapshots(csv_rows, current_count)
         last_csv_date = csv_rows[-1][0]
         # Mantieni solo le entry API successive all'ultimo giorno del CSV
         api_entries = [e for e in existing_history if e["date"] > last_csv_date]
+        # Anchor: prima entry API disponibile (fallback al current count se assente)
+        if api_entries:
+            anchor_count = api_entries[0]["count"]
+        else:
+            anchor_count = current_count
+        anchor_cumsum = sum(g for _, g in csv_rows)
+        hist_monthly = historical_monthly_snapshots(
+            csv_rows, anchor_count, anchor_cumsum=anchor_cumsum
+        )
     else:
         hist_monthly = []
         api_entries = list(existing_history)
