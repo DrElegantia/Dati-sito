@@ -1,2 +1,7 @@
 __pycache__/
 *.pyc
+
+# Blocco dati personali: i briefing mattutini NON devono mai stare in questa repo pubblica
+docs/briefing-*.md
+docs/briefing*.md
+briefing-*.md

@@ -1,0 +1,37 @@
+name: blocca-briefing-personali
+
+# Difesa in profondita: questa repo e PUBBLICA con GitHub Pages attivo su /docs.
+# I briefing mattutini contengono dati personali e NON devono mai finire qui.
+# Se un push reintroduce un file briefing-*.md, questo workflow lo rimuove subito
+# e fallisce in modo rumoroso per segnalare il problema alla sorgente.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  rimuovi-briefing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Cerca e rimuovi briefing personali
+        run: |
+          set -e
+          MATCHES=$(git ls-files 'docs/briefing-*.md' 'docs/briefing*.md' 'briefing-*.md' || true)
+          if [ -n "$MATCHES" ]; then
+            echo "::error::Trovati file briefing personali in repo pubblica, rimozione automatica:"
+            echo "$MATCHES"
+            git rm -q $MATCHES
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git commit -m "security: rimozione automatica briefing personali (repo pubblica)"
+            git push
+            echo "::error::Briefing rimossi. CONTROLLARE la sorgente cloud che li pubblica."
+            exit 1
+          fi
+          echo "OK: nessun briefing personale presente."
