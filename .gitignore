@@ -5,3 +5,8 @@ __pycache__/
 docs/briefing-*.md
 docs/briefing*.md
 briefing-*.md
+
+# Segreti e rumore: mai in questa repo pubblica
+.env
+.env.*
+.DS_Store
