@@ -145,12 +145,19 @@ def to_records(df, cols):
     return out.to_dict(orient="records")
 
 def main():
-    requested_year = "2024"
     out_path = Path("docs/earn_nt_net_dashboard.json")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     long_df, years = load_data_long()
-    year = requested_year if requested_year in years else (years[-1] if years else requested_year)
+    # ultimo anno con Netto e Costo al 100% per tutti i paesi
+    complete = [
+        y for y in years
+        if pivot_year(long_df, y)
+        .query("Livello == '100%'")
+        .dropna(subset=["Netto", "Costo"])["geo\\TIME_PERIOD"]
+        .nunique() == len(PAESI)
+    ]
+    year = complete[-1] if complete else years[-1]
 
     pivot = pivot_year(long_df, year)
     kpi = compute_kpi(pivot)
